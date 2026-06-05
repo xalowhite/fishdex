@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FishDex — Angler's Field Guide to North America</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root{
+    --bg:#0d1b24; --panel:#12252f; --panel2:#173039; --line:#244553;
+    --ink:#e9f3f2; --muted:#8fa9b0; --accent:#37b6a0; --accent2:#5ad1bb;
+    --warn:#e6a23c; --peak:#3ddc84; --good:#9bd95a; --slow:#5d7681;
+    --chip:#1d3a44; --shadow:0 4px 18px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  #app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(90deg,#0e2530,#12313d);
+    border-bottom:1px solid var(--line);flex:0 0 auto}
+  header h1{font-size:18px;margin:0;letter-spacing:.5px;font-weight:700}
+  header h1 .fin{color:var(--accent2)}
+  header .tag{font-size:12px;color:var(--muted);margin-left:2px}
+  header .spacer{flex:1}
+  .main{display:flex;flex:1;min-height:0}
+
+  /* ---------- Rolodex (left) ---------- */
+  .rolodex{width:38%;max-width:480px;min-width:300px;display:flex;flex-direction:column;
+    background:var(--panel);border-right:1px solid var(--line)}
+  .rolodex .search{padding:10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+  .rolodex input[type=text]{width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);font-size:14px;outline:none}
+  .rolodex input::placeholder{color:var(--muted)}
+  .ctxbar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);min-height:18px}
+  .ctxbar b{color:var(--accent2)}
+  .ctxbar button{margin-left:auto;background:var(--chip);border:1px solid var(--line);color:var(--ink);
+    border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer}
+  .grp{padding:8px 12px 3px;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);
+    position:sticky;top:0;background:var(--panel);z-index:1}
+  .list{overflow-y:auto;flex:1;padding-bottom:24px}
+  .card{margin:6px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);
+    cursor:pointer;transition:border-color .15s,transform .05s}
+  .card:hover{border-color:var(--accent)}
+  .card.sel{border-color:var(--accent2);background:#16323c;box-shadow:var(--shadow)}
+  .card.dim{opacity:.42}
+  .card .row1{display:flex;align-items:center;gap:10px}
+  .thumb{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:46px;height:30px;
+    background:#0e222b;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:none}
+  .card .nm{font-weight:600;font-size:15px}
+  .card .sci{font-size:11px;color:var(--muted);font-style:italic}
+  .card .meta{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px}
+  .pill{font-size:10.5px;padding:2px 7px;border-radius:20px;background:var(--chip);color:var(--accent2);border:1px solid var(--line)}
+  .pill.fight{color:#e9c96b;letter-spacing:1px}
+  .bite{margin-left:auto;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .bite.peak{background:#103a26;color:var(--peak);border:1px solid #1f6b46}
+  .bite.good{background:#2e3a16;color:var(--good);border:1px solid #4d6b1f}
+  .bite.slow{background:#23323a;color:var(--slow);border:1px solid var(--line)}
+  .subs{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);display:none;flex-direction:column;gap:4px}
+  .card.open .subs{display:flex}
+  .sub{display:flex;gap:8px;align-items:center;font-size:12.5px;padding:3px 6px;border-radius:6px;cursor:pointer}
+  .sub:hover{background:#1b3540}
+  .sub.sel{background:#16323c;color:var(--accent2)}
+  .sub .sn{font-weight:600}
+  .sub .ss{color:var(--muted);font-style:italic;font-size:10.5px}
+
+  /* ---------- Right side ---------- */
+  .right{flex:1;display:flex;flex-direction:column;min-width:0}
+  .filters{flex:0 0 auto;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .filters .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .toggle{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  .switch{width:42px;height:23px;border-radius:20px;background:var(--line);position:relative;transition:.2s;flex:0 0 auto}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;
+    background:#cfe;transition:.2s}
+  .toggle.on .switch{background:var(--accent)}
+  .toggle.on .switch::after{left:21px}
+  .toggle .lbl{font-size:13px;font-weight:600}
+  .toggle .sub{font-size:11px;color:var(--muted)}
+  #nowBtn{background:var(--accent);border:none;color:#06231d;font-weight:700;border-radius:7px;
+    padding:7px 12px;font-size:12.5px;cursor:pointer}
+  #nowBtn:hover{background:var(--accent2)}
+  .ghostbtn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:7px;
+    padding:7px 12px;font-size:12.5px;cursor:pointer}
+  .ghostbtn.on{background:#23464f;border-color:var(--accent);color:var(--accent2);font-weight:700}
+  .anglefilters{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px}
+  .anglefilters.hide{display:none}
+  .fgroup{display:flex;flex-direction:column;gap:5px}
+  .fgroup .h{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+  .seg{display:flex;flex-wrap:wrap;gap:4px}
+  .seg button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:6px;
+    padding:4px 9px;font-size:12px;cursor:pointer}
+  .seg button.on{background:var(--accent);border-color:var(--accent);color:#06231d;font-weight:700}
+  select.mon{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 8px;font-size:12px}
+  .mapwrap{flex:1;position:relative;min-height:0}
+  #map{position:absolute;inset:0;background:#0a141a}
+  .legend{position:absolute;right:12px;bottom:18px;z-index:500;background:rgba(15,33,41,.92);
+    border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:11.5px;line-height:1.7;color:var(--ink);box-shadow:var(--shadow)}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  .info{position:absolute;left:12px;top:12px;z-index:500;width:330px;max-width:calc(100% - 24px);background:rgba(15,33,41,.96);
+    border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);display:none;
+    max-height:calc(100% - 24px);overflow:hidden auto}
+  .info.show{display:block}
+  .info .hero{width:100%;height:150px;object-fit:cover;display:none;background:#0e222b;border-bottom:1px solid var(--line)}
+  .info .pad{padding:12px 14px}
+  .info .ihead{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+  .info .iart{background:#0e222b;border:1px solid var(--line);border-radius:8px;padding:3px 5px;display:flex}
+  .info h3{margin:0 0 2px;font-size:16px}
+  .info h3 .subname{font-size:12px;color:var(--accent2);font-weight:600}
+  .info .sci{font-size:11px;color:var(--muted);font-style:italic}
+  .info .kv{font-size:12px;margin:4px 0;color:var(--muted);line-height:1.45}
+  .info .kv b{color:var(--ink);font-weight:600}
+  .info .stars{color:#e9c96b;letter-spacing:1px}
+  .info .baits{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .info .reglink{display:inline-block;margin-top:8px;background:var(--accent);color:#06231d;font-weight:700;
+    text-decoration:none;border-radius:7px;padding:7px 11px;font-size:12.5px}
+  .info .reglink:hover{background:var(--accent2)}
+  .info .disclaimer{font-size:10.5px;color:var(--muted);margin-top:8px;line-height:1.4}
+  .info .speclist{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+  .info .speclist .pill{cursor:pointer}
+  .info .credit{font-size:9.5px;color:#5d7681;margin-top:6px}
+  .leaflet-tooltip.stt{background:#0e2530;border:1px solid var(--accent);color:var(--ink);font-weight:600}
+  .leaflet-tooltip.eco{background:#241f12;border:1px solid #b78b3a;color:#f1e3c4;font-weight:600}
+  .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;z-index:600}
+  @media (max-width:760px){
+    .main{flex-direction:column}
+    .rolodex{width:100%;max-width:none;height:42%;border-right:none;border-bottom:1px solid var(--line)}
+    .right{height:58%}
+    .info{width:240px}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>🎣 Fish<span class="fin">Dex</span></h1>
+    <span class="tag">North American angler's field guide</span>
+    <span class="spacer"></span>
+    <span class="tag" id="count"></span>
+  </header>
+  <div class="main">
+    <aside class="rolodex">
+      <div class="search">
+        <input id="q" type="text" placeholder="Search species, family, bait, diet…" autocomplete="off" />
+        <div class="ctxbar" id="ctx"><span>Showing all North American game fish</span></div>
+      </div>
+      <div class="list" id="list"></div>
+    </aside>
+    <section class="right">
+      <div class="filters">
+        <div class="top">
+          <label class="toggle" id="angleToggle">
+            <span class="switch"></span>
+            <span><span class="lbl">Angling mode</span><br><span class="sub">rank by season, month & time of day</span></span>
+          </label>
+          <button id="nowBtn">🎣 What's biting now</button>
+          <button id="ecoBtn" class="ghostbtn">🗺️ Ecoregions: off</button>
+          <div class="ctxbar" style="margin-left:auto" id="hint">Tip: click any state, province, or Mexican state to see what swims there.</div>
+        </div>
+        <div class="anglefilters hide" id="angleFilters">
+          <div class="fgroup">
+            <div class="h">Month</div>
+            <select class="mon" id="month"><option value="">Any month</option></select>
+          </div>
+          <div class="fgroup"><div class="h">Time of day</div><div class="seg" id="tod"></div></div>
+          <div class="fgroup"><div class="h">Water type</div><div class="seg" id="water"></div></div>
+        </div>
+      </div>
+      <div class="mapwrap">
+        <div id="map"></div>
+        <div class="loading" id="loading">Loading North America…</div>
+        <div class="info" id="info"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+    </section>
+  </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ============================================================
+   FishDex data v2 — curated North American game fish
+   Coverage: USA (incl. AK & HI), Canada (provinces/territories),
+   Mexico (states). Ranges are approximate native+established
+   distributions by state/province. Seasons/months/time reflect
+   typical PEAK angling activity, not absolute presence.
+   Educational starting set — edit & expand freely.
+
+   Fields per fish:
+     id, name, sci, family, emoji, shape (svg silhouette key)
+     water[]    : habitat types (used as a hard filter)
+     habitat    : one-line description
+     states[]   : state/province/Mexican-state names (accent-insensitive match)
+     bestMonths : 1-12 peak months
+     tod[]      : peak times of day
+     tempF      : preferred water temp band
+     baits[]    : top producers
+     diet       : primary forage
+     fight      : 1-5 sportfighting rating
+     record     : approx. IGFA all-tackle world record (lb)
+     regs       : generic regulation reminder
+     tide       : tide/solunar relevance note ("" if N/A)
+     tip        : tactical note
+     subs[]     : optional subspecies {n, s, states[]}
+   ============================================================ */
+
+// -------- Region presets (names match GeoJSON "name", accent-insensitive) --------
+const REGION = {
+  // USA
+  PNW:        ["Washington","Oregon","Idaho"],
+  CALIF:      ["California"],
+  GREATBASIN: ["Nevada","Utah"],
+  ROCKIES:    ["Montana","Wyoming","Colorado","Idaho","Utah"],
+  SOUTHWEST:  ["Arizona","New Mexico"],
+  PLAINS:     ["North Dakota","South Dakota","Nebraska","Kansas","Oklahoma"],
+  MIDWEST:    ["Minnesota","Wisconsin","Iowa","Missouri","Illinois","Indiana","Michigan","Ohio"],
+  GREATLAKES: ["Minnesota","Wisconsin","Michigan","Illinois","Indiana","Ohio","New York","Pennsylvania"],
+  NORTHEAST:  ["New York","Pennsylvania","New Jersey","Connecticut","Rhode Island","Massachusetts",
+               "Vermont","New Hampshire","Maine"],
+  MIDATL:     ["Maryland","Delaware","Virginia","West Virginia","North Carolina"],
+  SOUTHEAST:  ["Virginia","North Carolina","South Carolina","Georgia","Florida","Alabama",
+               "Tennessee","Kentucky","Mississippi"],
+  GULF:       ["Florida","Alabama","Mississippi","Louisiana","Texas"],
+  SOUTHCENT:  ["Texas","Oklahoma","Arkansas","Louisiana","Missouri"],
+  ATLANTIC:   ["Maine","New Hampshire","Massachusetts","Rhode Island","Connecticut","New York",
+               "New Jersey","Delaware","Maryland","Virginia","North Carolina","South Carolina",
+               "Georgia","Florida"],
+  PACIFICUS:  ["California","Oregon","Washington","Alaska"],
+  ALASKA:     ["Alaska"],
+  HAWAII:     ["Hawaii"],
+  // Canada
+  CAN_BC:     ["British Columbia"],
+  CAN_WEST:   ["British Columbia","Alberta","Yukon"],
+  CAN_PRAIRIE:["Alberta","Saskatchewan","Manitoba"],
+  CAN_CENT:   ["Ontario","Quebec"],
+  CAN_ATL:    ["New Brunswick","Nova Scotia","Prince Edward Island","Newfoundland and Labrador"],
+  CAN_NORTH:  ["Yukon","Northwest Territories","Nunavut"],
+  CAN_ALL:    ["British Columbia","Alberta","Saskatchewan","Manitoba","Ontario","Quebec",
+               "New Brunswick","Nova Scotia","Prince Edward Island","Newfoundland and Labrador",
+               "Yukon","Northwest Territories","Nunavut"],
+  // Mexico
+  MX_BAJA:    ["Baja California","Baja California Sur"],
+  MX_CORTEZ:  ["Baja California Sur","Sonora","Sinaloa"],
+  MX_PACIFIC: ["Baja California","Baja California Sur","Sonora","Sinaloa","Nayarit","Jalisco",
+               "Colima","Michoacán","Guerrero","Oaxaca","Chiapas"],
+  MX_GULF:    ["Tamaulipas","Veracruz","Tabasco","Campeche"],
+  MX_CARIB:   ["Quintana Roo","Yucatán"]
+};
+function union(){ const s=new Set(); for(const a of arguments){ (REGION[a]||a).forEach(x=>s.add(x)); } return [...s]; }
+
+const FISH = [
+  /* ===================== BLACK BASS ===================== */
+  { id:"largemouth", name:"Largemouth Bass", sci:"Micropterus salmoides", family:"Black Bass", emoji:"🐟", shape:"bass",
+    water:["lake","pond","reservoir","river"], habitat:"Weedy lakes, ponds & slow rivers; relates to cover.",
+    states:union("SOUTHEAST","SOUTHCENT","MIDWEST","MIDATL","NORTHEAST","CALIF","SOUTHWEST",["Oregon","Washington"],"MX_GULF",["Tamaulipas"]),
+    bestMonths:[4,5,6,9,10], tod:["dawn","dusk","morning","night"], tempF:"65–80°F",
+    baits:["Plastic worms","Jigs","Spinnerbaits","Topwater frogs","Crankbaits"],
+    diet:"Baitfish, crayfish, frogs", fight:4, record:22.25, regs:"Often 12–15\" minimum; check slot limits.", tide:"",
+    tip:"Pre-spawn (spring) and fall feed-up are prime. Fish shallow cover early & late.",
+    subs:[ {n:"Florida Largemouth", s:"M. s. floridanus", states:["Florida","Texas","California"]},
+           {n:"Northern Largemouth", s:"M. s. salmoides", states:union("MIDWEST","NORTHEAST","SOUTHEAST")} ] },
+
+  { id:"smallmouth", name:"Smallmouth Bass", sci:"Micropterus dolomieu", family:"Black Bass", emoji:"🐟", shape:"bass",
+    water:["lake","river","stream","reservoir"], habitat:"Cool, clear rocky lakes & current-swept rivers.",
+    states:union("GREATLAKES","NORTHEAST","MIDWEST","MIDATL",["Tennessee","Kentucky","Missouri","Arkansas","Oklahoma","Washington","Oregon","Idaho"],"CAN_CENT",["Manitoba"]),
+    bestMonths:[5,6,7,9,10], tod:["dawn","dusk","morning"], tempF:"60–72°F",
+    baits:["Tube jigs","Ned rigs","Crankbaits","Drop-shot","Jerkbaits"],
+    diet:"Crayfish, minnows", fight:5, record:11.94, regs:"Check seasonal closures during spawn.", tide:"",
+    tip:"Loves rocky points & current seams. Pound-for-pound the hardest-fighting bass." },
+
+  { id:"spotted", name:"Spotted Bass", sci:"Micropterus punctulatus", family:"Black Bass", emoji:"🐟", shape:"bass",
+    water:["reservoir","river","lake"], habitat:"Clear reservoirs & rocky rivers of the South-Central US.",
+    states:union("SOUTHCENT",["Georgia","Alabama","Tennessee","Kentucky","Mississippi","North Carolina","South Carolina","Kansas"]),
+    bestMonths:[4,5,6,10], tod:["dawn","morning","dusk"], tempF:"63–78°F",
+    baits:["Finesse jigs","Drop-shot","Spoons","Crankbaits"],
+    diet:"Shad, crayfish", fight:4, record:10.5, regs:"Often grouped with bass limits.", tide:"",
+    tip:"Holds deeper than largemouth; chase suspended fish over points & bluffs." },
+
+  /* ===================== TEMPERATE BASS ===================== */
+  { id:"striper", name:"Striped Bass", sci:"Morone saxatilis", family:"Temperate Bass", emoji:"🐠", shape:"striper",
+    water:["saltwater","brackish","river","reservoir"], habitat:"Coastal migrations + landlocked reservoirs.",
+    states:union("ATLANTIC",["California","Tennessee","Texas","Oklahoma","Arkansas","Alabama","Georgia"],"CAN_ATL",["Quebec"]),
+    bestMonths:[4,5,6,10,11], tod:["dawn","dusk","night"], tempF:"55–68°F",
+    baits:["Bunker/menhaden","Bucktail jigs","Topwater plugs","Live shad","Swimbaits"],
+    diet:"Menhaden, herring, shad", fight:5, record:81.88, regs:"Strict slot & seasons on the coast — verify.", tide:"Tide-driven; fish moving water around dawn/dusk.",
+    tip:"Follow the bait. Spring/fall coastal runs and reservoir schooling produce blitzes." },
+
+  { id:"whitebass", name:"White Bass", sci:"Morone chrysops", family:"Temperate Bass", emoji:"🐠", shape:"striper",
+    water:["reservoir","river","lake"], habitat:"Open-water schools in big reservoirs & tributaries.",
+    states:union("MIDWEST","SOUTHCENT","PLAINS",["Tennessee","Kentucky","Ohio","Pennsylvania"]),
+    bestMonths:[4,5,6], tod:["morning","midday","dusk"], tempF:"58–68°F",
+    baits:["Inline spinners","Small jigs","Spoons","Live minnows"],
+    diet:"Shad, insects", fight:3, record:6.81, regs:"Generous limits in most states.", tide:"",
+    tip:"Spring spawning runs up rivers create fast, frenzied light-tackle action." },
+
+  /* ===================== TROUT ===================== */
+  { id:"rainbow", name:"Rainbow Trout", sci:"Oncorhynchus mykiss", family:"Trout", emoji:"🌈", shape:"trout",
+    water:["stream","river","lake"], habitat:"Cold, oxygen-rich streams, tailwaters & stocked lakes.",
+    states:union("PNW","ROCKIES","CALIF","NORTHEAST","GREATLAKES",["North Carolina","Tennessee","Georgia","Virginia","West Virginia","Arizona","New Mexico"],"CAN_WEST",["Ontario"]),
+    bestMonths:[3,4,5,6,9,10], tod:["dawn","morning","dusk"], tempF:"50–62°F",
+    baits:["Dry flies","Nymphs","Spinners","PowerBait","Salmon eggs"],
+    diet:"Insects, eggs, baitfish", fight:4, record:48, regs:"Check stocking schedules & creel limits.", tide:"",
+    tip:"Match the hatch on rivers; still-fish stocked lakes after spring stocking.",
+    subs:[ {n:"Steelhead (sea-run)", s:"O. m. irideus", states:union("PNW","CALIF","GREATLAKES","CAN_BC",["Alaska"])},
+           {n:"Redband Trout", s:"O. m. gairdneri", states:["Oregon","Idaho","Washington","Nevada","California"]} ] },
+
+  { id:"brown", name:"Brown Trout", sci:"Salmo trutta", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["river","stream","lake"], habitat:"Bigger, warmer water than brookies; wary & predatory.",
+    states:union("ROCKIES","NORTHEAST","GREATLAKES","PNW","CALIF",["North Carolina","Tennessee","Virginia","Arkansas","Missouri","Wisconsin"],["Ontario"]),
+    bestMonths:[4,5,6,9,10,11], tod:["dusk","night","dawn"], tempF:"48–65°F",
+    baits:["Streamers","Nymphs","Jerkbaits","Nightcrawlers","Spinners"],
+    diet:"Insects, baitfish, mice", fight:4, record:44.3, regs:"Fall spawn closures common.", tide:"",
+    tip:"Trophy browns feed hard at dusk and after dark, especially fall pre-spawn." },
+
+  { id:"brook", name:"Brook Trout", sci:"Salvelinus fontinalis", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["stream","river","lake"], habitat:"Small, cold, pristine headwaters & northern ponds.",
+    states:union("NORTHEAST","ROCKIES",["Michigan","Wisconsin","Minnesota","North Carolina","Tennessee","Virginia","West Virginia","Georgia"],"CAN_ATL","CAN_CENT",["Manitoba"]),
+    bestMonths:[5,6,7,9], tod:["morning","dusk"], tempF:"45–58°F",
+    baits:["Dry flies","Small spinners","Worms","Nymphs"],
+    diet:"Insects, small baitfish", fight:3, record:14.5, regs:"Low creel limits protect natives.", tide:"",
+    tip:"A true cold-water char. Tiny brookies hammer dry flies in mountain creeks." },
+
+  { id:"cutthroat", name:"Cutthroat Trout", sci:"Oncorhynchus clarkii", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["stream","river","lake"], habitat:"Cold western streams & high-mountain lakes.",
+    states:union("ROCKIES","PNW",["Nevada","California","Alaska","New Mexico"],"CAN_BC",["Alberta"]),
+    bestMonths:[6,7,8,9], tod:["morning","midday","dusk"], tempF:"48–60°F",
+    baits:["Attractor dry flies","Nymphs","Small spinners"],
+    diet:"Insects, crustaceans", fight:3, record:41, regs:"Many waters catch-and-release for natives.", tide:"",
+    tip:"Eager surface feeders once snowmelt clears. Many subspecies by drainage.",
+    subs:[ {n:"Yellowstone Cutthroat", s:"O. c. bouvieri", states:["Wyoming","Montana","Idaho"]},
+           {n:"Lahontan Cutthroat", s:"O. c. henshawi", states:["Nevada","California"]},
+           {n:"Westslope Cutthroat", s:"O. c. lewisi", states:["Montana","Idaho","Washington","British Columbia","Alberta"]},
+           {n:"Coastal Cutthroat", s:"O. c. clarkii", states:["Washington","Oregon","Alaska","California","British Columbia"]} ] },
+
+  { id:"goldentrout", name:"Golden Trout", sci:"Oncorhynchus aguabonita", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["stream","lake"], habitat:"High-elevation Sierra lakes & alpine creeks.",
+    states:["California","Wyoming","Montana","Idaho","Washington"],
+    bestMonths:[7,8,9], tod:["morning","midday"], tempF:"48–58°F",
+    baits:["Small dry flies","Tiny spinners","Nymphs"],
+    diet:"Insects", fight:2, record:11, regs:"Remote alpine waters — light limits.", tide:"",
+    tip:"California's state fish. A backcountry hike-in reward in late summer." },
+
+  { id:"bulltrout", name:"Bull Trout", sci:"Salvelinus confluentus", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["river","lake","stream"], habitat:"Cold, clean Northwest & Rockies rivers; native char.",
+    states:union(["Montana","Idaho","Washington","Oregon"],"CAN_BC",["Alberta"]),
+    bestMonths:[8,9,10], tod:["morning","dusk"], tempF:"40–54°F",
+    baits:["Large streamers","Swimbaits","Spoons"],
+    diet:"Whitefish, trout, sculpins", fight:4, record:32, regs:"Often protected/closed — verify carefully.", tide:"",
+    tip:"A predatory native char. Many populations are protected; know the rules before targeting." },
+
+  { id:"laketrout", name:"Lake Trout", sci:"Salvelinus namaycush", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["lake"], habitat:"Deep, cold northern lakes; near thermocline in summer.",
+    states:union("GREATLAKES","NORTHEAST","ROCKIES","ALASKA",["Minnesota"],"CAN_ALL"),
+    bestMonths:[1,2,3,5,11,12], tod:["morning","midday"], tempF:"40–52°F",
+    baits:["Spoons","Tube jigs","Lake-trout flies","Live ciscoes"],
+    diet:"Ciscoes, whitefish, smelt", fight:4, record:72, regs:"Slot/size limits on many lakes.", tide:"",
+    tip:"Shallow right after ice-out and through the ice; go deep with downriggers in summer." },
+
+  /* ===================== CHAR / GRAYLING ===================== */
+  { id:"arcticchar", name:"Arctic Char", sci:"Salvelinus alpinus", family:"Char", emoji:"🐟", shape:"trout",
+    water:["river","lake","saltwater"], habitat:"Far-north rivers & lakes; sea-run & landlocked forms.",
+    states:union(["Alaska"],"CAN_NORTH",["Quebec","Newfoundland and Labrador"]),
+    bestMonths:[7,8,9], tod:["midday","afternoon"], tempF:"39–50°F",
+    baits:["Spoons","Spinners","Egg flies","Streamers"],
+    diet:"Insects, baitfish, eggs", fight:4, record:32.6, regs:"Remote fly-in fisheries; guide rules apply.", tide:"Sea-run fish stage on tides at river mouths.",
+    tip:"Spawning-color males glow red-orange. Late-summer runs are the window." },
+
+  { id:"grayling", name:"Arctic Grayling", sci:"Thymallus arcticus", family:"Char", emoji:"🐟", shape:"trout",
+    water:["river","stream","lake"], habitat:"Clear, cold northern rivers; sail-like dorsal fin.",
+    states:union(["Alaska","Montana"],"CAN_WEST","CAN_NORTH",["Saskatchewan","Manitoba"]),
+    bestMonths:[6,7,8], tod:["morning","midday","dusk"], tempF:"42–55°F",
+    baits:["Dry flies","Small nymphs","Tiny spinners"],
+    diet:"Insects", fight:2, record:5.9, regs:"Often catch-and-release in the Lower 48.", tide:"",
+    tip:"Greedy surface feeders — a fly-rod delight on northern rivers." },
+
+  /* ===================== SALMON ===================== */
+  { id:"chinook", name:"Chinook (King) Salmon", sci:"Oncorhynchus tshawytscha", family:"Salmon", emoji:"🐟", shape:"salmon",
+    water:["river","lake","saltwater"], habitat:"Pacific rivers/ocean + stocked Great Lakes.",
+    states:union("PNW","ALASKA","CALIF",["Michigan","Wisconsin","New York","Indiana","Ohio"],"CAN_BC"),
+    bestMonths:[8,9,10], tod:["dawn","dusk"], tempF:"45–58°F",
+    baits:["Spoons","Spinners","Cured roe","Plugs","Flies"],
+    diet:"Herring, anchovies, squid", fight:5, record:97.25, regs:"Tight quotas & closures — check daily.", tide:"Time tide changes in estuaries & river mouths.",
+    tip:"Fall spawning runs up tributaries are the classic shot at the biggest salmon." },
+
+  { id:"coho", name:"Coho (Silver) Salmon", sci:"Oncorhynchus kisutch", family:"Salmon", emoji:"🐟", shape:"salmon",
+    water:["river","lake","saltwater"], habitat:"Pacific coast + Great Lakes; aggressive & acrobatic.",
+    states:union("PNW","ALASKA","CALIF",["Michigan","Wisconsin","Illinois","New York","Indiana"],"CAN_BC"),
+    bestMonths:[9,10,11], tod:["dawn","morning","dusk"], tempF:"45–55°F",
+    baits:["Spinners","Spoons","Flies","Roe"],
+    diet:"Baitfish, squid", fight:4, record:33.6, regs:"Marked-hatchery-only in some rivers.", tide:"Incoming tide stacks fish at river mouths.",
+    tip:"Chrome silvers strike hard and jump often; great fly-rod target in fall." },
+
+  { id:"sockeye", name:"Sockeye (Red) Salmon", sci:"Oncorhynchus nerka", family:"Salmon", emoji:"🐟", shape:"salmon",
+    water:["river","lake","saltwater"], habitat:"Plankton-feeders that flood Pacific rivers in summer.",
+    states:union(["Alaska","Washington"],"CAN_BC"),
+    bestMonths:[6,7,8], tod:["morning","midday"], tempF:"46–55°F",
+    baits:["Sparse flies (flossing)","Coho flies","Small spoons"],
+    diet:"Plankton, insects", fight:4, record:15.2, regs:"Strict bag limits during runs.", tide:"",
+    tip:"They rarely 'bite' — sight-fish dense schools with short-line fly tactics." },
+
+  { id:"pinksalmon", name:"Pink (Humpy) Salmon", sci:"Oncorhynchus gorbuscha", family:"Salmon", emoji:"🐟", shape:"salmon",
+    water:["river","saltwater"], habitat:"Smallest Pacific salmon; huge odd-year runs.",
+    states:union(["Alaska","Washington"],"CAN_BC"),
+    bestMonths:[8,9], tod:["morning","dusk"], tempF:"45–55°F",
+    baits:["Small pink jigs","Pink flies","Tiny spoons"],
+    diet:"Plankton, small baitfish", fight:2, record:14.9, regs:"Generous limits in run years.", tide:"Tide pushes fresh schools to the beach.",
+    tip:"Pink is the magic color. Great, fast action for kids in run years." },
+
+  { id:"atlanticsalmon", name:"Atlantic Salmon", sci:"Salmo salar", family:"Salmon", emoji:"🐟", shape:"salmon",
+    water:["river","lake","saltwater"], habitat:"Cold Northeast/Canadian rivers + landlocked lakes.",
+    states:union(["Maine","New Hampshire","Vermont","New York"],"CAN_ATL",["Quebec"]),
+    bestMonths:[6,7,9], tod:["morning","dusk"], tempF:"46–58°F",
+    baits:["Classic wet flies","Streamers","Smelt imitations"],
+    diet:"Smelt, baitfish, insects", fight:5, record:79.2, regs:"Fly-only & C&R on many rivers; licenses required.", tide:"",
+    tip:"\"The fish of kings.\" Landlocked salmon chase smelt — troll just after ice-out." },
+
+  /* ===================== PIKE / ESOX ===================== */
+  { id:"pike", name:"Northern Pike", sci:"Esox lucius", family:"Pike", emoji:"🐊", shape:"pike",
+    water:["lake","river","reservoir"], habitat:"Weedy bays & slow rivers across the northern tier.",
+    states:union("MIDWEST","NORTHEAST","ROCKIES","PLAINS","ALASKA",["Pennsylvania","New York","Ohio"],"CAN_ALL"),
+    bestMonths:[1,2,5,6,11,12], tod:["morning","midday","afternoon"], tempF:"50–65°F",
+    baits:["Large spoons","Spinnerbaits","Swimbaits","Live suckers","Jerkbaits"],
+    diet:"Fish, frogs, ducklings", fight:4, record:55, regs:"Slot limits protect big females.", tide:"",
+    tip:"Ambush predator — cast big baits along weed edges. Excellent through the ice." },
+
+  { id:"muskie", name:"Muskellunge", sci:"Esox masquinongy", family:"Pike", emoji:"🐊", shape:"pike",
+    water:["lake","river","reservoir"], habitat:"Large lakes & rivers of the Upper Midwest, Northeast & Ontario.",
+    states:union(["Minnesota","Wisconsin","Michigan","Illinois","Indiana","Ohio","Pennsylvania","New York","Kentucky","Tennessee","West Virginia","Iowa"],["Ontario","Quebec","Manitoba"]),
+    bestMonths:[6,7,9,10,11], tod:["midday","afternoon","dusk"], tempF:"60–70°F",
+    baits:["Bucktails","Large glide baits","Topwater","Rubber baits"],
+    diet:"Suckers, ciscoes, panfish", fight:5, record:67.5, regs:"High minimum lengths (often 40–54\").", tide:"",
+    tip:"\"The fish of 10,000 casts.\" Cold-front fall feeding produces the giants." },
+
+  { id:"pickerel", name:"Chain Pickerel", sci:"Esox niger", family:"Pike", emoji:"🐊", shape:"pike",
+    water:["pond","lake","river"], habitat:"Vegetated ponds & slow streams of the East.",
+    states:union("NORTHEAST","SOUTHEAST","MIDATL",["Florida","Texas","Louisiana"],"CAN_ATL"),
+    bestMonths:[1,2,3,11,12], tod:["morning","midday"], tempF:"45–62°F",
+    baits:["Spinnerbaits","Spoons","Jerkbaits","Live shiners"],
+    diet:"Minnows, small fish", fight:3, record:9.4, regs:"Generous limits.", tide:"",
+    tip:"Active in cold water when bass sulk — a fun winter target on light tackle." },
+
+  /* ===================== PERCH / WALLEYE ===================== */
+  { id:"walleye", name:"Walleye", sci:"Sander vitreus", family:"Perch", emoji:"🐟", shape:"walleye",
+    water:["lake","river","reservoir"], habitat:"Big lakes & rivers; light-sensitive eyes favor low light.",
+    states:union("MIDWEST","PLAINS","GREATLAKES",["Pennsylvania","New York","Tennessee","Kentucky","Montana","Colorado","Arkansas","West Virginia"],"CAN_ALL"),
+    bestMonths:[4,5,6,9,10], tod:["dawn","dusk","night"], tempF:"55–68°F",
+    baits:["Jig + minnow","Crawler harnesses","Crankbaits","Blade baits"],
+    diet:"Yellow perch, shad", fight:3, record:25, regs:"Slot limits & spring closures common.", tide:"",
+    tip:"Bite turns on at dusk & after dark. Spring river runs concentrate fish below dams." },
+
+  { id:"sauger", name:"Sauger", sci:"Sander canadensis", family:"Perch", emoji:"🐟", shape:"walleye",
+    water:["river","reservoir"], habitat:"Turbid big rivers & reservoirs; tolerant of current & silt.",
+    states:union("SOUTHCENT","PLAINS",["Tennessee","Kentucky","Montana","North Dakota","Minnesota","Illinois","Ohio","West Virginia"],["Manitoba","Saskatchewan","Ontario","Quebec"]),
+    bestMonths:[2,3,4,11,12], tod:["dusk","night","midday"], tempF:"48–60°F",
+    baits:["Jigs","Blade baits","Minnows"],
+    diet:"Shad, minnows", fight:3, record:8.75, regs:"Often shares walleye limits.", tide:"",
+    tip:"Stacks below dams in late winter — a cold-season tailwater staple." },
+
+  { id:"yellowperch", name:"Yellow Perch", sci:"Perca flavescens", family:"Perch", emoji:"🐟", shape:"perch",
+    water:["lake","pond","river"], habitat:"Cool lakes & ponds; schools near bottom structure.",
+    states:union("MIDWEST","NORTHEAST","GREATLAKES","PLAINS",["Pennsylvania","Maryland","Virginia","Washington","Montana"],"CAN_ALL"),
+    bestMonths:[1,2,6,7,12], tod:["morning","midday"], tempF:"50–66°F",
+    baits:["Small jigs","Minnows","Worms","Spoons (ice)"],
+    diet:"Insects, minnows, eggs", fight:2, record:4.19, regs:"High limits; great table fare.", tide:"",
+    tip:"A panfish favorite and prime ice-fishing target. Find one, find the school." },
+
+  /* ===================== SUNFISH / PANFISH ===================== */
+  { id:"bluegill", name:"Bluegill", sci:"Lepomis macrochirus", family:"Sunfish", emoji:"🐟", shape:"panfish",
+    water:["pond","lake","reservoir","river"], habitat:"Nearly everywhere warm — ponds, lakes, slow rivers.",
+    states:union("SOUTHEAST","SOUTHCENT","MIDWEST","NORTHEAST","MIDATL","PLAINS","CALIF","SOUTHWEST",["Oregon","Washington"],["Ontario","Quebec"]),
+    bestMonths:[5,6,7,8], tod:["morning","afternoon","dusk"], tempF:"65–80°F",
+    baits:["Worms","Crickets","Small jigs","Poppers (fly)"],
+    diet:"Insects, larvae", fight:2, record:4.75, regs:"Generous limits — kid-friendly.", tide:"",
+    tip:"Spawning beds in late spring make for nonstop action — perfect for kids." },
+
+  { id:"redear", name:"Redear Sunfish (Shellcracker)", sci:"Lepomis microlophus", family:"Sunfish", emoji:"🐟", shape:"panfish",
+    water:["lake","pond","reservoir"], habitat:"Warm lakes & ponds; bottom-oriented snail crusher.",
+    states:union("SOUTHEAST","SOUTHCENT","CALIF",["Arizona","Nevada","Maryland","Virginia"]),
+    bestMonths:[4,5,6], tod:["morning","afternoon"], tempF:"68–80°F",
+    baits:["Red worms","Crickets","Small jigs near bottom"],
+    diet:"Snails, clams, larvae", fight:2, record:6.3, regs:"Often combined panfish limits.", tide:"",
+    tip:"Bigger than most bluegill. Spring bed-fishing on the bottom is the trick." },
+
+  { id:"rockbass", name:"Rock Bass", sci:"Ambloplites rupestris", family:"Sunfish", emoji:"🐟", shape:"panfish",
+    water:["river","lake","stream"], habitat:"Rocky rivers & clear lakes; red-eyed scrapper.",
+    states:union("GREATLAKES","NORTHEAST","MIDWEST","MIDATL",["Tennessee","Kentucky","Missouri","Arkansas"],["Ontario","Quebec","Manitoba"]),
+    bestMonths:[5,6,7,8], tod:["morning","dusk"], tempF:"60–75°F",
+    baits:["Small crankbaits","Jigs","Worms","Crayfish"],
+    diet:"Crayfish, insects, minnows", fight:2, record:3, regs:"Generous limits.", tide:"",
+    tip:"Hangs with smallmouth on rocky banks — a fun bycatch on light tackle." },
+
+  { id:"blackcrappie", name:"Black Crappie", sci:"Pomoxis nigromaculatus", family:"Sunfish", emoji:"🐟", shape:"crappie",
+    water:["lake","reservoir","pond","river"], habitat:"Brushy, clear lakes & reservoirs; suspends near cover.",
+    states:union("SOUTHEAST","SOUTHCENT","MIDWEST","NORTHEAST","MIDATL","PLAINS",["California"],["Ontario"]),
+    bestMonths:[3,4,5,10], tod:["dawn","dusk","morning"], tempF:"58–68°F",
+    baits:["Marabou jigs","Minnows","Small spinners"],
+    diet:"Minnows, insects", fight:2, record:5.46, regs:"9–10\" minimums on some lakes.", tide:"",
+    tip:"Spring spawn pushes slabs shallow to brush & docks — a beloved spring run." },
+
+  { id:"whitecrappie", name:"White Crappie", sci:"Pomoxis annularis", family:"Sunfish", emoji:"🐟", shape:"crappie",
+    water:["reservoir","river","lake"], habitat:"More tolerant of murky water than black crappie.",
+    states:union("SOUTHCENT","MIDWEST","PLAINS",["Georgia","Alabama","Tennessee","Kentucky","Mississippi","Ohio","Pennsylvania"]),
+    bestMonths:[3,4,5,10], tod:["dawn","dusk","morning"], tempF:"58–68°F",
+    baits:["Jigs","Minnows","Spider-rigging"],
+    diet:"Shad, minnows", fight:2, record:5.31, regs:"Often pooled crappie limits.", tide:"",
+    tip:"Suspends over standing timber & creek channels in reservoirs." },
+
+  /* ===================== CATFISH ===================== */
+  { id:"channelcat", name:"Channel Catfish", sci:"Ictalurus punctatus", family:"Catfish", emoji:"🐡", shape:"catfish",
+    water:["river","lake","reservoir","pond"], habitat:"Adaptable bottom feeder in nearly all warm waters.",
+    states:union("SOUTHEAST","SOUTHCENT","MIDWEST","PLAINS","MIDATL","NORTHEAST","SOUTHWEST","CALIF",["Manitoba","Saskatchewan","Ontario"]),
+    bestMonths:[5,6,7,8,9], tod:["dusk","night","afternoon"], tempF:"70–85°F",
+    baits:["Cut bait","Chicken liver","Stinkbait","Nightcrawlers"],
+    diet:"Anything — true omnivore", fight:3, record:58, regs:"Generous limits; trophy slots in spots.", tide:"",
+    tip:"Summer nights are prime. Fish current breaks & holes after dark." },
+
+  { id:"flathead", name:"Flathead Catfish", sci:"Pylodictis olivaris", family:"Catfish", emoji:"🐡", shape:"catfish",
+    water:["river","reservoir","lake"], habitat:"Big rivers & reservoirs; loves log jams & deep cover.",
+    states:union("SOUTHCENT","MIDWEST","PLAINS",["Georgia","Alabama","Tennessee","Kentucky","Pennsylvania","Ohio","North Carolina","South Carolina"]),
+    bestMonths:[6,7,8,9], tod:["dusk","night"], tempF:"72–85°F",
+    baits:["Live bluegill","Live shad","Big cut bait"],
+    diet:"Live fish", fight:5, record:123, regs:"Trophy-protection slots in many rivers.", tide:"",
+    tip:"A true predator — uses LIVE bait near woody cover at night for trophies." },
+
+  { id:"bluecat", name:"Blue Catfish", sci:"Ictalurus furcatus", family:"Catfish", emoji:"🐡", shape:"catfish",
+    water:["river","reservoir","brackish"], habitat:"Large rivers & reservoirs; roams open water.",
+    states:union("SOUTHCENT","SOUTHEAST",["Virginia","Maryland","Tennessee","Kentucky","Missouri","Illinois","Kansas","Nebraska","South Dakota"]),
+    bestMonths:[1,2,6,7,11,12], tod:["dusk","night","midday"], tempF:"55–80°F",
+    baits:["Fresh cut shad","Skipjack","Drum"],
+    diet:"Shad, herring, fish", fight:5, record:143, regs:"Trophy slots — release the giants.", tide:"Tidal rivers (e.g. James) fish best on moving water.",
+    tip:"Trophy blues bite all winter. Drift cut bait across channel ledges." },
+
+  /* ===================== STURGEON / BIG FRESHWATER ===================== */
+  { id:"whitesturgeon", name:"White Sturgeon", sci:"Acipenser transmontanus", family:"Sturgeon", emoji:"🐉", shape:"sturgeon",
+    water:["river","brackish"], habitat:"Big West-coast rivers (Columbia, Fraser, Sacramento).",
+    states:union(["Washington","Oregon","Idaho","California"],"CAN_BC"),
+    bestMonths:[4,5,6,9,10], tod:["midday","afternoon"], tempF:"50–66°F",
+    baits:["Cured roe","Squid","Lamprey","Smelt"],
+    diet:"Eulachon, shad, crustaceans", fight:5, record:468, regs:"Almost entirely catch-and-release; barbless hooks.", tide:"Lower rivers fish best on tide changes.",
+    tip:"North America's largest freshwater fish. Strictly C&R on the Fraser — pure adrenaline." },
+
+  { id:"lakesturgeon", name:"Lake Sturgeon", sci:"Acipenser fulvescens", family:"Sturgeon", emoji:"🐉", shape:"sturgeon",
+    water:["river","lake"], habitat:"Great Lakes basin & large northern rivers.",
+    states:union("GREATLAKES",["Minnesota","Wisconsin","Tennessee","Missouri"],["Ontario","Quebec","Manitoba"]),
+    bestMonths:[6,7,9], tod:["afternoon","dusk"], tempF:"55–70°F",
+    baits:["Nightcrawler gobs","Cut bait"],
+    diet:"Insects, mollusks, leeches", fight:5, record:168, regs:"Highly protected; tightly regulated seasons.", tide:"",
+    tip:"A living fossil. Trophy C&R seasons (e.g. Rainy River) are bucket-list trips." },
+
+  { id:"carp", name:"Common Carp", sci:"Cyprinus carpio", family:"Other Freshwater", emoji:"🐟", shape:"carp",
+    water:["lake","river","pond","reservoir"], habitat:"Warm, fertile waters nationwide; wary & powerful.",
+    states:union("SOUTHEAST","SOUTHCENT","MIDWEST","NORTHEAST","MIDATL","PLAINS","CALIF","SOUTHWEST",["Oregon","Washington"],["Ontario","Quebec"]),
+    bestMonths:[5,6,7,8,9], tod:["morning","afternoon","dusk"], tempF:"65–82°F",
+    baits:["Sweet corn","Boilies","Dough bait","Bread"],
+    diet:"Detritus, insects, seeds", fight:4, record:75.2, regs:"Often unregulated (non-native).", tide:"",
+    tip:"A serious sportfish abroad and increasingly here — chum with corn and hold on." },
+
+  { id:"freshdrum", name:"Freshwater Drum", sci:"Aplodinotus grunniens", family:"Other Freshwater", emoji:"🐟", shape:"perch",
+    water:["river","lake","reservoir"], habitat:"Big rivers & lakes; grunts audibly, bottom feeder.",
+    states:union("MIDWEST","SOUTHCENT","PLAINS","GREATLAKES",["Tennessee","Alabama","Louisiana"],["Ontario","Manitoba"]),
+    bestMonths:[5,6,7,8], tod:["afternoon","dusk","night"], tempF:"65–80°F",
+    baits:["Nightcrawlers","Jigs","Cut bait","Crankbaits"],
+    diet:"Mussels, crayfish, insects", fight:3, record:54.5, regs:"No limits in most states.", tide:"",
+    tip:"Hard-pulling and abundant — a great light-tackle bonus on river drifts." },
+
+  { id:"bowfin", name:"Bowfin", sci:"Amia calva", family:"Other Freshwater", emoji:"🐊", shape:"pike",
+    water:["river","lake","pond"], habitat:"Vegetated backwaters & swamps of the East & South.",
+    states:union("SOUTHEAST","GULF","SOUTHCENT",["Minnesota","Wisconsin","Michigan","New York","Pennsylvania"],["Ontario","Quebec"]),
+    bestMonths:[5,6,7,8,9], tod:["morning","dusk","night"], tempF:"70–85°F",
+    baits:["Cut bait","Soft plastics","Spinnerbaits","Live shiners"],
+    diet:"Fish, crayfish, frogs", fight:5, record:21.5, regs:"Usually no limits.", tide:"",
+    tip:"\"Mudfish\" / \"dogfish\" — a prehistoric brawler that destroys tackle. Underrated fun." },
+
+  { id:"alligatorgar", name:"Alligator Gar", sci:"Atractosteus spatula", family:"Other Freshwater", emoji:"🐊", shape:"gar",
+    water:["river","reservoir","brackish"], habitat:"Big sluggish Southern rivers, bayous & reservoirs.",
+    states:union("GULF","SOUTHCENT",["Tennessee","Arkansas"],"MX_GULF",["Tamaulipas","Veracruz"]),
+    bestMonths:[5,6,7,8], tod:["afternoon","dusk","night"], tempF:"75–88°F",
+    baits:["Cut carp/mullet","Large circle hooks"],
+    diet:"Fish, crabs, waterfowl", fight:5, record:279, regs:"Protected in places (e.g. 1-fish in TX zones).", tide:"",
+    tip:"Largest gar — a 6-foot apex predator. Heavy gear & patience; mostly C&R." },
+
+  /* ===================== INSHORE SALTWATER ===================== */
+  { id:"redfish", name:"Redfish (Red Drum)", sci:"Sciaenops ocellatus", family:"Inshore", emoji:"🐠", shape:"redfish",
+    water:["saltwater","brackish"], habitat:"Gulf & Atlantic flats, marshes, oyster bars & surf.",
+    states:union("GULF",["Georgia","South Carolina","North Carolina","Virginia"],"MX_GULF","MX_CARIB"),
+    bestMonths:[9,10,11,4,5], tod:["dawn","morning","dusk"], tempF:"60–80°F",
+    baits:["Gold spoons","Soft plastics","Live shrimp","Cut mullet"],
+    diet:"Shrimp, crabs, mullet", fight:4, record:94.2, regs:"Tight slot limits (often 18–27\").", tide:"Sight-fish tailing reds on a falling tide.",
+    tip:"Fall bull-red runs hit the beaches & passes. A flats-fishing staple." },
+
+  { id:"snook", name:"Snook", sci:"Centropomus undecimalis", family:"Inshore", emoji:"🐠", shape:"snook",
+    water:["saltwater","brackish"], habitat:"Subtropical mangroves, passes, beaches & bridges.",
+    states:union(["Florida","Texas"],"MX_GULF","MX_CARIB","MX_PACIFIC"),
+    bestMonths:[5,6,7,8,9], tod:["dusk","night","dawn"], tempF:"70–85°F",
+    baits:["Live pilchards","Jerkbaits","Bucktails","Topwater"],
+    diet:"Baitfish, shrimp", fight:5, record:53.8, regs:"Seasonal closures & slot in FL — verify.", tide:"Ambush feeders on outgoing tide around lights & structure.",
+    tip:"Cold snaps push them upriver. Night-fishing dock lights is deadly." },
+
+  { id:"seatrout", name:"Spotted Seatrout", sci:"Cynoscion nebulosus", family:"Inshore", emoji:"🐠", shape:"snook",
+    water:["saltwater","brackish"], habitat:"Seagrass flats & marsh estuaries of the Gulf & Atlantic.",
+    states:union("GULF",["Georgia","South Carolina","North Carolina","Virginia"],"MX_GULF"),
+    bestMonths:[4,5,6,10,11], tod:["dawn","dusk"], tempF:"65–80°F",
+    baits:["Popping cork + shrimp","Soft plastics","Topwater plugs"],
+    diet:"Shrimp, baitfish", fight:3, record:17.5, regs:"Slot & bag limits vary by state.", tide:"Work grass flats on moving tide, low light.",
+    tip:"Bigger \"gator\" trout favor low light & bigger baits." },
+
+  { id:"flounder", name:"Southern Flounder", sci:"Paralichthys lethostigma", family:"Inshore", emoji:"🐠", shape:"flounder",
+    water:["saltwater","brackish"], habitat:"Sandy/muddy estuary bottoms, inlets & channels.",
+    states:union("GULF",["Georgia","South Carolina","North Carolina","Virginia"],"MX_GULF"),
+    bestMonths:[9,10,11], tod:["morning","midday"], tempF:"60–75°F",
+    baits:["Live mud minnows","Gulp jigs","Finger mullet"],
+    diet:"Baitfish, shrimp", fight:2, record:20.5, regs:"Fall closures protect the run in some states.", tide:"Fall \"flounder run\" toward inlets on the tide.",
+    tip:"Drag baits slow on bottom; let them chew before setting the hook." },
+
+  { id:"tarpon", name:"Tarpon", sci:"Megalops atlanticus", family:"Inshore", emoji:"🐠", shape:"tarpon",
+    water:["saltwater","brackish"], habitat:"Beaches, passes, bridges & backcountry of the Gulf/Atlantic.",
+    states:union(["Florida","Texas","Louisiana","Alabama","Mississippi","Georgia","South Carolina","North Carolina"],"MX_GULF","MX_CARIB"),
+    bestMonths:[5,6,7], tod:["dawn","dusk","night"], tempF:"74–88°F",
+    baits:["Live crabs","Live mullet","Swimbaits","Flies"],
+    diet:"Baitfish, crabs", fight:5, record:286.6, regs:"Catch-and-release; kill tags required to harvest.", tide:"Time bridge & pass bites to strong tide flows.",
+    tip:"\"The Silver King.\" Spring/early-summer migration along beaches is the show — bow to the king on jumps." },
+
+  { id:"bonefish", name:"Bonefish", sci:"Albula vulpes", family:"Inshore", emoji:"🐠", shape:"bonefish",
+    water:["saltwater"], habitat:"Shallow tropical flats of the Florida Keys & Mexican Caribbean.",
+    states:union(["Florida"],"MX_CARIB"),
+    bestMonths:[3,4,5,9,10], tod:["morning","midday","afternoon"], tempF:"72–84°F",
+    baits:["Shrimp/crab flies","Live shrimp","Small jigs"],
+    diet:"Shrimp, crabs, worms", fight:4, record:19.1, regs:"Catch-and-release fly fishery.", tide:"Fish tailing bones on a pushing tide onto the flat.",
+    tip:"\"Ghost of the flats.\" Sight-fishing on foot or poled skiff — blistering runs." },
+
+  { id:"permit", name:"Permit", sci:"Trachinotus falcatus", family:"Inshore", emoji:"🐠", shape:"permit",
+    water:["saltwater"], habitat:"Flats, wrecks & channels of South Florida & the Caribbean.",
+    states:union(["Florida"],"MX_CARIB"),
+    bestMonths:[3,4,5,6], tod:["morning","midday"], tempF:"74–86°F",
+    baits:["Live crabs","Crab flies","Jigs"],
+    diet:"Crabs, shrimp, urchins", fight:5, record:60, regs:"Special permit zones in FL; mostly C&R.", tide:"Flats fish best on rising tide; wrecks on slack.",
+    tip:"The flats grand-slam's toughest leg — maddeningly picky, brutally strong." },
+
+  { id:"bluefish", name:"Bluefish", sci:"Pomatomus saltatrix", family:"Inshore", emoji:"🐠", shape:"bluefish",
+    water:["saltwater","brackish"], habitat:"Atlantic beaches, inlets & bays; toothy blitz feeders.",
+    states:union("ATLANTIC"),
+    bestMonths:[5,6,9,10], tod:["dawn","dusk"], tempF:"60–72°F",
+    baits:["Metal lures","Poppers","Cut bunker","Swimbaits"],
+    diet:"Menhaden, anything", fight:4, record:31.8, regs:"Bag limits on the coast.", tide:"Blitzes fire on moving tide when bait gets pinned.",
+    tip:"Use wire or heavy mono — those teeth shred everything. Pure chaos in a blitz." },
+
+  /* ===================== NEARSHORE / REEF ===================== */
+  { id:"redsnapper", name:"Red Snapper", sci:"Lutjanus campechanus", family:"Nearshore", emoji:"🐠", shape:"snapper",
+    water:["saltwater"], habitat:"Gulf & SE Atlantic reefs, wrecks & oil rigs.",
+    states:union("GULF",["Georgia","South Carolina","North Carolina"],"MX_GULF"),
+    bestMonths:[6,7,8], tod:["morning","midday"], tempF:"62–75°F",
+    baits:["Cut bait","Live pinfish","Vertical jigs"],
+    diet:"Fish, crustaceans", fight:4, record:50.4, regs:"Very short federal seasons — check open dates.", tide:"",
+    tip:"Drop to structure in 60–300 ft. Federal season windows are tight — plan around them." },
+
+  { id:"lingcod", name:"Lingcod", sci:"Ophiodon elongatus", family:"Nearshore", emoji:"🐠", shape:"lingcod",
+    water:["saltwater"], habitat:"Pacific rocky reefs & pinnacles from CA to AK.",
+    states:union("PACIFICUS","CAN_BC"),
+    bestMonths:[3,4,5,6], tod:["morning","midday"], tempF:"45–55°F",
+    baits:["Swimbaits","Jigs","Live greenling"],
+    diet:"Fish, octopus, crabs", fight:4, record:82.7, regs:"Depth & seasonal closures (rockfish rules).", tide:"Slack-tide windows make deep reef fishing fishable.",
+    tip:"Aggressive ambusher with a huge mouth — they'll eat a hooked rockfish on the way up." },
+
+  { id:"pacifichalibut", name:"Pacific Halibut", sci:"Hippoglossus stenolepis", family:"Nearshore", emoji:"🐠", shape:"flounder",
+    water:["saltwater"], habitat:"Sand/gravel flats off AK, BC & the Pacific NW.",
+    states:union(["Alaska","Washington","Oregon","California"],"CAN_BC"),
+    bestMonths:[5,6,7,8], tod:["morning","midday"], tempF:"40–52°F",
+    baits:["Herring","Salmon bellies","Large jigs"],
+    diet:"Fish, crabs, octopus", fight:4, record:459, regs:"Strict charter limits & size rules.", tide:"Anchor or drift the slack-to-moving tide on the flats.",
+    tip:"Barn-door flatfish to 300+ lb. Subsistence/charter rules are strict — know your limit." },
+
+  /* ===================== OFFSHORE / PELAGIC ===================== */
+  { id:"mahi", name:"Mahi-Mahi (Dorado)", sci:"Coryphaena hippurus", family:"Offshore", emoji:"🐠", shape:"mahi",
+    water:["saltwater"], habitat:"Warm blue water near weedlines, debris & buoys, both coasts.",
+    states:union(["Florida","North Carolina","South Carolina","Georgia","Texas","Louisiana","California"],"MX_PACIFIC","MX_CARIB","MX_GULF","HAWAII"),
+    bestMonths:[5,6,7,8,9], tod:["morning","midday"], tempF:"72–84°F",
+    baits:["Ballyhoo","Trolled lures","Bucktails","Live bait"],
+    diet:"Flying fish, squid", fight:5, record:88, regs:"Bag limits coastwide; fast-growing.", tide:"",
+    tip:"Run weedlines & floating debris. Acrobatic, fast-growing and superb eating." },
+
+  { id:"yellowfin", name:"Yellowfin Tuna", sci:"Thunnus albacares", family:"Offshore", emoji:"🐠", shape:"tuna",
+    water:["saltwater"], habitat:"Offshore canyons, rips & FADs of the Gulf, Atlantic & Pacific.",
+    states:union(["Louisiana","Florida","North Carolina","Massachusetts","New Jersey","Texas","California"],"MX_PACIFIC","MX_BAJA","HAWAII"),
+    bestMonths:[6,7,8,9,10], tod:["dawn","morning","dusk"], tempF:"72–82°F",
+    baits:["Trolled lures","Live hardtails","Chunked bait","Poppers"],
+    diet:"Baitfish, squid", fight:5, record:427, regs:"HMS permit & size limits required.", tide:"",
+    tip:"Run to the canyons & rips. Brutal, lung-busting fights on stand-up gear." },
+
+  { id:"roosterfish", name:"Roosterfish", sci:"Nematistius pectoralis", family:"Offshore", emoji:"🐠", shape:"rooster",
+    water:["saltwater"], habitat:"Sandy surf & rocky points of the Mexican Pacific & Baja.",
+    states:union("MX_PACIFIC","MX_BAJA","MX_CORTEZ"),
+    bestMonths:[6,7,8,9], tod:["dawn","morning"], tempF:"74–85°F",
+    baits:["Live mullet/ladyfish","Poppers","Big swimbaits"],
+    diet:"Mullet, baitfish", fight:5, record:114, regs:"Catch-and-release prized in Baja.", tide:"Beach bite fires at first light on the incoming.",
+    tip:"That comb of dorsal spines and a screaming run — the Baja beach prize. Almost always released." },
+
+  { id:"yellowtail", name:"California Yellowtail", sci:"Seriola dorsalis", family:"Offshore", emoji:"🐠", shape:"tuna",
+    water:["saltwater"], habitat:"Kelp beds, reefs & offshore banks of SoCal & Baja.",
+    states:union(["California"],"MX_BAJA","MX_CORTEZ"),
+    bestMonths:[5,6,7,8,9], tod:["dawn","morning"], tempF:"64–72°F",
+    baits:["Live sardines","Surface iron","Yo-yo jigs"],
+    diet:"Sardines, squid, mackerel", fight:5, record:114, regs:"Size & bag limits in CA waters.", tide:"",
+    tip:"A reef-diving bulldog — hook one near structure and it's a knife-fight to the rocks." },
+
+  { id:"stripedmarlin", name:"Striped Marlin", sci:"Kajikia audax", family:"Offshore", emoji:"🐠", shape:"marlin",
+    water:["saltwater"], habitat:"Blue water off Baja & the SoCal bight; billfish capital is Cabo.",
+    states:union(["California"],"MX_BAJA","MX_PACIFIC"),
+    bestMonths:[10,11,12,1], tod:["morning","midday"], tempF:"70–80°F",
+    baits:["Trolled lures","Bait-and-switch ballyhoo","Live bait"],
+    diet:"Mackerel, sardines, squid", fight:5, record:494, regs:"Billfish are release-first; tags to keep.", tide:"",
+    tip:"Cabo's fall season stacks stripies. Bait-and-switch teasing makes for fly/light-tackle shots." },
+
+  { id:"sailfish", name:"Sailfish", sci:"Istiophorus platypterus", family:"Offshore", emoji:"🐠", shape:"marlin",
+    water:["saltwater"], habitat:"Warm offshore edges of FL, the Gulf, & the Mexican Pacific.",
+    states:union(["Florida","North Carolina","South Carolina","Georgia","Texas","Louisiana"],"MX_PACIFIC","MX_CARIB","MX_GULF"),
+    bestMonths:[11,12,1,2], tod:["morning","midday"], tempF:"72–82°F",
+    baits:["Kite-fished live bait","Ballyhoo","Dredges + teasers"],
+    diet:"Sardines, ballyhoo, squid", fight:5, record:142, regs:"Release-only fishery in practice.", tide:"",
+    tip:"Fastest fish in the sea. South FL winter sailfish runs on kites are world-class." }
+];
+
+const TOD_ORDER = ["dawn","morning","midday","afternoon","dusk","night"];
+const TOD_LABEL = {dawn:"Dawn",morning:"Morning",midday:"Midday",afternoon:"Afternoon",dusk:"Dusk",night:"Night"};
+const WATER_LABEL = {lake:"Lake",pond:"Pond",reservoir:"Reservoir",river:"River",stream:"Stream",
+  brackish:"Brackish",saltwater:"Saltwater"};
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+// Family accent color for silhouettes / cards
+const FAMILY_COLOR = {
+  "Black Bass":"#4e9e5a","Temperate Bass":"#6fa8c7","Trout":"#d98b5f","Char":"#cf6f6f",
+  "Salmon":"#e0796b","Pike":"#7fae54","Perch":"#cdb24e","Sunfish":"#5bbf9b",
+  "Catfish":"#9a8c79","Sturgeon":"#7d8a99","Other Freshwater":"#8aa36f",
+  "Inshore":"#5ec2c0","Nearshore":"#5aa9d6","Offshore":"#5a86d6"
+};
+
+/* ============================================================
+   Wikipedia article titles for runtime photo lookup
+   (REST summary endpoint follows redirects, but exact is safer)
+   ============================================================ */
+const WIKI = {
+  largemouth:"Largemouth bass", smallmouth:"Smallmouth bass", spotted:"Spotted bass",
+  striper:"Striped bass", whitebass:"White bass",
+  rainbow:"Rainbow trout", brown:"Brown trout", brook:"Brook trout", cutthroat:"Cutthroat trout",
+  goldentrout:"California golden trout", bulltrout:"Bull trout", laketrout:"Lake trout",
+  arcticchar:"Arctic char", grayling:"Arctic grayling",
+  chinook:"Chinook salmon", coho:"Coho salmon", sockeye:"Sockeye salmon", pinksalmon:"Pink salmon",
+  atlanticsalmon:"Atlantic salmon",
+  pike:"Northern pike", muskie:"Muskellunge", pickerel:"Chain pickerel",
+  walleye:"Walleye", sauger:"Sauger", yellowperch:"Yellow perch",
+  bluegill:"Bluegill", redear:"Redear sunfish", rockbass:"Rock bass",
+  blackcrappie:"Black crappie", whitecrappie:"White crappie",
+  channelcat:"Channel catfish", flathead:"Flathead catfish", bluecat:"Blue catfish",
+  whitesturgeon:"White sturgeon", lakesturgeon:"Lake sturgeon",
+  carp:"Common carp", freshdrum:"Freshwater drum", bowfin:"Bowfin", alligatorgar:"Alligator gar",
+  redfish:"Red drum", snook:"Common snook", seatrout:"Spotted seatrout", flounder:"Southern flounder",
+  tarpon:"Atlantic tarpon", bonefish:"Bonefish", permit:"Permit (fish)", bluefish:"Bluefish",
+  redsnapper:"Northern red snapper", lingcod:"Lingcod", pacifichalibut:"Pacific halibut",
+  mahi:"Mahi-mahi", yellowfin:"Yellowfin tuna", roosterfish:"Roosterfish",
+  yellowtail:"Seriola dorsalis", stripedmarlin:"Striped marlin", sailfish:"Sailfish"
+};
+
+/* ============================================================
+   Official fishing-regulation / license sources by state.
+   We deep-link to the authoritative agency rather than hardcode
+   bag/size limits (which change yearly and by waterbody).
+   { agency, url }
+   ============================================================ */
+const STATE_REGS = {
+  // ---- USA ----
+  "Alabama":{agency:"AL Dept. of Conservation & Natural Resources",url:"https://www.outdooralabama.com/fishing"},
+  "Alaska":{agency:"Alaska Dept. of Fish & Game",url:"https://www.adfg.alaska.gov/index.cfm?adfg=fishingSportFishingInfo.main"},
+  "Arizona":{agency:"Arizona Game & Fish Dept.",url:"https://www.azgfd.com/fishing/regulations/"},
+  "Arkansas":{agency:"Arkansas Game & Fish Commission",url:"https://www.agfc.com/fishing/"},
+  "California":{agency:"CA Dept. of Fish & Wildlife",url:"https://wildlife.ca.gov/Fishing"},
+  "Colorado":{agency:"Colorado Parks & Wildlife",url:"https://cpw.state.co.us/thingstodo/Pages/Fishing.aspx"},
+  "Connecticut":{agency:"CT DEEP Fisheries",url:"https://portal.ct.gov/DEEP/Fishing/General-Information/Fishing-in-Connecticut"},
+  "Delaware":{agency:"Delaware DNREC Fish & Wildlife",url:"https://dnrec.delaware.gov/fish-wildlife/fishing/"},
+  "Florida":{agency:"Florida FWC",url:"https://myfwc.com/fishing/"},
+  "Georgia":{agency:"Georgia DNR Wildlife Resources",url:"https://georgiawildlife.com/fishing"},
+  "Hawaii":{agency:"Hawaii DLNR Aquatic Resources",url:"https://dlnr.hawaii.gov/dar/fishing/fishing-regulations/"},
+  "Idaho":{agency:"Idaho Fish & Game",url:"https://idfg.idaho.gov/rules/fish"},
+  "Illinois":{agency:"Illinois DNR",url:"https://dnr.illinois.gov/fishing.html"},
+  "Indiana":{agency:"Indiana DNR Fish & Wildlife",url:"https://www.in.gov/dnr/fish-and-wildlife/fishing/"},
+  "Iowa":{agency:"Iowa DNR",url:"https://www.iowadnr.gov/Things-to-Do/Fishing"},
+  "Kansas":{agency:"Kansas Dept. of Wildlife & Parks",url:"https://ksoutdoors.com/Fishing"},
+  "Kentucky":{agency:"Kentucky Fish & Wildlife",url:"https://fw.ky.gov/Fish/Pages/default.aspx"},
+  "Louisiana":{agency:"LA Dept. of Wildlife & Fisheries",url:"https://www.wlf.louisiana.gov/page/fishing"},
+  "Maine":{agency:"Maine Inland Fisheries & Wildlife",url:"https://www.maine.gov/ifw/fishing-boating/fishing/"},
+  "Maryland":{agency:"Maryland DNR Fisheries",url:"https://dnr.maryland.gov/fisheries/Pages/default.aspx"},
+  "Massachusetts":{agency:"MassWildlife",url:"https://www.mass.gov/fishing"},
+  "Michigan":{agency:"Michigan DNR",url:"https://www.michigan.gov/dnr/things-to-do/fishing"},
+  "Minnesota":{agency:"Minnesota DNR",url:"https://www.dnr.state.mn.us/fishing/index.html"},
+  "Mississippi":{agency:"MS Dept. of Wildlife, Fisheries & Parks",url:"https://www.mdwfp.com/fishing-boating/"},
+  "Missouri":{agency:"Missouri Dept. of Conservation",url:"https://mdc.mo.gov/fishing"},
+  "Montana":{agency:"Montana Fish, Wildlife & Parks",url:"https://fwp.mt.gov/fish"},
+  "Nebraska":{agency:"Nebraska Game & Parks",url:"https://outdoornebraska.gov/fishing/"},
+  "Nevada":{agency:"Nevada Dept. of Wildlife",url:"https://www.ndow.org/activity/fishing/"},
+  "New Hampshire":{agency:"NH Fish & Game",url:"https://www.wildlife.nh.gov/fishing-new-hampshire"},
+  "New Jersey":{agency:"NJ Div. of Fish & Wildlife",url:"https://dep.nj.gov/njfw/fishing/"},
+  "New Mexico":{agency:"New Mexico Dept. of Game & Fish",url:"https://www.wildlife.state.nm.us/fishing/"},
+  "New York":{agency:"NY DEC",url:"https://dec.ny.gov/things-to-do/freshwater-fishing"},
+  "North Carolina":{agency:"NC Wildlife Resources Commission",url:"https://www.ncwildlife.org/fishing"},
+  "North Dakota":{agency:"North Dakota Game & Fish",url:"https://gf.nd.gov/fishing"},
+  "Ohio":{agency:"Ohio DNR Div. of Wildlife",url:"https://ohiodnr.gov/discover-and-learn/safety-conservation/about-ODNR/wildlife/fishing"},
+  "Oklahoma":{agency:"Oklahoma Dept. of Wildlife Conservation",url:"https://www.wildlifedepartment.com/fishing"},
+  "Oregon":{agency:"Oregon Dept. of Fish & Wildlife",url:"https://myodfw.com/fishing"},
+  "Pennsylvania":{agency:"PA Fish & Boat Commission",url:"https://www.fishandboat.com/Fish/Pages/default.aspx"},
+  "Rhode Island":{agency:"RI DEM Fish & Wildlife",url:"https://dem.ri.gov/natural-resources-bureau/fish-and-wildlife/freshwater-fisheries"},
+  "South Carolina":{agency:"SC DNR",url:"https://www.dnr.sc.gov/fishing.html"},
+  "South Dakota":{agency:"South Dakota Game, Fish & Parks",url:"https://gfp.sd.gov/fishing/"},
+  "Tennessee":{agency:"Tennessee Wildlife Resources Agency",url:"https://www.tn.gov/twra/fishing.html"},
+  "Texas":{agency:"Texas Parks & Wildlife",url:"https://tpwd.texas.gov/fishboat/fish/"},
+  "Utah":{agency:"Utah Div. of Wildlife Resources",url:"https://wildlife.utah.gov/fishing-in-utah.html"},
+  "Vermont":{agency:"Vermont Fish & Wildlife",url:"https://vtfishandwildlife.com/fish"},
+  "Virginia":{agency:"Virginia Dept. of Wildlife Resources",url:"https://dwr.virginia.gov/fishing/"},
+  "Washington":{agency:"Washington Dept. of Fish & Wildlife",url:"https://wdfw.wa.gov/fishing"},
+  "West Virginia":{agency:"West Virginia DNR",url:"https://wvdnr.gov/fishing/"},
+  "Wisconsin":{agency:"Wisconsin DNR",url:"https://dnr.wisconsin.gov/topic/fishing"},
+  "Wyoming":{agency:"Wyoming Game & Fish Dept.",url:"https://wgfd.wyo.gov/fishing-and-boating"},
+  // ---- Canada ----
+  "British Columbia":{agency:"Freshwater Fisheries Society of BC",url:"https://www.gofishbc.com/"},
+  "Alberta":{agency:"My Wild Alberta (Govt. of Alberta)",url:"https://mywildalberta.ca/fishing/"},
+  "Saskatchewan":{agency:"Govt. of Saskatchewan — Angling",url:"https://www.saskatchewan.ca/residents/environment-public-health-and-safety/wildlife-issues/fishing-hunting-and-trapping/angling"},
+  "Manitoba":{agency:"Manitoba Natural Resources — Fishing",url:"https://www.gov.mb.ca/nrnd/fish-wildlife/fishing/"},
+  "Ontario":{agency:"Ontario — Fishing",url:"https://www.ontario.ca/page/fishing"},
+  "Quebec":{agency:"Québec — Sport Fishing",url:"https://www.quebec.ca/en/tourism-and-recreation/sport-hunting-fishing/sport-fishing"},
+  "New Brunswick":{agency:"Govt. of New Brunswick — Fishing",url:"https://www2.gnb.ca/content/gnb/en/departments/erd/natural_resources/content/fish_and_wildlife.html"},
+  "Nova Scotia":{agency:"Nova Scotia — Sportfishing",url:"https://novascotia.ca/fish/sportfishing/"},
+  "Prince Edward Island":{agency:"PEI — Fishing",url:"https://www.princeedwardisland.ca/en/topic/fishing"},
+  "Newfoundland and Labrador":{agency:"DFO — Recreational Fisheries (NL)",url:"https://www.dfo-mpo.gc.ca/fisheries-peches/recreational-recreative/index-eng.html"},
+  "Yukon":{agency:"Yukon — Fishing",url:"https://yukon.ca/en/outdoor-recreation-and-wildlife/fishing"},
+  "Northwest Territories":{agency:"NWT — Sport Fishing",url:"https://www.gov.nt.ca/ecc/en/services/sport-fishing"},
+  "Nunavut":{agency:"Nunavut — Fisheries",url:"https://www.gov.nu.ca/environment"}
+};
+const MX_REGS = {agency:"CONAPESCA — Mexican sportfishing license",url:"https://www.gob.mx/conapesca"};
+const MX_STATES = new Set(["Baja California","Baja California Sur","Sonora","Sinaloa","Nayarit","Jalisco",
+  "Colima","Michoacán","Guerrero","Oaxaca","Chiapas","Tamaulipas","Veracruz","Tabasco","Campeche",
+  "Quintana Roo","Yucatán"]);
+
+/* ============================================================
+   Ecoregion overlay sources (EPA Level III US / CEC North America).
+   Loaded at runtime when the user toggles the layer; degrades
+   gracefully if the host is unavailable.
+   ============================================================ */
+// EPA Level III ecoregions (simplified server-side via maxAllowableOffset). CORS-enabled.
+const ECOREGION_SOURCES = [
+  "https://gispub.epa.gov/arcgis/rest/services/ORD/USEPA_Ecoregions_Level_III_and_IV/MapServer/11/query?where=1%3D1&outFields=US_L3NAME,NA_L1NAME&f=geojson&outSR=4326&maxAllowableOffset=0.05&geometryPrecision=3&returnGeometry=true"
+];
+
+</script>
+<script>
+/* ============================================================
+   FishDex app logic v2
+   ============================================================ */
+
+// Runtime polygon sources (browser fetch; falls back in order).
+const GEO_SOURCES = [
+  { key:"us", urls:[
+      "https://cdn.jsdelivr.net/gh/PublicaMundi/MappingAPI@master/data/geojson/us-states.json",
+      "https://raw.githubusercontent.com/python-visualization/folium/main/examples/data/us-states.json",
+      "https://cdn.jsdelivr.net/gh/codeforgermany/click_that_hood@main/public/data/united-states.geojson"
+  ]},
+  { key:"ca", urls:[
+      "https://cdn.jsdelivr.net/gh/codeforgermany/click_that_hood@main/public/data/canada.geojson",
+      "https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/canada.geojson"
+  ]},
+  { key:"mx", urls:[
+      "https://cdn.jsdelivr.net/gh/codeforgermany/click_that_hood@main/public/data/mexico.geojson",
+      "https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/mexico.geojson"
+  ]}
+];
+
+const state = {
+  angling:false, month:"", tod:new Set(), water:new Set(),
+  selectedFish:null, selectedSub:null, selectedState:null, query:""
+};
+
+let map, stateLayers={}, normIndex={};  // normIndex: normalized name -> display name
+
+/* ---------- name normalization (accent/case-insensitive) ---------- */
+function norm(s){ return (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()
+  .replace(/[^a-z0-9 ]/g,"").replace(/\s+/g," ").trim(); }
+
+function fishById(id){ return FISH.find(f=>f.id===id); }
+function fishStates(f, subIdx){
+  if(subIdx!=null && f.subs && f.subs[subIdx]) return f.subs[subIdx].states;
+  return f.states;
+}
+function fishStatesNorm(f, subIdx){ return new Set(fishStates(f,subIdx).map(norm)); }
+
+/* ---------- bite score (blend month + time of day) ---------- */
+function monthScore(f){
+  if(state.month==="") return null;
+  const m=+state.month;
+  let best=99;
+  for(const bm of f.bestMonths){ let d=Math.abs(bm-m); d=Math.min(d,12-d); best=Math.min(best,d); }
+  if(best===0) return 1; if(best===1) return 0.6; if(best===2) return 0.3; return 0.1;
+}
+function todScore(f){
+  if(state.tod.size===0) return null;
+  return f.tod.some(t=>state.tod.has(t)) ? 1 : 0.2;
+}
+function evalFish(f){
+  if(state.water.size && !f.water.some(w=>state.water.has(w))) return {visible:false};
+  if(!state.angling) return {visible:true, rating:null, pct:null};
+  const parts=[monthScore(f),todScore(f)].filter(x=>x!==null);
+  if(parts.length===0) return {visible:true, rating:"good", pct:65};
+  const avg=parts.reduce((a,b)=>a+b,0)/parts.length;
+  const pct=Math.round(avg*100);
+  const rating = avg>=0.75?"peak":avg>=0.42?"good":"slow";
+  return {visible:true, rating, pct};
+}
+
+/* ---------- fish silhouettes (inline SVG) ---------- */
+function fishSVG(shape, color, w){
+  w=w||44; const h=Math.round(w*0.6);
+  const c=color||"#5bbf9b", dk="rgba(0,0,0,.35)";
+  let body;
+  switch(shape){
+    case "pike": case "gar":
+      body=`<path d="M2 30 C20 16,55 16,78 27 L96 19 L90 30 L96 41 L78 33 C55 44,20 44,2 30 Z" fill="${c}"/>
+            <circle cx="20" cy="28" r="2.4" fill="${dk}"/>`; break;
+    case "flounder":
+      body=`<ellipse cx="46" cy="30" rx="42" ry="20" fill="${c}"/>
+            <path d="M88 30 l8 -6 v12 z" fill="${c}"/><circle cx="30" cy="24" r="2.6" fill="${dk}"/>`; break;
+    case "marlin":
+      body=`<path d="M30 30 C45 16,78 16,92 28 L98 22 L94 30 L98 38 L92 32 C78 44,45 44,30 30 Z" fill="${c}"/>
+            <path d="M30 30 L0 22 L26 30 L0 38 Z" fill="${c}"/>
+            <path d="M52 17 C56 9,64 8,70 12" stroke="${c}" stroke-width="3" fill="none"/>
+            <circle cx="78" cy="27" r="2.4" fill="${dk}"/>`; break;
+    case "tuna":
+      body=`<path d="M6 30 C22 14,64 14,82 27 L98 16 L92 30 L98 44 L82 33 C64 46,22 46,6 30 Z" fill="${c}"/>
+            <path d="M40 16 l5 -7 l3 8 z" fill="${c}"/><circle cx="22" cy="27" r="2.6" fill="${dk}"/>`; break;
+    case "catfish":
+      body=`<path d="M4 30 C22 18,58 18,80 28 L96 20 L90 30 L96 40 L80 32 C58 42,22 42,4 30 Z" fill="${c}"/>
+            <circle cx="22" cy="27" r="2.4" fill="${dk}"/>
+            <path d="M14 30 q-8 4 -14 2 M14 31 q-8 7 -15 8" stroke="${c}" stroke-width="1.6" fill="none"/>`; break;
+    case "sturgeon":
+      body=`<path d="M0 31 C24 22,60 22,86 28 L98 24 L94 31 L98 38 L86 34 C60 40,24 40,0 31 Z" fill="${c}"/>
+            <path d="M10 24 L86 27" stroke="${dk}" stroke-width="1" opacity=".5"/>
+            <circle cx="20" cy="29" r="2" fill="${dk}"/>`; break;
+    default: // generic rounded gamefish
+      body=`<path d="M4 30 C20 14,60 14,80 26 L98 16 L92 30 L98 44 L80 34 C60 46,20 46,4 30 Z" fill="${c}"/>
+            <path d="M80 26 L98 16 L92 30 Z" fill="${c}"/>
+            <circle cx="22" cy="27" r="2.6" fill="${dk}"/>
+            <path d="M44 18 C50 24,50 36,44 42" stroke="${dk}" stroke-width="1" fill="none" opacity=".35"/>`;
+  }
+  return `<svg viewBox="0 0 100 60" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+}
+function stars(n){ return "★★★★★".slice(0,n)+"☆☆☆☆☆".slice(0,5-n); }
+
+/* ---------- rolodex render ---------- */
+function renderList(){
+  const list=document.getElementById("list"); const q=norm(state.query);
+  const selStateNorm = state.selectedState?norm(state.selectedState):null;
+
+  let items=FISH.filter(f=>{
+    if(selStateNorm && !fishStatesNorm(f).has(selStateNorm)) return false;
+    if(q){
+      const hay=norm(f.name+" "+f.sci+" "+f.family+" "+f.baits.join(" ")+" "+(f.diet||"")+" "+
+        (f.subs?f.subs.map(s=>s.n).join(" "):""));
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const groups={}; items.forEach(f=>{ (groups[f.family]=groups[f.family]||[]).push(f); });
+  list.innerHTML=""; let shown=0;
+
+  Object.keys(groups).forEach(fam=>{
+    // pre-eval to know if group has any visible
+    const vis=groups[fam].map(f=>({f,ev:evalFish(f)})).filter(x=>x.ev.visible);
+    if(!vis.length) return;
+    const g=document.createElement("div"); g.className="grp";
+    g.innerHTML=`<span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${FAMILY_COLOR[fam]||'#5bbf9b'};margin-right:6px"></span>${fam} <span style="opacity:.6">(${vis.length})</span>`;
+    list.appendChild(g);
+
+    // sort by bite pct when angling
+    if(state.angling) vis.sort((a,b)=>(b.ev.pct||0)-(a.ev.pct||0));
+
+    vis.forEach(({f,ev})=>{
+      shown++;
+      const card=document.createElement("div");
+      card.className="card"+(state.selectedFish===f.id?" sel":"")+(ev.rating==="slow"?" dim":"")+
+        (state.selectedFish===f.id && f.subs?" open":"");
+      card.dataset.id=f.id;
+
+      let bite="";
+      if(state.angling && ev.rating){
+        const lbl=ev.rating==="peak"?`● Biting ${ev.pct}%`:ev.rating==="good"?`◐ Active ${ev.pct}%`:`○ Slow ${ev.pct}%`;
+        bite=`<span class="bite ${ev.rating}">${lbl}</span>`;
+      }
+      const waterPills=f.water.slice(0,3).map(w=>`<span class="pill">${WATER_LABEL[w]||w}</span>`).join("");
+      let subsHtml="";
+      if(f.subs){ subsHtml=`<div class="subs">`+f.subs.map((s,i)=>
+        `<div class="sub ${state.selectedFish===f.id&&state.selectedSub===i?'sel':''}" data-sub="${i}">
+           <span class="sn">${s.n}</span><span class="ss">${s.s}</span></div>`).join("")+`</div>`; }
+
+      card.innerHTML=`
+        <div class="row1">
+          <span class="thumb">${fishSVG(f.shape, FAMILY_COLOR[f.family])}</span>
+          <div style="min-width:0;flex:1">
+            <div class="nm">${f.name}</div>
+            <div class="sci">${f.sci}</div>
+          </div>
+          ${bite}
+        </div>
+        <div class="meta">${waterPills}<span class="pill fight">${stars(f.fight)}</span>${f.subs?`<span class="pill">${f.subs.length} subsp.</span>`:""}</div>
+        ${subsHtml}`;
+      list.appendChild(card);
+    });
+  });
+
+  if(shown===0){
+    list.innerHTML=`<div style="padding:30px 16px;color:var(--muted);text-align:center">
+      No fish match these filters.${state.selectedState?`<br>Try clearing the <b>${state.selectedState}</b> location.`:""}</div>`;
+  }
+  document.getElementById("count").textContent=shown+" / "+FISH.length+" species";
+}
+
+/* ---------- context bar ---------- */
+function renderCtx(){
+  const ctx=document.getElementById("ctx");
+  if(state.selectedState){
+    ctx.innerHTML=`<span>Fish found in <b>${state.selectedState}</b></span><button id="clearState">Clear location</button>`;
+    document.getElementById("clearState").onclick=()=>setSelectedState(null);
+  } else if(state.selectedFish){
+    const f=fishById(state.selectedFish);
+    const sub=state.selectedSub!=null&&f.subs?" — "+f.subs[state.selectedSub].n:"";
+    ctx.innerHTML=`<span>Range shown for <b>${f.name}${sub}</b></span><button id="clearFish">Show all</button>`;
+    document.getElementById("clearFish").onclick=()=>selectFish(null);
+  } else {
+    ctx.innerHTML=`<span>Showing all North American game fish</span>`;
+  }
+}
+
+/* ---------- map ---------- */
+function styleState(name){
+  const nn=norm(name);
+  const base={weight:.8, color:"#2b4d59", fillColor:"#16323c", fillOpacity:.5};
+  if(state.selectedFish){
+    const f=fishById(state.selectedFish);
+    const sts=fishStatesNorm(f, state.selectedSub);
+    return sts.has(nn)
+      ? {weight:1.2, color:"#0c2a22", fillColor:"#37b6a0", fillOpacity:.82}
+      : {weight:.5, color:"#21404c", fillColor:"#11242c", fillOpacity:.32};
+  }
+  if(state.selectedState && norm(state.selectedState)===nn)
+    return {weight:2, color:"#5ad1bb", fillColor:"#26566b", fillOpacity:.85};
+  return base;
+}
+function restyle(){ for(const k in stateLayers) stateLayers[k].setStyle(styleState(stateLayers[k]._fdName)); }
+
+function onEachState(feature, layer){
+  const name=feature.properties.name || feature.properties.NAME || "—";
+  layer._fdName=name;
+  stateLayers[norm(name)]=layer; normIndex[norm(name)]=name;
+  layer.bindTooltip(name,{className:"stt",sticky:true});
+  layer.on({
+    mouseover:e=>{ const s=styleState(name); e.target.setStyle({weight:2.2,color:"#5ad1bb",fillOpacity:Math.min(.95,s.fillOpacity+.15)}); e.target.bringToFront(); },
+    mouseout:e=>e.target.setStyle(styleState(name)),
+    click:()=>setSelectedState(name)
+  });
+}
+
+function initMap(){
+  map=L.map("map",{minZoom:2,maxZoom:8,zoomControl:true,worldCopyJump:true}).setView([44,-96],3);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{
+    attribution:'&copy; OpenStreetMap, &copy; CARTO • boundaries: click_that_hood', subdomains:"abcd", maxZoom:8
+  }).addTo(map);
+  let loaded=0;
+  GEO_SOURCES.forEach(src=>loadGeo(src.urls,0,()=>{ loaded++; if(loaded>=GEO_SOURCES.length){ document.getElementById("loading").style.display="none"; restyle(); }}));
+}
+function loadGeo(urls, i, done){
+  if(i>=urls.length){ console.warn("FishDex: all sources failed for",urls[0]); done(); return; }
+  fetch(urls[i]).then(r=>{ if(!r.ok) throw 0; return r.json(); })
+    .then(geo=>{ L.geoJSON(geo,{style:f=>styleState(f.properties.name||f.properties.NAME),onEachFeature:onEachState}).addTo(map); done(); })
+    .catch(()=>loadGeo(urls,i+1,done));
+}
+
+/* ---------- ecoregion overlay (EPA Level III, colored by Level I) ---------- */
+let ecoLayer=null, ecoLoading=false;
+const ECO_PALETTE=["#caa24a","#6fae54","#5aa9d6","#cf8f6f","#9b7fd1","#5ec2a0","#d6a05a","#88909e","#c77f9e","#7bb25e","#bf6f6f","#5a86d6"];
+const ECO_L1_COLOR={};
+function ecoColor(name){ name=name||"—"; if(!(name in ECO_L1_COLOR)) ECO_L1_COLOR[name]=ECO_PALETTE[Object.keys(ECO_L1_COLOR).length%ECO_PALETTE.length]; return ECO_L1_COLOR[name]; }
+function ecoStyle(f){ const c=ecoColor(f&&f.properties&&f.properties.NA_L1NAME); return {color:c,weight:.6,fillColor:c,fillOpacity:.16,interactive:false}; }
+function loadEco(urls,i,done){
+  if(i>=urls.length){ done(false); return; }
+  fetch(urls[i]).then(r=>r.ok?r.json():Promise.reject()).then(geo=>{
+    ecoLayer=L.geoJSON(geo,{interactive:false,style:ecoStyle}); done(true);
+  }).catch(()=>loadEco(urls,i+1,done));
+}
+function toggleEco(){
+  const btn=document.getElementById("ecoBtn");
+  const off=()=>{ btn.classList.remove("on"); btn.textContent="🗺️ Ecoregions: off"; };
+  const on =()=>{ btn.classList.add("on"); btn.textContent="🗺️ Ecoregions: on"; };
+  if(ecoLayer && map.hasLayer(ecoLayer)){ map.removeLayer(ecoLayer); off(); return; }
+  if(ecoLayer){ ecoLayer.addTo(map); on(); return; }
+  if(ecoLoading) return;
+  ecoLoading=true; btn.textContent="🗺️ Ecoregions: loading…";
+  loadEco(ECOREGION_SOURCES,0,(ok)=>{
+    ecoLoading=false;
+    if(ok&&ecoLayer){ ecoLayer.addTo(map); on(); }
+    else { btn.textContent="🗺️ Ecoregions: unavailable"; setTimeout(off,2600); }
+  });
+}
+
+/* ---------- info card ---------- */
+const photoCache={};
+function loadPhoto(f, imgEl, creditEl){
+  const title=(typeof WIKI!=="undefined")?WIKI[f.id]:null; if(!title||!imgEl) return;
+  const apply=(o)=>{ if(!o||!o.src) return; imgEl.onload=()=>{imgEl.style.display="block";}; imgEl.src=o.src; if(creditEl&&o.credit) creditEl.textContent=o.credit; };
+  if(photoCache[f.id]!==undefined){ apply(photoCache[f.id]); return; }
+  fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title))
+    .then(r=>r.ok?r.json():Promise.reject())
+    .then(d=>{
+      let src=(d.thumbnail&&d.thumbnail.source)||(d.originalimage&&d.originalimage.source)||null;
+      if(src) src=src.replace(/\/\d+px-/,"/500px-");
+      const o = src?{src,credit:"Photo: Wikipedia / "+(d.title||title)}:null;
+      photoCache[f.id]=o; apply(o);
+    }).catch(()=>{ photoCache[f.id]=null; });
+}
+function renderInfo(){
+  const box=document.getElementById("info");
+  if(state.selectedFish){ renderFishInfo(box); box.classList.add("show"); return; }
+  if(state.selectedState){ renderStateInfo(box); box.classList.add("show"); return; }
+  box.classList.remove("show");
+}
+function renderFishInfo(box){
+  const f=fishById(state.selectedFish);
+  const sub=state.selectedSub!=null&&f.subs?f.subs[state.selectedSub]:null;
+  const months=f.bestMonths.map(m=>MONTHS[m-1].slice(0,3)).join(", ");
+  const tod=f.tod.map(t=>TOD_LABEL[t]).join(", ");
+  box.innerHTML=`
+    <img class="hero" alt="${f.name}">
+    <div class="pad">
+      <div class="ihead">
+        <span class="iart">${fishSVG(f.shape,FAMILY_COLOR[f.family],60)}</span>
+        <div><h3>${f.name}${sub?` <span class="subname">(${sub.n})</span>`:""}</h3>
+        <div class="sci">${sub?sub.s:f.sci}</div></div>
+      </div>
+      <div class="kv"><b>Family:</b> ${f.family} &nbsp;·&nbsp; <b>Fight:</b> <span class="stars">${stars(f.fight)}</span></div>
+      <div class="kv"><b>Habitat:</b> ${f.habitat}</div>
+      <div class="kv"><b>Diet:</b> ${f.diet}</div>
+      <div class="kv"><b>Best months:</b> ${months} &nbsp;·&nbsp; <b>Time:</b> ${tod}</div>
+      <div class="kv"><b>Water temp:</b> ${f.tempF} &nbsp;·&nbsp; <b>World record:</b> ${f.record} lb</div>
+      ${f.tide?`<div class="kv"><b>Tide / solunar:</b> ${f.tide}</div>`:""}
+      <div class="kv"><b>Regs:</b> <span style="color:var(--warn)">${f.regs}</span> <span style="color:var(--muted)">— click a state for official limits.</span></div>
+      <div class="kv"><b>Tip:</b> ${f.tip}</div>
+      <div class="kv" style="margin-top:6px"><b>What they're biting:</b></div>
+      <div class="baits">${f.baits.map(b=>`<span class="pill">${b}</span>`).join("")}</div>
+      <div class="credit"></div>
+    </div>`;
+  loadPhoto(f, box.querySelector(".hero"), box.querySelector(".credit"));
+}
+function renderStateInfo(box){
+  const name=state.selectedState;
+  const here=FISH.filter(f=>fishStatesNorm(f).has(norm(name)));
+  const reg = STATE_REGS[name] || (typeof MX_STATES!=="undefined"&&MX_STATES.has(name)?MX_REGS:null);
+  const pills=here.slice(0,48).map(f=>`<span class="pill" data-fid="${f.id}">${f.name}</span>`).join("")
+    ||'<span style="color:var(--muted);font-size:12px">No species in this guide yet for here.</span>';
+  box.innerHTML=`<div class="pad">
+    <div class="ihead"><span style="font-size:22px">📍</span><div><h3>${name}</h3>
+      <div class="sci">${here.length} game species in this guide</div></div></div>
+    ${reg?`<div class="kv"><b>Official source:</b> ${reg.agency}</div>
+      <a class="reglink" href="${reg.url}" target="_blank" rel="noopener noreferrer">📋 Regulations & licenses ↗</a>
+      <div class="disclaimer">Bag, size & season limits change yearly and vary by waterbody — always confirm current rules on the official site before you fish.</div>`
+     :`<div class="kv" style="color:var(--muted)">No official-source link on file for this region yet.</div>`}
+    <div class="kv" style="margin-top:10px"><b>Species found here</b> <span style="color:var(--muted)">(tap to view range)</span></div>
+    <div class="speclist">${pills}</div>
+  </div>`;
+  box.querySelectorAll(".speclist .pill[data-fid]").forEach(p=>p.onclick=()=>selectFish(p.dataset.fid));
+}
+
+/* ---------- selection ---------- */
+function selectFish(id, subIdx=null){
+  if(state.selectedFish===id && state.selectedSub===subIdx && id!==null){ state.selectedFish=null; state.selectedSub=null; }
+  else { state.selectedFish=id; state.selectedSub=subIdx; if(id) state.selectedState=null; }
+  restyle(); renderInfo(); renderList(); renderCtx();
+  if(id){
+    const f=fishById(id); const sts=fishStates(f,subIdx).map(norm);
+    const layers=sts.map(n=>stateLayers[n]).filter(Boolean);
+    if(layers.length){ try{ map.fitBounds(L.featureGroup(layers).getBounds().pad(0.12),{maxZoom:6,animate:true}); }catch(e){} }
+  }
+}
+function setSelectedState(name){
+  state.selectedState=(state.selectedState===name)?null:name;
+  if(state.selectedState){ state.selectedFish=null; state.selectedSub=null; }
+  renderInfo(); restyle(); renderList(); renderCtx();
+}
+
+/* ---------- filters UI ---------- */
+function buildFilterUI(){
+  const monthSel=document.getElementById("month");
+  MONTHS.forEach((m,i)=>{ const o=document.createElement("option"); o.value=i+1; o.textContent=m; monthSel.appendChild(o); });
+  monthSel.onchange=()=>{ state.month=monthSel.value; renderList(); };
+
+  document.getElementById("nowBtn").onclick=()=>{
+    const m=new Date().getMonth()+1; state.month=String(m); monthSel.value=m;
+    const hr=new Date().getHours();
+    const t = hr<7?"dawn":hr<11?"morning":hr<14?"midday":hr<17?"afternoon":hr<20?"dusk":"night";
+    state.tod=new Set([t]);
+    document.querySelectorAll('#tod button').forEach(b=>b.classList.toggle("on",b.dataset.k===t));
+    if(!state.angling) document.getElementById("angleToggle").click();
+    renderList();
+  };
+
+  const todBox=document.getElementById("tod");
+  TOD_ORDER.forEach(t=>{ const b=document.createElement("button"); b.textContent=TOD_LABEL[t]; b.dataset.k=t;
+    b.onclick=()=>{ b.classList.toggle("on"); state.tod.has(t)?state.tod.delete(t):state.tod.add(t); renderList(); }; todBox.appendChild(b); });
+
+  const waterBox=document.getElementById("water");
+  Object.keys(WATER_LABEL).forEach(w=>{ const b=document.createElement("button"); b.textContent=WATER_LABEL[w]; b.dataset.k=w;
+    b.onclick=()=>{ b.classList.toggle("on"); state.water.has(w)?state.water.delete(w):state.water.add(w); renderList(); }; waterBox.appendChild(b); });
+
+  document.getElementById("ecoBtn").onclick=toggleEco;
+
+  const tgl=document.getElementById("angleToggle");
+  tgl.onclick=()=>{ state.angling=!state.angling; tgl.classList.toggle("on",state.angling);
+    document.getElementById("angleFilters").classList.toggle("hide",!state.angling);
+    document.getElementById("hint").textContent=state.angling?"Set month & time to rank what's biting now.":"Tip: click any state, province, or Mexican state to see what swims there.";
+    renderList(); };
+}
+function renderLegend(){
+  document.getElementById("legend").innerHTML=`
+    <div><i style="background:#37b6a0"></i>Selected fish's range</div>
+    <div><i style="background:#26566b"></i>Clicked location</div>
+    <div><i style="background:#16323c"></i>Other states / provinces</div>`;
+}
+
+/* ---------- events ---------- */
+function wireList(){
+  document.getElementById("list").addEventListener("click",e=>{
+    const subEl=e.target.closest(".sub"); const card=e.target.closest(".card");
+    if(subEl&&card){ selectFish(card.dataset.id,+subEl.dataset.sub); return; }
+    if(card) selectFish(card.dataset.id);
+  });
+  const q=document.getElementById("q"); q.addEventListener("input",()=>{ state.query=q.value; renderList(); });
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+  buildFilterUI(); wireList(); renderLegend(); renderList(); renderCtx(); initMap();
+});
+
+</script>
+</body>
+</html>
