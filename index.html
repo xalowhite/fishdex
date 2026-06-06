@@ -313,7 +313,7 @@ const FISH = [
   /* ===================== TROUT ===================== */
   { id:"rainbow", name:"Rainbow Trout", sci:"Oncorhynchus mykiss", family:"Trout", emoji:"🌈", shape:"trout",
     water:["stream","river","lake"], habitat:"Cold, oxygen-rich streams, tailwaters & stocked lakes.",
-    states:union("PNW","ROCKIES","CALIF","NORTHEAST","GREATLAKES",["North Carolina","Tennessee","Georgia","Virginia","West Virginia","Arizona","New Mexico"],"CAN_WEST",["Ontario"]),
+    states:union("PNW","ROCKIES","CALIF","NORTHEAST","GREATLAKES",["North Carolina","Tennessee","Georgia","Virginia","West Virginia","Arizona","New Mexico","Missouri","Arkansas"],"CAN_WEST",["Ontario"]),
     bestMonths:[3,4,5,6,9,10], tod:["dawn","morning","dusk"], tempF:"50–62°F",
     baits:["Dry flies","Nymphs","Spinners","PowerBait","Salmon eggs"],
     diet:"Insects, eggs, baitfish", fight:4, record:48, regs:"Check stocking schedules & creel limits.", tide:"",
@@ -1069,7 +1069,55 @@ const WATERS = [
   { name:"Hatteras / The Point", region:"North Carolina", type:"offshore", depth:"Gulf Stream · 120–1,500 ft · 15–35 mi out", lat:35.10, lon:-74.90,
     species:["yellowfin","mahi","sailfish"], note:"Cape Hatteras pushes the Gulf Stream its closest to shore on the East Coast — short run to tuna and mahi." },
   { name:"Big Rock / Cape Lookout (Morehead City)", region:"North Carolina", type:"offshore", depth:"Gulf Stream · 150–2,000 ft · 30–50 mi out", lat:34.20, lon:-76.00,
-    species:["yellowfin","mahi","sailfish"], note:"Home of the Big Rock blue marlin tournament — summer bluewater for billfish, tuna and dolphin." }
+    species:["yellowfin","mahi","sailfish"], note:"Home of the Big Rock blue marlin tournament — summer bluewater for billfish, tuna and dolphin." },
+
+  /* ===================== ARKANSAS showcase (trophy tailwaters → Delta) ===================== */
+  // ---- Trophy trout tailwaters ----
+  { name:"White River (below Bull Shoals Dam)", region:"Arkansas", type:"tailwater", lat:36.37, lon:-92.56,
+    species:["brown","rainbow"], note:"World-class trophy-brown tailwater near Cotter — 40 lb-class browns. Also stocked with cutthroat & brook, so all four trout in one river. Watch dam generation." },
+  { name:"Norfork Tailwater", region:"Arkansas", type:"tailwater", lat:36.25, lon:-92.24,
+    species:["rainbow","brown"], note:"Short, fertile tailwater below Norfork Dam that once gave up a world-record brown; technical wade fishing on low water." },
+  { name:"Little Red River (below Greers Ferry)", region:"Arkansas", type:"tailwater", lat:35.52, lon:-91.97,
+    species:["brown","rainbow"], note:"Heber Springs tailwater that produced a former world-record brown (40 lb 4 oz). Sowbugs and scuds rule." },
+  { name:"Spring River (Mammoth Spring)", region:"Arkansas", type:"tailwater", lat:36.40, lon:-91.50,
+    species:["rainbow","brown"], note:"Cold, spring-fed river flowing year-round from the nation's largest spring — float-and-wade trout plus summer smallmouth lower down." },
+  // ---- Ozark smallmouth streams ----
+  { name:"Crooked Creek", region:"Arkansas", type:"smbriver", lat:36.23, lon:-92.55,
+    species:["smallmouth","rockbass"], note:"Arkansas's blue-ribbon smallmouth stream — gin-clear Ozark water, wade or float for hard-fighting bronzebacks." },
+  { name:"Buffalo National River", region:"Arkansas", type:"smbriver", lat:36.03, lon:-92.75,
+    species:["smallmouth","rockbass"], note:"America's first National River — bluff-lined floats with smallmouth and goggle-eye (rock bass)." },
+  { name:"Kings River", region:"Arkansas", type:"smbriver", lat:36.30, lon:-93.72,
+    species:["smallmouth","rockbass"], note:"Remote NW Arkansas float feeding Table Rock — quality smallmouth in a quiet setting." },
+  { name:"Mulberry River", region:"Arkansas", type:"smbriver", lat:35.55, lon:-93.85,
+    species:["smallmouth","rockbass"], note:"Whitewater float in the Ozark National Forest with willing spring smallmouth." },
+  // ---- Reservoirs (bass, inland striper, walleye, crappie, catfish) ----
+  { name:"Bull Shoals Lake", region:"Arkansas", type:"reservoir", lat:36.45, lon:-92.85,
+    species:["largemouth","smallmouth","spotted","whitebass","walleye","striper","channelcat"], note:"Deep, clear White-River impoundment — every black bass, plus walleye, white bass and stripers." },
+  { name:"Beaver Lake", region:"Arkansas", type:"reservoir", lat:36.42, lon:-93.82,
+    species:["striper","largemouth","smallmouth","whitebass","walleye","blackcrappie","channelcat"], note:"NW Arkansas trophy-striper lake — chase open-water stripers and white bass, bass on the bluffs." },
+  { name:"Norfork Lake", region:"Arkansas", type:"reservoir", lat:36.42, lon:-92.20,
+    species:["striper","largemouth","smallmouth","blackcrappie","channelcat"], note:"Clear highland reservoir famed for big stripers and a strong bass and crappie mix." },
+  { name:"Lake Ouachita", region:"Arkansas", type:"reservoir", lat:34.57, lon:-93.40,
+    species:["striper","largemouth","spotted","blackcrappie","channelcat","bluecat"], note:"Arkansas's largest lake — exceptionally clear, with stripers, spotted bass and big catfish." },
+  { name:"Greers Ferry Lake", region:"Arkansas", type:"reservoir", lat:35.57, lon:-92.00,
+    species:["walleye","whitebass","largemouth","smallmouth","blackcrappie"], note:"Top Arkansas walleye lake (spring spawning run up the Little Red) plus hybrid & white bass jumps." },
+  { name:"Lake Hamilton (Hot Springs)", region:"Arkansas", type:"reservoir", lat:34.45, lon:-93.10,
+    species:["striper","largemouth","blackcrappie","channelcat"], note:"Hot Springs resort lake stocked with stripers and hybrids; year-round warm-water bass and crappie." },
+  { name:"Lake Dardanelle (Arkansas River)", region:"Arkansas", type:"reservoir", lat:35.32, lon:-93.18,
+    species:["largemouth","blackcrappie","whitecrappie","bluecat","channelcat","whitebass"], note:"Sprawling river-reservoir and bass-tournament staple with strong crappie and catfish." },
+  { name:"Lake Conway", region:"Arkansas", type:"reservoir", lat:35.05, lon:-92.35,
+    species:["blackcrappie","largemouth","bluegill","channelcat"], note:"The country's largest state-built lake — a shallow, stumpy crappie and bream factory near Conway." },
+  { name:"Millwood Lake", region:"Arkansas", type:"reservoir", lat:33.68, lon:-93.96,
+    species:["largemouth","blackcrappie","whitecrappie","channelcat","alligatorgar"], note:"Shallow, fertile SW Arkansas lake — trophy largemouth, slab crappie, and a real shot at alligator gar." },
+  { name:"Lake Chicot", region:"Arkansas", type:"reservoir", lat:33.35, lon:-91.20,
+    species:["largemouth","blackcrappie","bluegill","channelcat","bowfin"], note:"The largest natural oxbow lake in the U.S. — Delta largemouth, crappie, bream and bowfin." },
+  // ---- Big rivers & Delta (catfish, gar, sauger, drum) ----
+  { name:"Arkansas River (Little Rock pools)", region:"Arkansas", type:"bigriver", lat:34.75, lon:-92.30,
+    species:["bluecat","flathead","channelcat","whitebass","sauger","freshdrum"], note:"Navigation-pool tailwaters below the dams — blue & flathead cats, white bass and winter sauger." },
+  { name:"Mississippi River (Helena)", region:"Arkansas", type:"bigriver", lat:34.53, lon:-90.59,
+    species:["bluecat","flathead","channelcat","alligatorgar","freshdrum"], note:"Big-river trophy blue cats and flatheads; the lower reaches hold alligator gar." },
+  { name:"Delta oxbows (lower White / Arkansas)", region:"Arkansas", type:"bigriver", lat:34.30, lon:-91.30,
+    species:["alligatorgar","bowfin","bluecat","blackcrappie"], note:"Backwater oxbows and sloughs of the Delta — Arkansas's stronghold for alligator gar, plus bowfin and catfish." }
 ];
 
 const ECO_RANGE = {
@@ -1080,7 +1128,7 @@ const ECO_RANGE = {
   // ----- Temperate Bass -----
   whitebass: EU("CORNBELT","PLAINS","TEXAS","OZARK","INTERIOR","GREATLAKES_PLAIN"),
   // ----- Trout -----
-  rainbow: EU("PNW","ROCKIES","SIERRA","APPALACHIA","NORTHEAST","NORTHWOODS","GREATBASIN","DESERT"),
+  rainbow: EU("PNW","ROCKIES","SIERRA","APPALACHIA","NORTHEAST","NORTHWOODS","GREATBASIN","DESERT","OZARK"),
   brown: EU("ROCKIES","PNW","SIERRA","APPALACHIA","NORTHEAST","NORTHWOODS","OZARK","INTERIOR","GREATBASIN"),
   brook: EU("APPALACHIA","NORTHEAST","NORTHWOODS"),
   cutthroat: EU("ROCKIES","PNW","GREATBASIN","SIERRA"),
@@ -1098,7 +1146,7 @@ const ECO_RANGE = {
   muskie: EU("NORTHWOODS","GREATLAKES_PLAIN","APPALACHIA","INTERIOR","NORTHEAST"),
   pickerel: EU("ATLANTIC_CP","SOUTHEAST","NORTHEAST","FLORIDA"),
   // ----- Perch / Walleye -----
-  walleye: EU("NORTHWOODS","NORTHEAST","GREATLAKES_PLAIN","CORNBELT","PLAINS","APPALACHIA","INTERIOR","ROCKIES"),
+  walleye: EU("NORTHWOODS","NORTHEAST","GREATLAKES_PLAIN","CORNBELT","PLAINS","APPALACHIA","INTERIOR","ROCKIES","OZARK"),
   sauger: EU("PLAINS","CORNBELT","INTERIOR","OZARK","GREATLAKES_PLAIN",["Middle Rockies"]),
   yellowperch: EU("NORTHWOODS","NORTHEAST","GREATLAKES_PLAIN","CORNBELT","PLAINS","APPALACHIA"),
   // ----- Sunfish / Panfish -----
