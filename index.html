@@ -134,6 +134,9 @@
   .wpop .wchip{font-size:10.5px;padding:2px 7px;border-radius:20px;background:var(--chip);color:var(--accent2);border:1px solid var(--line);cursor:pointer}
   .wpop .wchip:hover{border-color:var(--accent)}
   .leaflet-tooltip.leaflet-tooltip-top{background:#0e2530;border:1px solid var(--accent);color:var(--ink);font-weight:600}
+  .wpin span{display:block;width:14px;height:14px;border-radius:50%;border:2px solid #eef7f6;
+    box-shadow:0 1px 4px rgba(0,0,0,.6);box-sizing:border-box}
+  .wpin:hover span{transform:scale(1.25);transition:transform .1s}
   .leaflet-tooltip.stt{background:#0e2530;border:1px solid var(--accent);color:var(--ink);font-weight:600}
   .leaflet-tooltip.eco{background:#241f12;border:1px solid #b78b3a;color:#f1e3c4;font-weight:600}
   .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;z-index:600}
@@ -1370,9 +1373,12 @@ function refreshWaters(){
   waterLayer.clearLayers(); waterMarkers={};
   watersToShow().forEach(w=>{
     const t=WATER_TYPE[w.type]||{color:"#888"};
-    const m=L.circleMarker([w.lat,w.lon],{radius:6,color:"#08131a",weight:1.5,fillColor:t.color,fillOpacity:.95});
+    // HTML divIcon marker -> lives in markerPane, above all polygons (so state/eco
+    // hover bringToFront can't paint over it).
+    const icon=L.divIcon({className:"wpin", html:`<span style="background:${t.color}"></span>`, iconSize:[18,18], iconAnchor:[9,9], popupAnchor:[0,-8]});
+    const m=L.marker([w.lat,w.lon],{icon, riseOnHover:true, title:w.name});
     m.bindPopup(()=>makeWaterPopup(w),{maxWidth:260,className:"wpopwrap"});
-    m.bindTooltip(w.name,{direction:"top",offset:[0,-4]});
+    m.bindTooltip(w.name,{direction:"top",offset:[0,-9]});
     m.addTo(waterLayer); waterMarkers[w.name]=m;
   });
   if(map && !map.hasLayer(waterLayer)) waterLayer.addTo(map);
