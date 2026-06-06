@@ -845,6 +845,84 @@ const ECOREGION_SOURCES = [
   "https://gispub.epa.gov/arcgis/rest/services/ORD/USEPA_Ecoregions_Level_III_and_IV/MapServer/11/query?where=1%3D1&outFields=US_L3NAME,NA_L1NAME&f=geojson&outSR=4326&maxAllowableOffset=0.05&geometryPrecision=3&returnGeometry=true"
 ];
 
+/* ============================================================
+   ECOREGION RANGES (US only — EPA Level III, contiguous 48).
+   Sharper than whole-state ranges for FRESHWATER species.
+   Marine/inshore species and Alaska/Hawaii/Canada/Mexico
+   coverage stay state/province-based (no eco entry).
+   Names must match US_L3NAME exactly (matched via norm()).
+   ============================================================ */
+const ECO = {
+  APPALACHIA:["Blue Ridge","Ridge and Valley","Central Appalachians","Southwestern Appalachians","Western Allegheny Plateau","Northern Allegheny Plateau","North Central Appalachians"],
+  NORTHEAST:["Acadian Plains and Hills","Northeastern Highlands","Northeastern Coastal Zone","Eastern Great Lakes Lowlands","Northern Piedmont","Atlantic Coastal Pine Barrens"],
+  NORTHWOODS:["Northern Lakes and Forests","Northern Minnesota Wetlands","North Central Hardwood Forests","Driftless Area"],
+  GREATLAKES_PLAIN:["Huron/Erie Lake Plains","Erie Drift Plain","Southern Michigan/Northern Indiana Drift Plains","Southeastern Wisconsin Till Plains","Eastern Corn Belt Plains","Eastern Great Lakes Lowlands"],
+  CORNBELT:["Central Corn Belt Plains","Eastern Corn Belt Plains","Western Corn Belt Plains","Central Irregular Plains","Interior River Valleys and Hills"],
+  OZARK:["Ozark Highlands","Boston Mountains","Ouachita Mountains","Arkansas Valley"],
+  INTERIOR:["Interior Plateau"],
+  SOUTHEAST:["Southeastern Plains","Piedmont","Southern Coastal Plain","Mississippi Valley Loess Plains","Mississippi Alluvial Plain","South Central Plains"],
+  ATLANTIC_CP:["Middle Atlantic Coastal Plain","Southern Coastal Plain","Atlantic Coastal Pine Barrens"],
+  FLORIDA:["Southern Florida Coastal Plain","Southern Coastal Plain"],
+  TEXAS:["Texas Blackland Prairies","East Central Texas Plains","Cross Timbers","Edwards Plateau","Western Gulf Coastal Plain","Southern Texas Plains"],
+  PLAINS:["Central Great Plains","High Plains","Northwestern Great Plains","Northern Glaciated Plains","Northwestern Glaciated Plains","Lake Agassiz Plain","Nebraska Sand Hills","Flint Hills","Southwestern Tablelands"],
+  ROCKIES:["Southern Rockies","Middle Rockies","Northern Rockies","Idaho Batholith","Canadian Rockies","Wasatch and Uinta Mountains"],
+  PNW:["Cascades","North Cascades","Eastern Cascades Slopes and Foothills","Blue Mountains","Klamath Mountains/California High North Coast Range","Coast Range","Puget Lowland","Willamette Valley","Columbia Plateau","Snake River Plain"],
+  SIERRA:["Sierra Nevada","Southern California Mountains","Central California Foothills and Coastal Mountains"],
+  CALVALLEY:["Central California Valley","Central California Foothills and Coastal Mountains","Southern California/Northern Baja Coast"],
+  DESERT:["Mojave Basin and Range","Sonoran Basin and Range","Chihuahuan Deserts","Arizona/New Mexico Plateau","Arizona/New Mexico Mountains","Colorado Plateaus","Madrean Archipelago","Central Basin and Range","Northern Basin and Range"],
+  GREATBASIN:["Central Basin and Range","Northern Basin and Range","Snake River Plain","Columbia Plateau"]
+};
+function EU(){ const s=new Set(); for(const a of arguments){ (ECO[a]||(Array.isArray(a)?a:[a])).forEach(x=>s.add(x)); } return [...s]; }
+
+const ECO_RANGE = {
+  // ----- Black Bass -----
+  largemouth: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","TEXAS","CORNBELT","OZARK","INTERIOR","GREATLAKES_PLAIN","PLAINS","CALVALLEY","DESERT","PNW"),
+  smallmouth: EU("APPALACHIA","NORTHEAST","NORTHWOODS","GREATLAKES_PLAIN","OZARK","INTERIOR","CORNBELT","PNW","ROCKIES"),
+  spotted: EU("OZARK","INTERIOR","SOUTHEAST","TEXAS"),
+  // ----- Temperate Bass -----
+  whitebass: EU("CORNBELT","PLAINS","TEXAS","OZARK","INTERIOR","GREATLAKES_PLAIN"),
+  // ----- Trout -----
+  rainbow: EU("PNW","ROCKIES","SIERRA","APPALACHIA","NORTHEAST","NORTHWOODS","GREATBASIN","DESERT"),
+  brown: EU("ROCKIES","PNW","SIERRA","APPALACHIA","NORTHEAST","NORTHWOODS","OZARK","INTERIOR","GREATBASIN"),
+  brook: EU("APPALACHIA","NORTHEAST","NORTHWOODS"),
+  cutthroat: EU("ROCKIES","PNW","GREATBASIN","SIERRA"),
+  goldentrout: ["Sierra Nevada","Middle Rockies","Southern Rockies"],
+  bulltrout: ["Northern Rockies","Idaho Batholith","Cascades","North Cascades","Blue Mountains","Canadian Rockies","Eastern Cascades Slopes and Foothills"],
+  laketrout: EU("NORTHWOODS","NORTHEAST",["Northern Rockies","Middle Rockies","Southern Rockies"]),
+  // ----- Salmon (lower-48 portion; AK via states) -----
+  chinook: EU("PNW","GREATLAKES_PLAIN","NORTHWOODS",["Central California Valley","Klamath Mountains/California High North Coast Range","Sierra Nevada"]),
+  coho: EU("PNW","GREATLAKES_PLAIN","NORTHWOODS",["Klamath Mountains/California High North Coast Range"]),
+  sockeye: ["Cascades","North Cascades","Columbia Plateau","Puget Lowland"],
+  pinksalmon: ["Puget Lowland","North Cascades","Coast Range"],
+  atlanticsalmon: EU("NORTHEAST"),
+  // ----- Pike -----
+  pike: EU("NORTHWOODS","NORTHEAST","GREATLAKES_PLAIN","CORNBELT","PLAINS","ROCKIES"),
+  muskie: EU("NORTHWOODS","GREATLAKES_PLAIN","APPALACHIA","INTERIOR","NORTHEAST"),
+  pickerel: EU("ATLANTIC_CP","SOUTHEAST","NORTHEAST","FLORIDA"),
+  // ----- Perch / Walleye -----
+  walleye: EU("NORTHWOODS","NORTHEAST","GREATLAKES_PLAIN","CORNBELT","PLAINS","APPALACHIA","INTERIOR","ROCKIES"),
+  sauger: EU("PLAINS","CORNBELT","INTERIOR","OZARK","GREATLAKES_PLAIN",["Middle Rockies"]),
+  yellowperch: EU("NORTHWOODS","NORTHEAST","GREATLAKES_PLAIN","CORNBELT","PLAINS","APPALACHIA"),
+  // ----- Sunfish / Panfish -----
+  bluegill: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","TEXAS","CORNBELT","OZARK","INTERIOR","GREATLAKES_PLAIN","PLAINS","CALVALLEY","DESERT","PNW","NORTHEAST"),
+  redear: EU("SOUTHEAST","FLORIDA","TEXAS","ATLANTIC_CP","CALVALLEY","DESERT"),
+  rockbass: EU("APPALACHIA","NORTHEAST","NORTHWOODS","GREATLAKES_PLAIN","OZARK","INTERIOR"),
+  blackcrappie: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","TEXAS","CORNBELT","OZARK","INTERIOR","GREATLAKES_PLAIN","PLAINS","NORTHEAST","CALVALLEY"),
+  whitecrappie: EU("SOUTHEAST","TEXAS","CORNBELT","OZARK","INTERIOR","PLAINS","GREATLAKES_PLAIN"),
+  // ----- Catfish -----
+  channelcat: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","TEXAS","CORNBELT","OZARK","INTERIOR","GREATLAKES_PLAIN","PLAINS","CALVALLEY","DESERT","NORTHEAST"),
+  flathead: EU("OZARK","INTERIOR","SOUTHEAST","TEXAS","CORNBELT","PLAINS","APPALACHIA"),
+  bluecat: EU("OZARK","INTERIOR","SOUTHEAST","TEXAS","CORNBELT","PLAINS","ATLANTIC_CP"),
+  // ----- Sturgeon -----
+  whitesturgeon: ["Columbia Plateau","Cascades","Coast Range","Willamette Valley","Snake River Plain","Central California Valley","Klamath Mountains/California High North Coast Range"],
+  lakesturgeon: EU("NORTHWOODS","GREATLAKES_PLAIN","NORTHEAST","CORNBELT","INTERIOR"),
+  // ----- Other Freshwater -----
+  carp: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","TEXAS","CORNBELT","OZARK","INTERIOR","GREATLAKES_PLAIN","PLAINS","CALVALLEY","DESERT","NORTHEAST","PNW"),
+  freshdrum: EU("CORNBELT","INTERIOR","OZARK","SOUTHEAST","TEXAS","PLAINS","GREATLAKES_PLAIN"),
+  bowfin: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","NORTHWOODS","GREATLAKES_PLAIN","NORTHEAST"),
+  alligatorgar: EU("SOUTHEAST","TEXAS")
+};
+
 </script>
 <script>
 /* ============================================================
@@ -870,10 +948,19 @@ const GEO_SOURCES = [
 
 const state = {
   angling:false, month:"", tod:new Set(), water:new Set(),
-  selectedFish:null, selectedSub:null, selectedState:null, query:""
+  selectedFish:null, selectedSub:null, selectedState:null, selectedEco:null, query:""
 };
 
 let map, stateLayers={}, normIndex={};  // normIndex: normalized name -> display name
+
+// Contiguous-US states: when a fish has ecoregion data, these are shown via
+// ecoregion polygons instead of whole-state fills (AK/HI/Canada/Mexico stay state-level).
+const LOWER48 = new Set(["Alabama","Arizona","Arkansas","California","Colorado","Connecticut","Delaware",
+  "Florida","Georgia","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine",
+  "Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada",
+  "New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma",
+  "Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah",
+  "Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"].map(s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()));
 
 /* ---------- name normalization (accent/case-insensitive) ---------- */
 function norm(s){ return (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()
@@ -885,6 +972,17 @@ function fishStates(f, subIdx){
   return f.states;
 }
 function fishStatesNorm(f, subIdx){ return new Set(fishStates(f,subIdx).map(norm)); }
+
+/* ---------- ecoregion range helpers (US freshwater sharpening) ---------- */
+// usesEco requires ecoData to be loaded; until then a fish falls back to whole-state display.
+function usesEco(f, subIdx){ return subIdx==null && !!ecoData && typeof ECO_RANGE!=="undefined" && !!ECO_RANGE[f.id]; }
+function fishEco(f, subIdx){ return usesEco(f,subIdx) ? ECO_RANGE[f.id] : []; }
+function fishEcoNorm(f, subIdx){ return new Set(fishEco(f,subIdx).map(norm)); }
+// states to highlight for a fish: if it has eco, drop lower-48 (shown as ecoregions) but keep AK/HI/Canada/Mexico
+function fishHighlightStates(f, subIdx){
+  const sts=fishStates(f,subIdx);
+  return usesEco(f,subIdx) ? sts.filter(s=>!LOWER48.has(norm(s))) : sts;
+}
 
 /* ---------- bite score (blend month + time of day) ---------- */
 function monthScore(f){
@@ -951,8 +1049,10 @@ function stars(n){ return "★★★★★".slice(0,n)+"☆☆☆☆☆".slice(0
 function renderList(){
   const list=document.getElementById("list"); const q=norm(state.query);
   const selStateNorm = state.selectedState?norm(state.selectedState):null;
+  const selEcoNorm = state.selectedEco?norm(state.selectedEco):null;
 
   let items=FISH.filter(f=>{
+    if(selEcoNorm && !fishEcoNorm(f).has(selEcoNorm)) return false;
     if(selStateNorm && !fishStatesNorm(f).has(selStateNorm)) return false;
     if(q){
       const hay=norm(f.name+" "+f.sci+" "+f.family+" "+f.baits.join(" ")+" "+(f.diet||"")+" "+
@@ -1010,8 +1110,9 @@ function renderList(){
   });
 
   if(shown===0){
+    const where=state.selectedEco||state.selectedState;
     list.innerHTML=`<div style="padding:30px 16px;color:var(--muted);text-align:center">
-      No fish match these filters.${state.selectedState?`<br>Try clearing the <b>${state.selectedState}</b> location.`:""}</div>`;
+      No fish match these filters.${where?`<br>Try clearing the <b>${where}</b> location.`:""}</div>`;
   }
   document.getElementById("count").textContent=shown+" / "+FISH.length+" species";
 }
@@ -1019,7 +1120,10 @@ function renderList(){
 /* ---------- context bar ---------- */
 function renderCtx(){
   const ctx=document.getElementById("ctx");
-  if(state.selectedState){
+  if(state.selectedEco){
+    ctx.innerHTML=`<span>Fish in the <b>${state.selectedEco}</b> ecoregion</span><button id="clearEco">Clear</button>`;
+    document.getElementById("clearEco").onclick=()=>setSelectedEco(null);
+  } else if(state.selectedState){
     ctx.innerHTML=`<span>Fish found in <b>${state.selectedState}</b></span><button id="clearState">Clear location</button>`;
     document.getElementById("clearState").onclick=()=>setSelectedState(null);
   } else if(state.selectedFish){
@@ -1033,21 +1137,25 @@ function renderCtx(){
 }
 
 /* ---------- map ---------- */
+const HILITE={weight:1.2, color:"#0c2a22", fillColor:"#37b6a0", fillOpacity:.82};
+const DIM={weight:.5, color:"#21404c", fillColor:"#11242c", fillOpacity:.32};
 function styleState(name){
   const nn=norm(name);
   const base={weight:.8, color:"#2b4d59", fillColor:"#16323c", fillOpacity:.5};
   if(state.selectedFish){
     const f=fishById(state.selectedFish);
-    const sts=fishStatesNorm(f, state.selectedSub);
-    return sts.has(nn)
-      ? {weight:1.2, color:"#0c2a22", fillColor:"#37b6a0", fillOpacity:.82}
-      : {weight:.5, color:"#21404c", fillColor:"#11242c", fillOpacity:.32};
+    const sts=new Set(fishHighlightStates(f, state.selectedSub).map(norm));
+    return sts.has(nn) ? HILITE : DIM;
   }
+  if(state.selectedEco) return DIM; // dim states so the ecoregion reads clearly
   if(state.selectedState && norm(state.selectedState)===nn)
     return {weight:2, color:"#5ad1bb", fillColor:"#26566b", fillOpacity:.85};
   return base;
 }
-function restyle(){ for(const k in stateLayers) stateLayers[k].setStyle(styleState(stateLayers[k]._fdName)); }
+function restyle(){
+  for(const k in stateLayers) stateLayers[k].setStyle(styleState(stateLayers[k]._fdName));
+  if(ecoLayer) ecoLayer.setStyle(styleEcoFeature);
+}
 
 function onEachState(feature, layer){
   const name=feature.properties.name || feature.properties.NAME || "—";
@@ -1076,31 +1184,70 @@ function loadGeo(urls, i, done){
     .catch(()=>loadGeo(urls,i+1,done));
 }
 
-/* ---------- ecoregion overlay (EPA Level III, colored by Level I) ---------- */
-let ecoLayer=null, ecoLoading=false;
+/* ---------- ecoregion layer (EPA Level III) ----------
+   ecoData : parsed FeatureCollection (loaded once)
+   ecoMode : toggle — interactive ecoregion filtering + colored overview
+   The layer is shown when: ecoMode, or an ecoregion is selected, or a
+   selected fish has ecoregion data. Interactive only in ecoMode, so
+   state click-to-filter still works underneath otherwise. */
+let ecoData=null, ecoLayer=null, ecoMode=false, ecoLoading=false;
 const ECO_PALETTE=["#caa24a","#6fae54","#5aa9d6","#cf8f6f","#9b7fd1","#5ec2a0","#d6a05a","#88909e","#c77f9e","#7bb25e","#bf6f6f","#5a86d6"];
 const ECO_L1_COLOR={};
 function ecoColor(name){ name=name||"—"; if(!(name in ECO_L1_COLOR)) ECO_L1_COLOR[name]=ECO_PALETTE[Object.keys(ECO_L1_COLOR).length%ECO_PALETTE.length]; return ECO_L1_COLOR[name]; }
-function ecoStyle(f){ const c=ecoColor(f&&f.properties&&f.properties.NA_L1NAME); return {color:c,weight:.6,fillColor:c,fillOpacity:.16,interactive:false}; }
-function loadEco(urls,i,done){
-  if(i>=urls.length){ done(false); return; }
-  fetch(urls[i]).then(r=>r.ok?r.json():Promise.reject()).then(geo=>{
-    ecoLayer=L.geoJSON(geo,{interactive:false,style:ecoStyle}); done(true);
-  }).catch(()=>loadEco(urls,i+1,done));
+function ecoBandStyle(f){ const c=ecoColor(f&&f.properties&&f.properties.NA_L1NAME); return {color:c,weight:.5,fillColor:c,fillOpacity:.18}; }
+const ECO_HIDE={color:"#000",weight:0,fillColor:"#000",fillOpacity:0};
+function styleEcoFeature(f){
+  const nn=norm(f&&f.properties&&f.properties.US_L3NAME);
+  if(state.selectedFish){
+    const fish=fishById(state.selectedFish);
+    if(usesEco(fish,state.selectedSub)){
+      return fishEcoNorm(fish,state.selectedSub).has(nn)
+        ? {color:"#0c2a22",weight:.8,fillColor:"#37b6a0",fillOpacity:.8}
+        : (ecoMode?ecoBandStyle(f):ECO_HIDE);
+    }
+    return ecoMode?ecoBandStyle(f):ECO_HIDE;
+  }
+  if(state.selectedEco){
+    return norm(state.selectedEco)===nn
+      ? {color:"#5ad1bb",weight:1.6,fillColor:"#37b6a0",fillOpacity:.72}
+      : (ecoMode?ecoBandStyle(f):ECO_HIDE);
+  }
+  return ecoMode?ecoBandStyle(f):ECO_HIDE;
 }
-function toggleEco(){
+function onEachEco(feature, layer){
+  const nm=feature.properties&&feature.properties.US_L3NAME;
+  layer.bindTooltip(nm||"Ecoregion",{className:"eco",sticky:true});
+  layer.on("click",()=>setSelectedEco(nm));
+}
+function buildEcoLayer(){
+  if(!ecoData) return;
+  ecoLayer=L.geoJSON(ecoData,{interactive:ecoMode, style:styleEcoFeature, onEachFeature: ecoMode?onEachEco:undefined});
+}
+// decide presence + (re)build the eco layer to match current selection/mode
+function refreshEco(){
+  const show = ecoMode || state.selectedEco || (state.selectedFish && usesEco(fishById(state.selectedFish), state.selectedSub));
+  if(ecoLayer){ map.removeLayer(ecoLayer); ecoLayer=null; }
+  if(show && ecoData){ buildEcoLayer(); ecoLayer.addTo(map); ecoLayer.bringToFront(); }
+}
+function loadEcoData(urls,i,cb){
+  if(i>=urls.length){ cb(false); return; }
+  fetch(urls[i]).then(r=>r.ok?r.json():Promise.reject()).then(geo=>{ ecoData=geo; cb(true); }).catch(()=>loadEcoData(urls,i+1,cb));
+}
+function preloadEco(){ if(!ecoData && !ecoLoading){ ecoLoading=true; loadEcoData(ECOREGION_SOURCES,0,(ok)=>{ ecoLoading=false; if(ok){ refreshEco(); restyle(); } }); } }
+function toggleEcoMode(){
   const btn=document.getElementById("ecoBtn");
-  const off=()=>{ btn.classList.remove("on"); btn.textContent="🗺️ Ecoregions: off"; };
-  const on =()=>{ btn.classList.add("on"); btn.textContent="🗺️ Ecoregions: on"; };
-  if(ecoLayer && map.hasLayer(ecoLayer)){ map.removeLayer(ecoLayer); off(); return; }
-  if(ecoLayer){ ecoLayer.addTo(map); on(); return; }
-  if(ecoLoading) return;
-  ecoLoading=true; btn.textContent="🗺️ Ecoregions: loading…";
-  loadEco(ECOREGION_SOURCES,0,(ok)=>{
-    ecoLoading=false;
-    if(ok&&ecoLayer){ ecoLayer.addTo(map); on(); }
-    else { btn.textContent="🗺️ Ecoregions: unavailable"; setTimeout(off,2600); }
-  });
+  const setBtn=(on,txt)=>{ btn.classList.toggle("on",on); btn.textContent="🗺️ "+(txt||("Ecoregions: "+(on?"on":"off"))); };
+  const hint=document.getElementById("hint");
+  if(!ecoData){
+    setBtn(false,"Ecoregions: loading…");
+    loadEcoData(ECOREGION_SOURCES,0,(ok)=>{ if(ok){ ecoMode=true; setBtn(true); hint.textContent="Ecoregion mode: click an ecoregion to see its fish."; refreshEco(); restyle(); }
+      else { setBtn(false,"Ecoregions: unavailable"); setTimeout(()=>setBtn(false),2600); } });
+    return;
+  }
+  ecoMode=!ecoMode; setBtn(ecoMode);
+  hint.textContent = ecoMode ? "Ecoregion mode: click an ecoregion to see its fish."
+                             : "Tip: click any state, province, or Mexican state to see what swims there.";
+  refreshEco(); restyle();
 }
 
 /* ---------- info card ---------- */
@@ -1121,8 +1268,26 @@ function loadPhoto(f, imgEl, creditEl){
 function renderInfo(){
   const box=document.getElementById("info");
   if(state.selectedFish){ renderFishInfo(box); box.classList.add("show"); return; }
+  if(state.selectedEco){ renderEcoInfo(box); box.classList.add("show"); return; }
   if(state.selectedState){ renderStateInfo(box); box.classList.add("show"); return; }
   box.classList.remove("show");
+}
+function renderEcoInfo(box){
+  const name=state.selectedEco;
+  const here=FISH.filter(f=>fishEcoNorm(f).has(norm(name)));
+  let l1="";
+  if(ecoData){ const ft=ecoData.features.find(f=>norm(f.properties.US_L3NAME)===norm(name)); if(ft) l1=(ft.properties.NA_L1NAME||"").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()); }
+  const pills=here.map(f=>`<span class="pill" data-fid="${f.id}">${f.name}</span>`).join("")
+    ||'<span style="color:var(--muted);font-size:12px">No freshwater species tagged here yet.</span>';
+  box.innerHTML=`<div class="pad">
+    <div class="ihead"><span style="font-size:22px">🗺️</span><div><h3>${name}</h3>
+      <div class="sci">EPA Level III ecoregion${l1?" · "+l1:""}</div></div></div>
+    <div class="kv">${here.length} freshwater species tagged to this ecoregion.</div>
+    <div class="kv" style="margin-top:8px"><b>Species here</b> <span style="color:var(--muted)">(tap to view range)</span></div>
+    <div class="speclist">${pills}</div>
+    <div class="disclaimer">Ecoregion ranges are curated approximations for freshwater fish. Marine species and Alaska/Hawaii/Canada/Mexico stay state-level.</div>
+  </div>`;
+  box.querySelectorAll(".speclist .pill[data-fid]").forEach(p=>p.onclick=()=>selectFish(p.dataset.fid));
 }
 function renderFishInfo(box){
   const f=fishById(state.selectedFish);
@@ -1173,18 +1338,28 @@ function renderStateInfo(box){
 /* ---------- selection ---------- */
 function selectFish(id, subIdx=null){
   if(state.selectedFish===id && state.selectedSub===subIdx && id!==null){ state.selectedFish=null; state.selectedSub=null; }
-  else { state.selectedFish=id; state.selectedSub=subIdx; if(id) state.selectedState=null; }
-  restyle(); renderInfo(); renderList(); renderCtx();
+  else { state.selectedFish=id; state.selectedSub=subIdx; if(id){ state.selectedState=null; state.selectedEco=null; } }
+  refreshEco(); restyle(); renderInfo(); renderList(); renderCtx();
   if(id){
-    const f=fishById(id); const sts=fishStates(f,subIdx).map(norm);
-    const layers=sts.map(n=>stateLayers[n]).filter(Boolean);
-    if(layers.length){ try{ map.fitBounds(L.featureGroup(layers).getBounds().pad(0.12),{maxZoom:6,animate:true}); }catch(e){} }
+    const f=fishById(id); const b=L.latLngBounds([]);
+    fishHighlightStates(f,subIdx).map(norm).forEach(n=>{ const ly=stateLayers[n]; if(ly){ try{ b.extend(ly.getBounds()); }catch(e){} } });
+    if(usesEco(f,subIdx) && ecoLayer){ const set=fishEcoNorm(f,subIdx); ecoLayer.eachLayer(l=>{ if(l.feature && set.has(norm(l.feature.properties.US_L3NAME))){ try{ b.extend(l.getBounds()); }catch(e){} } }); }
+    if(b.isValid()){ try{ map.fitBounds(b.pad(0.12),{maxZoom:6,animate:true}); }catch(e){} }
   }
 }
 function setSelectedState(name){
   state.selectedState=(state.selectedState===name)?null:name;
-  if(state.selectedState){ state.selectedFish=null; state.selectedSub=null; }
-  renderInfo(); restyle(); renderList(); renderCtx();
+  if(state.selectedState){ state.selectedFish=null; state.selectedSub=null; state.selectedEco=null; }
+  refreshEco(); renderInfo(); restyle(); renderList(); renderCtx();
+}
+function setSelectedEco(name){
+  state.selectedEco=(state.selectedEco===name)?null:name;
+  if(state.selectedEco){ state.selectedFish=null; state.selectedSub=null; state.selectedState=null; }
+  refreshEco(); renderInfo(); restyle(); renderList(); renderCtx();
+  if(state.selectedEco && ecoLayer){
+    let lyr=null; ecoLayer.eachLayer(l=>{ if(l.feature && norm(l.feature.properties.US_L3NAME)===norm(state.selectedEco)) lyr=l; });
+    if(lyr){ try{ map.fitBounds(lyr.getBounds().pad(0.25),{maxZoom:6,animate:true}); }catch(e){} }
+  }
 }
 
 /* ---------- filters UI ---------- */
@@ -1211,7 +1386,7 @@ function buildFilterUI(){
   Object.keys(WATER_LABEL).forEach(w=>{ const b=document.createElement("button"); b.textContent=WATER_LABEL[w]; b.dataset.k=w;
     b.onclick=()=>{ b.classList.toggle("on"); state.water.has(w)?state.water.delete(w):state.water.add(w); renderList(); }; waterBox.appendChild(b); });
 
-  document.getElementById("ecoBtn").onclick=toggleEco;
+  document.getElementById("ecoBtn").onclick=toggleEcoMode;
 
   const tgl=document.getElementById("angleToggle");
   tgl.onclick=()=>{ state.angling=!state.angling; tgl.classList.toggle("on",state.angling);
@@ -1221,9 +1396,10 @@ function buildFilterUI(){
 }
 function renderLegend(){
   document.getElementById("legend").innerHTML=`
-    <div><i style="background:#37b6a0"></i>Selected fish's range</div>
+    <div><i style="background:#37b6a0"></i>Selected range (state or ecoregion)</div>
     <div><i style="background:#26566b"></i>Clicked location</div>
-    <div><i style="background:#16323c"></i>Other states / provinces</div>`;
+    <div><i style="background:#16323c"></i>Other states / provinces</div>
+    <div style="margin-top:3px;font-size:10px;opacity:.7">US freshwater fish show ecoregion ranges</div>`;
 }
 
 /* ---------- events ---------- */
@@ -1238,6 +1414,7 @@ function wireList(){
 
 window.addEventListener("DOMContentLoaded",()=>{
   buildFilterUI(); wireList(); renderLegend(); renderList(); renderCtx(); initMap();
+  setTimeout(preloadEco, 1200); // warm the ecoregion data so fish ranges render instantly
 });
 
 </script>
