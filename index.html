@@ -118,6 +118,22 @@
   .info .speclist{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
   .info .speclist .pill{cursor:pointer}
   .info .credit{font-size:9.5px;color:#5d7681;margin-top:6px}
+  .info .waters{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .info .waterchip{font-size:11px;padding:3px 8px;border-radius:7px;background:#143138;color:var(--accent2);
+    border:1px solid var(--line);cursor:pointer}
+  .info .waterchip:hover{border-color:var(--accent);background:#1a3c44}
+  /* Leaflet popup theming for water pins */
+  .wpopwrap .leaflet-popup-content-wrapper{background:#10242d;color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+  .wpopwrap .leaflet-popup-tip{background:#10242d;border:1px solid var(--line)}
+  .wpopwrap .leaflet-popup-content{margin:10px 12px;font-size:12px;line-height:1.4}
+  .wpop .wph{display:flex;align-items:center;gap:7px;font-size:14px}
+  .wpop .wdot{width:11px;height:11px;border-radius:50%;display:inline-block;border:1px solid #08131a}
+  .wpop .wtype{font-size:11px;color:var(--muted);margin:2px 0 6px}
+  .wpop .wnote{color:#cfe0e2;margin-bottom:7px}
+  .wpop .wsp{display:flex;flex-wrap:wrap;gap:4px}
+  .wpop .wchip{font-size:10.5px;padding:2px 7px;border-radius:20px;background:var(--chip);color:var(--accent2);border:1px solid var(--line);cursor:pointer}
+  .wpop .wchip:hover{border-color:var(--accent)}
+  .leaflet-tooltip.leaflet-tooltip-top{background:#0e2530;border:1px solid var(--accent);color:var(--ink);font-weight:600}
   .leaflet-tooltip.stt{background:#0e2530;border:1px solid var(--accent);color:var(--ink);font-weight:600}
   .leaflet-tooltip.eco{background:#241f12;border:1px solid #b78b3a;color:#f1e3c4;font-weight:600}
   .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;z-index:600}
@@ -874,6 +890,89 @@ const ECO = {
 };
 function EU(){ const s=new Set(); for(const a of arguments){ (ECO[a]||(Array.isArray(a)?a:[a])).forEach(x=>s.add(x)); } return [...s]; }
 
+/* ============================================================
+   NOTABLE WATERS — named destination fisheries (curated, not
+   exhaustive). Showcase region: MISSOURI. Schema supports future
+   coastal regions via optional {zone, depth} for marine spots.
+   Each: { name, region, type, lat, lon, species:[fishId], note }
+   ============================================================ */
+const WATER_TYPE = {
+  tailwater:{label:"Trout tailwater",color:"#5aa9d6"},
+  troutpark:{label:"Trout park",color:"#7cc0e0"},
+  troutstream:{label:"Wild trout stream",color:"#4f93c4"},
+  smbriver:{label:"Smallmouth river",color:"#6fae54"},
+  reservoir:{label:"Reservoir / lake",color:"#37b6a0"},
+  bigriver:{label:"Big river",color:"#b08d5b"},
+  // marine zones (for future coastal regions)
+  flats:{label:"Inshore flats",color:"#5ec2c0"},
+  nearshore:{label:"Nearshore / reef",color:"#5aa9d6"},
+  offshore:{label:"Offshore / bluewater",color:"#5a86d6"}
+};
+const WATERS = [
+  // ---- Trout: tailwater, parks & wild streams ----
+  { name:"Lake Taneycomo", region:"Missouri", type:"tailwater", lat:36.643, lon:-93.225,
+    species:["rainbow","brown"], note:"Cold tailwater below Table Rock Dam (Branson). Stocked rainbows + trophy browns; fish low water on the upper end." },
+  { name:"Roaring River (State Park)", region:"Missouri", type:"troutpark", lat:36.581, lon:-93.832,
+    species:["rainbow"], note:"Spring-fed put-and-take trout park near Cassville. Daily stocked rainbows; March–Oct catch-and-keep season." },
+  { name:"Bennett Spring (State Park)", region:"Missouri", type:"troutpark", lat:37.717, lon:-92.853,
+    species:["rainbow"], note:"One of MO's busiest trout parks, near Lebanon. Heavy stocking; fly-only zones upstream." },
+  { name:"Montauk (State Park)", region:"Missouri", type:"troutpark", lat:37.452, lon:-91.693,
+    species:["rainbow"], note:"Headwaters of the Current River. Trout park stocking plus wild trout water downstream." },
+  { name:"Maramec Spring Park", region:"Missouri", type:"troutpark", lat:37.954, lon:-91.531,
+    species:["rainbow"], note:"Privately-run trout park near St. James fed by Missouri's 5th-largest spring." },
+  { name:"North Fork of the White River", region:"Missouri", type:"troutstream", lat:36.78, lon:-92.13,
+    species:["rainbow","brown"], note:"Blue-ribbon wild trout water — self-sustaining rainbows and big browns; technical spring-creek-style fishing." },
+  { name:"Crane Creek", region:"Missouri", type:"troutstream", lat:36.90, lon:-93.57,
+    species:["rainbow"], note:"Tiny stream holding rare wild McCloud-strain rainbows. Catch-and-release, small flies, stealth required." },
+  { name:"Eleven Point River", region:"Missouri", type:"troutstream", lat:36.69, lon:-91.30,
+    species:["rainbow","smallmouth"], note:"Scenic float stream — stocked trout up top (Greer Spring), smallmouth lower down." },
+  { name:"Niangua River", region:"Missouri", type:"troutstream", lat:37.78, lon:-92.86,
+    species:["rainbow","smallmouth"], note:"Trout below Bennett Spring confluence; smallmouth and goggle-eye further down." },
+  // ---- Smallmouth (Ozark) rivers ----
+  { name:"Current River (lower)", region:"Missouri", type:"smbriver", lat:37.18, lon:-91.18,
+    species:["smallmouth","rockbass","walleye"], note:"Classic Ozark float — strong smallmouth, goggle-eye (rock bass), and river walleye." },
+  { name:"Jacks Fork River", region:"Missouri", type:"smbriver", lat:37.18, lon:-91.36,
+    species:["smallmouth","rockbass"], note:"Clear, spring-fed tributary of the Current. Wadeable smallmouth water in summer." },
+  { name:"Big River", region:"Missouri", type:"smbriver", lat:38.05, lon:-90.62,
+    species:["smallmouth","rockbass","largemouth"], note:"Eastern-Ozark smallmouth stream with special management (catch-and-release) stretches." },
+  { name:"Meramec River", region:"Missouri", type:"smbriver", lat:38.24, lon:-91.10,
+    species:["smallmouth","walleye","channelcat","rockbass"], note:"Big float river — smallmouth up top, walleye and catfish in the lower reaches." },
+  { name:"Gasconade River", region:"Missouri", type:"smbriver", lat:37.95, lon:-91.95,
+    species:["smallmouth","walleye","channelcat"], note:"Longest river entirely within MO; smallmouth and a respected river-walleye run." },
+  { name:"Big Piney River", region:"Missouri", type:"smbriver", lat:37.55, lon:-92.00,
+    species:["smallmouth","rockbass"], note:"Gasconade tributary; quality smallmouth on a quieter float." },
+  { name:"Elk River", region:"Missouri", type:"smbriver", lat:36.63, lon:-94.48,
+    species:["smallmouth","rockbass"], note:"Far-SW Missouri smallmouth float popular for summer wade-and-paddle trips." },
+  { name:"St. Francis River", region:"Missouri", type:"smbriver", lat:37.30, lon:-90.50,
+    species:["smallmouth","rockbass"], note:"Rocky, shut-in stretches in the St. Francois Mountains hold scrappy smallmouth." },
+  // ---- Reservoirs ----
+  { name:"Lake of the Ozarks", region:"Missouri", type:"reservoir", lat:38.13, lon:-92.66,
+    species:["largemouth","spotted","whitecrappie","blackcrappie","whitebass","channelcat","bluecat","flathead","bluegill","carp"], note:"MO's signature reservoir — bass on docks, crappie on brush, white-bass jumps, and big catfish in the main channel." },
+  { name:"Table Rock Lake", region:"Missouri", type:"reservoir", lat:36.60, lon:-93.31,
+    species:["largemouth","smallmouth","spotted","whitebass","blackcrappie","channelcat"], note:"Clear highland reservoir famous for spotted & smallmouth bass; finesse tactics shine." },
+  { name:"Truman Lake", region:"Missouri", type:"reservoir", lat:38.27, lon:-93.41,
+    species:["blackcrappie","whitecrappie","whitebass","channelcat","flathead","walleye","largemouth"], note:"Flooded-timber crappie & catfish factory above Warsaw; strong walleye too." },
+  { name:"Stockton Lake", region:"Missouri", type:"reservoir", lat:37.65, lon:-93.78,
+    species:["walleye","smallmouth","whitebass","blackcrappie","largemouth"], note:"Deep, clear lake — Missouri's top walleye bite plus smallmouth and white bass." },
+  { name:"Pomme de Terre Lake", region:"Missouri", type:"reservoir", lat:37.90, lon:-93.32,
+    species:["muskie","walleye","blackcrappie","whitecrappie","largemouth"], note:"Missouri's premier muskie lake (stocked), with good crappie and walleye." },
+  { name:"Smithville Lake", region:"Missouri", type:"reservoir", lat:39.42, lon:-94.57,
+    species:["walleye","muskie","blackcrappie","channelcat","largemouth"], note:"KC-area lake stocked with muskie and walleye; reliable crappie and cats." },
+  { name:"Mark Twain Lake", region:"Missouri", type:"reservoir", lat:39.53, lon:-91.63,
+    species:["blackcrappie","channelcat","largemouth","whitebass"], note:"NE Missouri's big-water crappie and catfish destination." },
+  { name:"Bull Shoals Lake (MO arm)", region:"Missouri", type:"reservoir", lat:36.55, lon:-92.86,
+    species:["largemouth","smallmouth","spotted","whitebass","walleye","channelcat"], note:"Deep, clear MO/AR border lake — bass, walleye and white-bass; stripers on the Arkansas side." },
+  { name:"Lake Wappapello", region:"Missouri", type:"reservoir", lat:36.93, lon:-90.32,
+    species:["blackcrappie","channelcat","largemouth","bluegill"], note:"SE Missouri lake known for crappie and channel catfish." },
+  // ---- Big rivers (catfish / sauger / drum) ----
+  { name:"Missouri River (Boonville reach)", region:"Missouri", type:"bigriver", lat:38.98, lon:-92.74,
+    species:["bluecat","flathead","channelcat","sauger","freshdrum","carp"], note:"Trophy blue & flathead catfish on the big muddy; sauger below wing-dikes in cold months." },
+  { name:"Mississippi River (Cape Girardeau)", region:"Missouri", type:"bigriver", lat:37.31, lon:-89.52,
+    species:["bluecat","flathead","channelcat","sauger","freshdrum"], note:"Big-river trophy blue cats; fish current seams and scour holes with fresh cut bait." },
+  { name:"Osage River (below Bagnell Dam)", region:"Missouri", type:"bigriver", lat:38.20, lon:-92.62,
+    species:["whitebass","blackcrappie","channelcat","flathead","freshdrum"], note:"Tailwater below Lake of the Ozarks — white bass runs, catfish, and spring crappie." }
+];
+
 const ECO_RANGE = {
   // ----- Black Bass -----
   largemouth: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","TEXAS","CORNBELT","OZARK","INTERIOR","GREATLAKES_PLAIN","PLAINS","CALVALLEY","DESERT","PNW"),
@@ -1250,6 +1349,35 @@ function toggleEcoMode(){
   refreshEco(); restyle();
 }
 
+/* ---------- notable waters (named-waterbody pins) ---------- */
+let waterLayer=L.layerGroup(), waterMarkers={};
+function watersToShow(){
+  if(state.selectedFish) return (typeof WATERS!=="undefined"?WATERS:[]).filter(w=>w.species.includes(state.selectedFish));
+  if(state.selectedState) return (typeof WATERS!=="undefined"?WATERS:[]).filter(w=>w.region===state.selectedState);
+  return [];
+}
+function makeWaterPopup(w){
+  const t=WATER_TYPE[w.type]||{label:w.type,color:"#888"};
+  const el=document.createElement("div"); el.className="wpop";
+  el.innerHTML=`<div class="wph"><span class="wdot" style="background:${t.color}"></span><b>${w.name}</b></div>
+    <div class="wtype">${t.label} · ${w.region}</div>
+    <div class="wnote">${w.note}</div>
+    <div class="wsp">${w.species.map(id=>{const f=fishById(id);return f?`<span class="wchip" data-fid="${id}">${f.name}</span>`:"";}).join("")}</div>`;
+  el.querySelectorAll(".wchip").forEach(c=>c.addEventListener("click",()=>selectFish(c.dataset.fid)));
+  return el;
+}
+function refreshWaters(){
+  waterLayer.clearLayers(); waterMarkers={};
+  watersToShow().forEach(w=>{
+    const t=WATER_TYPE[w.type]||{color:"#888"};
+    const m=L.circleMarker([w.lat,w.lon],{radius:6,color:"#08131a",weight:1.5,fillColor:t.color,fillOpacity:.95});
+    m.bindPopup(()=>makeWaterPopup(w),{maxWidth:260,className:"wpopwrap"});
+    m.bindTooltip(w.name,{direction:"top",offset:[0,-4]});
+    m.addTo(waterLayer); waterMarkers[w.name]=m;
+  });
+  if(map && !map.hasLayer(waterLayer)) waterLayer.addTo(map);
+}
+
 /* ---------- info card ---------- */
 const photoCache={};
 function loadPhoto(f, imgEl, creditEl){
@@ -1312,9 +1440,19 @@ function renderFishInfo(box){
       <div class="kv"><b>Tip:</b> ${f.tip}</div>
       <div class="kv" style="margin-top:6px"><b>What they're biting:</b></div>
       <div class="baits">${f.baits.map(b=>`<span class="pill">${b}</span>`).join("")}</div>
+      ${waterChipsHtml(f)}
       <div class="credit"></div>
     </div>`;
   loadPhoto(f, box.querySelector(".hero"), box.querySelector(".credit"));
+  box.querySelectorAll(".waterchip").forEach(c=>c.onclick=()=>{
+    const m=waterMarkers[c.dataset.w]; if(m){ map.setView(m.getLatLng(),9,{animate:true}); m.openPopup(); }
+  });
+}
+function waterChipsHtml(f){
+  const ws=(typeof WATERS!=="undefined"?WATERS:[]).filter(w=>w.species.includes(f.id));
+  if(!ws.length) return "";
+  return `<div class="kv" style="margin-top:8px"><b>Notable waters</b> <span style="color:var(--muted)">(${ws[0].region} — tap to zoom to the pin)</span></div>
+    <div class="waters">${ws.map(w=>`<span class="waterchip" data-w="${w.name}">📍 ${w.name}</span>`).join("")}</div>`;
 }
 function renderStateInfo(box){
   const name=state.selectedState;
@@ -1339,7 +1477,7 @@ function renderStateInfo(box){
 function selectFish(id, subIdx=null){
   if(state.selectedFish===id && state.selectedSub===subIdx && id!==null){ state.selectedFish=null; state.selectedSub=null; }
   else { state.selectedFish=id; state.selectedSub=subIdx; if(id){ state.selectedState=null; state.selectedEco=null; } }
-  refreshEco(); restyle(); renderInfo(); renderList(); renderCtx();
+  refreshEco(); refreshWaters(); restyle(); renderInfo(); renderList(); renderCtx();
   if(id){
     const f=fishById(id); const b=L.latLngBounds([]);
     fishHighlightStates(f,subIdx).map(norm).forEach(n=>{ const ly=stateLayers[n]; if(ly){ try{ b.extend(ly.getBounds()); }catch(e){} } });
@@ -1350,12 +1488,12 @@ function selectFish(id, subIdx=null){
 function setSelectedState(name){
   state.selectedState=(state.selectedState===name)?null:name;
   if(state.selectedState){ state.selectedFish=null; state.selectedSub=null; state.selectedEco=null; }
-  refreshEco(); renderInfo(); restyle(); renderList(); renderCtx();
+  refreshEco(); refreshWaters(); renderInfo(); restyle(); renderList(); renderCtx();
 }
 function setSelectedEco(name){
   state.selectedEco=(state.selectedEco===name)?null:name;
   if(state.selectedEco){ state.selectedFish=null; state.selectedSub=null; state.selectedState=null; }
-  refreshEco(); renderInfo(); restyle(); renderList(); renderCtx();
+  refreshEco(); refreshWaters(); renderInfo(); restyle(); renderList(); renderCtx();
   if(state.selectedEco && ecoLayer){
     let lyr=null; ecoLayer.eachLayer(l=>{ if(l.feature && norm(l.feature.properties.US_L3NAME)===norm(state.selectedEco)) lyr=l; });
     if(lyr){ try{ map.fitBounds(lyr.getBounds().pad(0.25),{maxZoom:6,animate:true}); }catch(e){} }
@@ -1399,6 +1537,7 @@ function renderLegend(){
     <div><i style="background:#37b6a0"></i>Selected range (state or ecoregion)</div>
     <div><i style="background:#26566b"></i>Clicked location</div>
     <div><i style="background:#16323c"></i>Other states / provinces</div>
+    <div><i style="background:#7cc0e0;border-radius:50%"></i>📍 Notable water (tap pin)</div>
     <div style="margin-top:3px;font-size:10px;opacity:.7">US freshwater fish show ecoregion ranges</div>`;
 }
 
