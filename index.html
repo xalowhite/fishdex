@@ -393,7 +393,7 @@ const FISH = [
   /* ===================== SALMON ===================== */
   { id:"chinook", name:"Chinook (King) Salmon", sci:"Oncorhynchus tshawytscha", family:"Salmon", emoji:"🐟", shape:"salmon",
     water:["river","lake","saltwater"], habitat:"Pacific rivers/ocean + stocked Great Lakes.",
-    states:union("PNW","ALASKA","CALIF",["Michigan","Wisconsin","New York","Indiana","Ohio"],"CAN_BC"),
+    states:union("PNW","ALASKA","CALIF",["Michigan","Wisconsin","New York","Indiana","Ohio","Illinois"],"CAN_BC"),
     bestMonths:[8,9,10], tod:["dawn","dusk"], tempF:"45–58°F",
     baits:["Spoons","Spinners","Cured roe","Plugs","Flies"],
     diet:"Herring, anchovies, squid", fight:5, record:97.25, regs:"Tight quotas & closures — check daily.", tide:"Time tide changes in estuaries & river mouths.",
@@ -905,6 +905,7 @@ const WATER_TYPE = {
   troutstream:{label:"Wild trout stream",color:"#4f93c4"},
   smbriver:{label:"Smallmouth river",color:"#6fae54"},
   reservoir:{label:"Reservoir / lake",color:"#37b6a0"},
+  greatlake:{label:"Great Lake",color:"#3f7fb0"},
   bigriver:{label:"Big river",color:"#b08d5b"},
   // marine zones (for future coastal regions)
   flats:{label:"Inshore flats",color:"#5ec2c0"},
@@ -1117,7 +1118,52 @@ const WATERS = [
   { name:"Mississippi River (Helena)", region:"Arkansas", type:"bigriver", lat:34.53, lon:-90.59,
     species:["bluecat","flathead","channelcat","alligatorgar","freshdrum"], note:"Big-river trophy blue cats and flatheads; the lower reaches hold alligator gar." },
   { name:"Delta oxbows (lower White / Arkansas)", region:"Arkansas", type:"bigriver", lat:34.30, lon:-91.30,
-    species:["alligatorgar","bowfin","bluecat","blackcrappie"], note:"Backwater oxbows and sloughs of the Delta — Arkansas's stronghold for alligator gar, plus bowfin and catfish." }
+    species:["alligatorgar","bowfin","bluecat","blackcrappie"], note:"Backwater oxbows and sloughs of the Delta — Arkansas's stronghold for alligator gar, plus bowfin and catfish." },
+
+  /* ===================== ILLINOIS showcase (Lake Michigan → southern rivers) ===================== */
+  // ---- Lake Michigan ----
+  { name:"Lake Michigan (Chicago–Waukegan)", region:"Illinois", type:"greatlake", depth:"trolling 20–150 ft", lat:42.05, lon:-87.68,
+    species:["chinook","coho","laketrout","brown","rainbow","yellowperch","smallmouth"], note:"Troll the open lake for chinook & coho salmon, lake trout and steelhead; perch and smallmouth work the harbors and breakwalls." },
+  // ---- Northern Illinois ----
+  { name:"Fox Chain O'Lakes", region:"Illinois", type:"reservoir", lat:42.46, lon:-88.15,
+    species:["largemouth","muskie","pike","walleye","blackcrappie","bluegill"], note:"Interconnected natural lakes NW of Chicago — muskie and northern pike plus a strong bass, walleye and panfish mix." },
+  { name:"Kankakee River", region:"Illinois", type:"smbriver", lat:41.20, lon:-88.00,
+    species:["smallmouth","pike","channelcat","walleye"], note:"Clean, gravel-bottomed river — one of northern Illinois's best smallmouth and northern-pike floats." },
+  { name:"Fox River", region:"Illinois", type:"smbriver", lat:41.80, lon:-88.32,
+    species:["smallmouth","walleye","channelcat"], note:"Dam-and-pool river through the Chicago suburbs with smallmouth and a respectable walleye bite below the dams." },
+  { name:"Rock River", region:"Illinois", type:"smbriver", lat:41.90, lon:-89.10,
+    species:["smallmouth","walleye","whitebass","channelcat","flathead"], note:"NW Illinois river known for smallmouth, walleye and flathead catfish." },
+  // ---- Central Illinois ----
+  { name:"Lake Shelbyville", region:"Illinois", type:"reservoir", lat:39.45, lon:-88.78,
+    species:["blackcrappie","largemouth","walleye","whitebass","muskie","channelcat"], note:"Big central-Illinois reservoir — crappie on brush, plus walleye, white bass and stocked muskie." },
+  { name:"Clinton Lake", region:"Illinois", type:"reservoir", lat:40.16, lon:-88.77,
+    species:["largemouth","striper","blackcrappie","channelcat"], note:"Warm-water cooling lake that stays open and fishable in winter; hybrid stripers chase shad in the discharge." },
+  { name:"Lake Springfield", region:"Illinois", type:"reservoir", lat:39.70, lon:-89.60,
+    species:["largemouth","blackcrappie","channelcat","whitebass"], note:"Capital-city lake with reliable largemouth, crappie and channel catfish." },
+  { name:"Evergreen Lake (Bloomington)", region:"Illinois", type:"reservoir", lat:40.59, lon:-88.97,
+    species:["muskie","largemouth","blackcrappie","channelcat"], note:"Clear central-Illinois lake stocked with muskie alongside good bass and crappie." },
+  { name:"Carlyle Lake", region:"Illinois", type:"reservoir", lat:38.62, lon:-89.35,
+    species:["whitebass","blackcrappie","walleye","sauger","largemouth","channelcat","bluecat"], note:"Illinois's largest inland lake — white-bass jumps, walleye/sauger, and big catfish on the flats." },
+  { name:"Braidwood Lake", region:"Illinois", type:"reservoir", lat:41.25, lon:-88.27,
+    species:["largemouth","striper","channelcat"], note:"Power-plant cooling lake famous for fat, fast-growing largemouth and winter open-water action." },
+  // ---- Southern Illinois ----
+  { name:"Rend Lake", region:"Illinois", type:"reservoir", lat:38.04, lon:-88.96,
+    species:["blackcrappie","whitecrappie","largemouth","whitebass","channelcat","bluegill"], note:"Shallow, fertile southern-Illinois lake — a crappie powerhouse with strong catfish and white bass." },
+  { name:"Kinkaid Lake", region:"Illinois", type:"reservoir", lat:37.77, lon:-89.42,
+    species:["muskie","largemouth","blackcrappie","channelcat"], note:"Clear, deep lake in the Shawnee hills — southern-Illinois muskie plus quality largemouth." },
+  { name:"Lake of Egypt", region:"Illinois", type:"reservoir", lat:37.62, lon:-88.97,
+    species:["largemouth","redear","blackcrappie","bluegill"], note:"Warm, clear lake with bass, slab redear (shellcrackers) and bluegill around the docks." },
+  { name:"Crab Orchard Lake", region:"Illinois", type:"reservoir", lat:37.72, lon:-89.08,
+    species:["largemouth","blackcrappie","channelcat","bluegill"], note:"Refuge lake near Carbondale — largemouth, crappie and channel cats." },
+  // ---- Big rivers ----
+  { name:"Mississippi River (Alton / Pool 26)", region:"Illinois", type:"bigriver", lat:38.97, lon:-90.19,
+    species:["bluecat","flathead","channelcat","sauger","whitebass","largemouth"], note:"Trophy blue catfish below Mel Price Lock & Dam; winter sauger and spring white bass in the tailwater." },
+  { name:"Illinois River (Starved Rock)", region:"Illinois", type:"bigriver", lat:41.32, lon:-88.99,
+    species:["sauger","flathead","channelcat","bluecat","whitebass","largemouth"], note:"Classic sauger tailwater below the Starved Rock dam, plus flatheads and white bass." },
+  { name:"Ohio River (Golconda)", region:"Illinois", type:"bigriver", lat:37.36, lon:-88.55,
+    species:["bluecat","flathead","channelcat","sauger","striper"], note:"Far-southern border river — giant blue cats, flatheads, sauger and hybrid stripers." },
+  { name:"Wabash River (eastern border)", region:"Illinois", type:"bigriver", lat:38.40, lon:-87.75,
+    species:["smallmouth","channelcat","flathead","sauger"], note:"IL/IN boundary river with smallmouth up top and trophy flathead catfish in the deeper holes." }
 ];
 
 const ECO_RANGE = {
