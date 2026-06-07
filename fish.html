@@ -1390,7 +1390,29 @@ const ACCESS = {
     {name:"Scott Driver (rim canal)",lat:27.180,lon:-80.920,info:"FWC ramp on the rim canal near Okeechobee with access to the open lake."}],
   "Carlyle Lake":[
     {name:"Dam West (Corps)",lat:38.620,lon:-89.360,info:"USACE ramp, beach and camp on the west side near the dam."},
-    {name:"Coles Creek (Corps)",lat:38.680,lon:-89.330,info:"USACE park — ramp and camping on the east shore."}]
+    {name:"Coles Creek (Corps)",lat:38.680,lon:-89.330,info:"USACE park — ramp and camping on the east shore."}],
+  // ---- Missouri & Arkansas verified public ramps (Corps / state agency) ----
+  "Truman Lake":[
+    {name:"Long Shoal (Corps / marina)",lat:38.270,lon:-93.420,info:"Full-service access on the Harry S. Truman State Park peninsula — ramp, fuel, bait & tackle, boat repair."},
+    {name:"Bucksaw (Corps / marina)",lat:38.220,lon:-93.550,info:"USACE marina & ramp about halfway to Brownington — boat slips, fuel, bait, tackle, store and campground."},
+    {name:"Berry Bend (Corps)",lat:38.260,lon:-93.500,info:"USACE campground with a boat ramp and playground on the lakeshore."}],
+  "Lake Ouachita":[
+    {name:"Brady Mountain (Corps)",lat:34.570,lon:-93.270,info:"USACE two-lane ramp near Royal with picnic area; large pet-friendly campground, fish-cleaning station and swim beach."},
+    {name:"Tompkins Bend (Corps)",lat:34.520,lon:-93.450,info:"USACE Class-A campground on the southwest end — boat ramp, showers, fish-cleaning station and trails."}],
+  "Stockton Lake":[
+    {name:"Orleans Trail (Corps / State Park)",lat:37.660,lon:-93.780,info:"Public ramp and marina near the dam — full-service with parking and nearby camping."},
+    {name:"Crabtree Cove (Corps)",lat:37.680,lon:-93.750,info:"USACE ramp and campground on the main lake; popular walleye access."},
+    {name:"Masters (Corps)",lat:37.700,lon:-93.720,info:"USACE ramp on the upper, windy lake — smallmouth & walleye water."}],
+  "Greers Ferry Lake":[
+    {name:"Heber Springs / Dam Site (Corps)",lat:35.520,lon:-92.040,info:"USACE ramp, marina and camping near the dam at Heber Springs."},
+    {name:"Devils Fork (Corps)",lat:35.610,lon:-92.180,info:"USACE park with ramp and camping on the Greers Ferry side."},
+    {name:"Mill Creek (Corps)",lat:35.570,lon:-91.950,info:"USACE ramp on the lower lake — walleye & hybrid bass access."}],
+  "Pomme de Terre Lake":[
+    {name:"Damsite / Hermitage (Corps)",lat:37.900,lon:-93.310,info:"USACE ramp and marina near the dam — muskie & crappie access."},
+    {name:"Pittsburg (Corps)",lat:37.860,lon:-93.320,info:"USACE park with ramp and campground on the Pomme de Terre arm."},
+    {name:"Nemo (Corps)",lat:37.950,lon:-93.280,info:"USACE ramp on the Lindley Creek arm — quieter water."}],
+  "Lake Conway":[
+    {name:"AGFC ramps (Conway/Mayflower)",lat:35.050,lon:-92.350,info:"AGFC public ramps around the lake (off Hwy 89 & Palarm) — shallow, stumpy crappie & bass water; idle through the timber."}]
 };
 
 </script>
@@ -1750,6 +1772,41 @@ const TACTICS = {
             conservation, refs:[{t,u}] }
    ============================================================ */
 const PROFILE = {
+  largemouth:{
+    tagline:"North America's most popular gamefish — an ambush predator of weedy lakes, ponds and slow rivers, and the species most shaped by where it lives.",
+    sections:[
+      { h:"Identification",
+        body:"Micropterus salmoides — the largest black bass. Olive-green with a bold, blotchy <b>dark horizontal stripe</b> down the side. The giveaways versus smallmouth and spotted bass: the <b>jaw (maxillary) extends well past the back of the eye</b>, and the spiny front dorsal and soft rear dorsal fins look <b>nearly separated</b> by a deep notch. No tooth patch on the tongue (spotted bass have one). Big fish develop a fat, bucket-mouthed profile — hence 'bucketmouth.'" },
+      { h:"Biology & life history",
+        body:"Largemouth spawn in spring as water climbs past about <b>60–65°F</b> — warmer than smallmouth, and earlier in the south. The male sweeps a nest on a soft-to-firm bottom near cover in 1–4 ft and guards eggs and fry. They're a cover-oriented ambush predator (not a structure/current fish like the smallmouth). Lifespan and ultimate size depend heavily on genetics and climate: a northern fish may live ~10–12 years and top out near 10 lb, while a warm-climate Florida-strain fish can live longer and exceed 15–20 lb." },
+      { h:"Behavior & seasonal patterns",
+        body:"Think <b>cover and ambush</b>: grass, pads, laydowns, docks, brush. Spring <b>pre-spawn</b> (fish staging shallow) and the fall <b>shad feed-up</b> are the two best windows. Summer means topwater frogs and walking baits at dawn/dusk over vegetation, with fish pulling to deeper cover and ledges in the heat. Winter slows them to a deep, lethargic bite on slow jigs, jerkbaits and blade baits. A largemouth's whole year is organized around where the warmest comfortable water and the densest ambush cover overlap." },
+      { h:"Diet & forage",
+        body:"A true opportunist — shad and other baitfish, bluegill and small sunfish, crayfish, frogs, even ducklings and snakes for the biggest fish. Match the dominant forage: shad-imitating crankbaits & swimbaits on open reservoirs, bluegill-pattern baits around bedding panfish, frogs over the pads, and live wild shiners where giant, wary fish demand them." },
+      { h:"The strain story — why a Florida bass dwarfs a Missouri bass",
+        body:"This is the key to largemouth: there are two genetic strains. <b>Northern-strain</b> largemouth (most of the country) average 6–8 lb at their best, rarely top 10, are more <i>aggressive</i> — chasing prey and relating to rock/structure — and tolerate cold winters but live shorter and stay smaller. <b>Florida-strain</b> bass (native to Florida) are genetically built to grow far larger (commonly 10+, potentially 20+ lb), evolved in warm, shallow, grass-filled lakes where they <i>ambush</i>, and tend to be more <b>cautious and selective</b> — tougher to fool in clear, pressured water (why wild shiners reign). Crucially, Florida genes only express their size potential in <b>warm water with a long (or year-round) growing season</b>. That's why states from Texas to the Carolinas stock Florida-strain bass for trophies — and why a Missouri 6-pounder is a fish of a lifetime while in Florida that's just average." }
+    ],
+    regions:[
+      { name:"Florida (the giant-bass capital)",
+        body:"Native <b>Florida-strain</b> water, year-round growing season, endless grass — the trophy epicenter. <b>Lake Okeechobee</b> ('the Big O'), the <b>Kissimmee chain</b> (Lake Toho), and trophy factories like <b>Rodman Reservoir</b> regularly give up double-digit bass; January–March pre-spawn is the magic window. The game is shallow and visual: wild shiners, flipping/punching matted grass, swimbaits and big worms. A 10-lb bass here is a realistic goal — the ceiling Missouri simply can't reach." },
+      { name:"Arkansas (a strain crossroads — real trophy potential)",
+        body:"Arkansas straddles the line, and the AGFC leans in: its <b>Florida-bass / Legacy Lunker program</b> stocks Florida-strain fish across the warm bottom two-thirds of the state. <b>Millwood Lake</b> in the southwest is the standout — ~175,000 Florida fingerlings a year for decades over shallow, fertile habitat, producing bass to 12 lb and beyond — with <b>Lake Hamilton, Ouachita and DeGray</b> also boosted, and the Delta oxbows (<b>Lake Chicot</b>) and shallow, stumpy <b>Lake Conway</b> classic largemouth water. The cold, clear highland lakes (Bull Shoals, Beaver, Norfork) stay northern-strain, where bass share the stage with smallmouth, spotted bass and walleye." },
+      { name:"Missouri (northern-strain — a numbers & quality state)",
+        body:"Cold winters keep Missouri almost entirely <b>northern-strain</b>, so it's a fantastic <i>numbers and solid-quality</i> fishery rather than a giant-bass state — true double-digits are rare. <b>Lake of the Ozarks</b> (mile after mile of docks and brush), <b>Truman Lake</b> (flooded timber), <b>Mark Twain</b>, and thousands of MDC community lakes and farm ponds carry the load. The clear highland lakes (<b>Table Rock</b>, <b>Bull Shoals</b>) actually favor spotted and smallmouth, with largemouth tucked in the bushier, stained creek arms. The plain contrast you'll feel: a 6-lb Missouri largemouth is a trophy; that's an average Okeechobee fish." },
+      { name:"North Carolina (Florida-strain stockings take hold)",
+        body:"Warm enough that <b>Florida-strain stockings</b> express — <b>Shearon Harris</b>, a power-plant cooling lake near Raleigh, stays warm year-round and is the state's premier <b>trophy-bass</b> water (double-digits show up), with <b>Jordan</b> and <b>Falls</b> lakes strong piedmont options and the coastal blackwater (Currituck Sound, the lower Cape Fear) offering classic grass-and-cypress largemouth. NC sits squarely between Missouri's numbers game and Florida's giant game." },
+      { name:"Illinois (cold state, warm-water wildcards)",
+        body:"Northern-strain and cold-wintered — but Illinois' secret is its <b>power-plant cooling lakes</b>: <b>Braidwood, Heidecke, Clinton, Newton, Coffeen and Sangchris</b> stay warm year-round, so bass feed and grow through winter and get unusually fat and fast for a northern climate — these are the state's trophy spots, often fishable in January. The natural <b>Fox Chain O'Lakes</b> and the southern reservoirs (<b>Rend, Kinkaid, Lake of Egypt</b>) fish like textbook warmwater largemouth water." }
+    ],
+    conservation:"Largemouth handle catch-and-release well; release the big females, which are old and slow-replaced (especially up north). Many waters run length or slot limits to protect quality. Remember the genetics ceiling — Florida giants need warm water; stocking Florida-strain in a cold northern lake just produces winter die-offs, not lunkers.",
+    refs:[
+      {t:"Northern vs Florida-strain largemouth — BassResource", u:"https://www.bassresource.com/fish_biology/northern-largemouth-florida-strain.html"},
+      {t:"Millwood & Arkansas's Florida-bass boost — Arkansas Game & Fish Commission", u:"https://www.agfc.com/news/millwood-one-of-many-arkansas-lakes-seeing-florida-bass-boost/"},
+      {t:"Arkansas Legacy Lunker / trophy-bass program — Wired2Fish", u:"https://www.wired2fish.com/news/arkansas-legacy-lunker-program-building-a-trophy-bass-population"},
+      {t:"AGFC Black Bass Program", u:"https://www.agfc.com/fishing/black-bass/black-bass-program/"},
+      {t:"Largemouth bass — Wikipedia", u:"https://en.wikipedia.org/wiki/Largemouth_bass"}
+    ]
+  },
   smallmouth:{
     tagline:"Pound for pound the hardest-fighting freshwater gamefish in North America — a cool-water predator of clear rivers and rocky lakes.",
     sections:[
