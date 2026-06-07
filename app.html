@@ -166,6 +166,17 @@
   .wpop .wintel b{color:var(--accent2);display:block;margin-bottom:2px}
   .wpop .wacc{color:var(--accent2);cursor:pointer;white-space:nowrap}
   .wpop .wacc:hover{text-decoration:underline}
+  .wpop .wlive{margin:6px 0;font-size:12px;color:#d7e6e2;background:#0e2a23;border:1px solid #1f6b46;
+    border-radius:8px;padding:7px 9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .wpop .wlive .protag{font-size:9.5px;font-weight:800;letter-spacing:.5px;background:var(--gold);color:#2a2410;
+    border-radius:5px;padding:1px 6px}
+  .wpop .wlive .liveflow b{color:var(--peak)}
+  .wpop .wlive .livesub{color:var(--muted);font-size:10.5px}
+  .wpop .wlive .genlink{color:#e9c96b;font-weight:600}
+  /* Leaflet layers control theming */
+  .leaflet-control-layers{background:#10242c !important;border:1px solid var(--line) !important;color:var(--ink);border-radius:8px !important}
+  .leaflet-control-layers-expanded{padding:8px 10px !important;font-size:13px}
+  .leaflet-control-layers label{margin:3px 0}
   /* How-to-catch (fish info card) */
   .info .howto{margin-top:10px;border:1px solid var(--line);border-radius:10px;background:#10242c;overflow:hidden}
   .info .howto>summary{cursor:pointer;padding:9px 11px;font-size:12.5px;font-weight:700;color:var(--accent2);
@@ -1439,8 +1450,34 @@ const WATERS = [
     species:["largemouth","blackcrappie","channelcat","flathead","bluecat"], note:"Navigable central/southern river & side lakes.", best:"Spring crappie & bass; summer cats.", how:"Backwaters & oxbows for bass/crappie; cut bait in the channel.", size:"Navigable river · New Athens" },
   { name:"Sangamon River", region:"Illinois", type:"smbriver", lat:39.95, lon:-89.40,
     species:["smallmouth","channelcat","flathead"], note:"Prairie river with smallmouth and trophy flatheads.", best:"Spring smb; summer flatheads.", how:"Wade/kayak; soft plastics up top; live bait in the deep holes.", size:"Prairie river · Petersburg/Decatur" }
-  /* APPEND-HERE */
 ];
+
+/* ============================================================
+   LIVE DATA HOOKS (Pro)
+   USGS_GAGE: water name -> USGS gage site number (verified active,
+   00060 discharge + 00065 gage height). Pulled live on popup open.
+   GEN_URL: tailwater name -> official dam-generation schedule page.
+   ============================================================ */
+const USGS_GAGE = {
+  "Crooked Creek":"07055607",
+  "Current River (lower)":"07067000",
+  "Meramec River":"07014500",
+  "Gasconade River":"06933500",
+  "Big Piney River":"06930000",
+  "Davidson River (Pisgah NF)":"03441000",
+  "French Broad River":"03451500",
+  "Buffalo National River":"07056700",
+  "Kings River":"07050500",
+  "White River (below Bull Shoals Dam)":"07060500",
+  "Norfork Tailwater":"07057370"
+};
+const GEN_URL = {
+  "White River (below Bull Shoals Dam)":"https://www.swpa.gov/generationschedules.aspx",
+  "Norfork Tailwater":"https://www.swpa.gov/generationschedules.aspx",
+  "Little Red River (below Greers Ferry)":"https://www.swpa.gov/generationschedules.aspx",
+  "Beaver Tailwater":"https://www.swpa.gov/generationschedules.aspx",
+  "Lake Taneycomo":"https://www.swpa.gov/generationschedules.aspx"
+};
 
 </script>
 <script>
@@ -2034,7 +2071,7 @@ const HILITE={weight:1.2, color:"#0c2a22", fillColor:"#37b6a0", fillOpacity:.82}
 const DIM={weight:.5, color:"#21404c", fillColor:"#11242c", fillOpacity:.32};
 function styleState(name){
   const nn=norm(name);
-  const base={weight:.8, color:"#2b4d59", fillColor:"#16323c", fillOpacity:.5};
+  const base={weight:.8, color:"#2b4d59", fillColor:"#16323c", fillOpacity: baseMode==="dark"?.5:.1};
   if(state.selectedFish){
     const f=fishById(state.selectedFish);
     const sts=new Set(fishHighlightStates(f, state.selectedSub).map(norm));
@@ -2062,11 +2099,18 @@ function onEachState(feature, layer){
   });
 }
 
+let baseMode="dark";
 function initMap(){
-  map=L.map("map",{minZoom:2,maxZoom:8,zoomControl:true,worldCopyJump:true}).setView([44,-96],3);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{
-    attribution:'&copy; OpenStreetMap, &copy; CARTO • boundaries: click_that_hood', subdomains:"abcd", maxZoom:8
-  }).addTo(map);
+  map=L.map("map",{minZoom:2,maxZoom:16,zoomControl:true,worldCopyJump:true}).setView([44,-96],3);
+  const dark=L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{
+    attribution:'&copy; OpenStreetMap, &copy; CARTO • boundaries: click_that_hood', subdomains:"abcd", maxZoom:19});
+  const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{attribution:'Imagery &copy; Esri, Maxar, USGS', maxZoom:19});
+  const satLabels=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",{maxZoom:19});
+  const satellite=L.layerGroup([sat,satLabels]);
+  const topo=L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",{attribution:'&copy; OpenTopoMap (CC-BY-SA)', maxZoom:17});
+  dark.addTo(map);
+  L.control.layers({"🌑 Dark":dark, "🛰️ Satellite":satellite, "🗺️ Topographic":topo}, null, {position:"topright"}).addTo(map);
+  map.on("baselayerchange", e=>{ baseMode = e.name.indexOf("Dark")>=0 ? "dark" : "imagery"; restyle(); });
   let loaded=0;
   GEO_SOURCES.forEach(src=>loadGeo(src.urls,0,()=>{ loaded++; if(loaded>=GEO_SOURCES.length){ document.getElementById("loading").style.display="none"; restyle(); }}));
 }
@@ -2152,8 +2196,28 @@ function watersToShow(){
   if(state.selectedState) return all.filter(w=>w.region===state.selectedState);
   return [];
 }
+/* ---------- live data (Pro): USGS real-time flow ---------- */
+const IS_PRO = true; // PREVIEW: live features visible to everyone until the paywall is wired
+const flowCache={};
+function loadFlow(site, elFlow){
+  if(!elFlow||!site) return;
+  if(flowCache[site]!==undefined){ elFlow.innerHTML=flowCache[site]||"💧 Live flow: unavailable"; return; }
+  fetch("https://waterservices.usgs.gov/nwis/iv/?format=json&sites="+site+"&parameterCd=00060,00065&siteStatus=active")
+    .then(r=>r.ok?r.json():Promise.reject()).then(j=>{
+      let cfs=null, ft=null, when="";
+      (j.value.timeSeries||[]).forEach(s=>{ const v=s.variable.variableCode[0].value; const val=s.values[0].value[0];
+        if(val){ if(v==="00060")cfs=val.value; if(v==="00065")ft=val.value; when=val.dateTime; } });
+      if(cfs===null&&ft===null){ flowCache[site]=""; elFlow.textContent="💧 Live flow: unavailable"; return; }
+      const t=when?new Date(when).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):"";
+      const html="💧 <b>"+(cfs!==null?Number(cfs).toLocaleString()+" cfs":"")+(cfs!==null&&ft!==null?" · ":"")+(ft!==null?ft+" ft":"")+"</b>"
+        +' <span class="livesub">USGS '+site+(t?" · "+t:"")+"</span>";
+      flowCache[site]=html; elFlow.innerHTML=html;
+    }).catch(()=>{ flowCache[site]=""; elFlow.textContent="💧 Live flow: unavailable"; });
+}
 function makeWaterPopup(w){
   const t=WATER_TYPE[w.type]||{label:w.type,color:"#888"};
+  const gage=(typeof USGS_GAGE!=="undefined")?USGS_GAGE[w.name]:null;
+  const gen=(typeof GEN_URL!=="undefined")?GEN_URL[w.name]:null;
   const el=document.createElement("div"); el.className="wpop";
   el.innerHTML=`<div class="wph"><span class="wdot" style="background:${t.color}"></span><b>${w.name}</b></div>
     <div class="wtype">${t.label} · ${w.region}${w.depth?` · <span style="color:#9fd8d2">${w.depth}</span>`:""}</div>
@@ -2163,10 +2227,12 @@ function makeWaterPopup(w){
     ${w.size?`<div class="wmeta"><b>Where</b> ${w.size}</div>`:""}
     ${w.intel?`<div class="wintel"><b>🪝 Local intel</b> ${w.intel}</div>`:""}
     ${(w.access&&w.access.length)?`<div class="wmeta"><b>Access</b> ${w.access.map((a,i)=>`<span class="wacc" data-ai="${i}">📍 ${a.name}</span>`).join(" · ")}</div>`:""}
+    ${(gage||gen)?`<div class="wlive"><span class="protag">PRO</span>${gage?`<span class="liveflow">💧 Live flow: loading…</span>`:""}${gen?`<a class="genlink" href="${gen}" target="_blank" rel="noopener">⚡ Dam generation ↗</a>`:""}</div>`:""}
     <div class="wsp">${w.species.map(id=>{const f=fishById(id);return f?`<span class="wchip" data-fid="${id}">${f.name}</span>`:"";}).join("")}</div>
     <button class="wsave${state.favWater.has(w.name)?" on":""}">${state.favWater.has(w.name)?"★ Saved spot":"☆ Save spot"}</button>`;
   el.querySelectorAll(".wchip").forEach(c=>c.addEventListener("click",()=>selectFish(c.dataset.fid)));
   el.querySelectorAll(".wacc").forEach(a=>a.addEventListener("click",()=>{ const pt=w.access&&w.access[+a.dataset.ai]; if(pt&&map) map.setView([pt.lat,pt.lon],13,{animate:true}); }));
+  if(gage && IS_PRO) loadFlow(gage, el.querySelector(".liveflow"));
   const sv=el.querySelector(".wsave"); if(sv) sv.addEventListener("click",()=>{ toggleFavWater(w.name); sv.classList.toggle("on",state.favWater.has(w.name)); sv.textContent=state.favWater.has(w.name)?"★ Saved spot":"☆ Save spot"; });
   return el;
 }
