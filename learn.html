@@ -3,464 +3,483 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>FishDex Learn — Complete Fishing Education: Fly, Spin & Baitcast</title>
-<meta name="description" content="Learn to fish from scratch: fly fishing 101, entomology, 130+ flies, knots, rigging, rod-weight progression from 2wt creeks to 15wt marlin, plus a complete spin & baitcast beginner guide." />
+<title>FishDex Learn — Fishing, from scratch to expert</title>
+<meta name="description" content="Learn to fish: fly fishing 101, 130+ flies, entomology, knots, rod-weight progression 2wt→15wt, and a complete spin & baitcast beginner guide — compartmentalized and visual." />
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0b1822;--bg2:#0e2230;--panel:#12252f;--panel2:#16323c;--line:#244553;
-    --ink:#e9f3f2;--muted:#90a8af;--accent:#37b6a0;--accent2:#5ad1bb;--gold:#e9c96b;--radius:12px;
-  }
+  :root{--bg:#0b1822;--bg2:#0e2230;--panel:#12252f;--panel2:#16323c;--line:#244553;--ink:#e9f3f2;--muted:#90a8af;
+    --accent:#37b6a0;--accent2:#5ad1bb;--gold:#e9c96b;--radius:14px;--display:"Rajdhani",-apple-system,"Segoe UI",sans-serif;}
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
   a{color:var(--accent2)}
   .wrap{max-width:1000px;margin:0 auto;padding:0 22px}
-  nav{position:sticky;top:0;z-index:30;background:rgba(11,24,34,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-  nav .row{display:flex;align-items:center;gap:14px;height:58px}
-  .logo{font-size:19px;font-weight:800}.logo .fin{color:var(--accent2)}
+  nav{position:sticky;top:0;z-index:30;background:rgba(11,24,34,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav .row{display:flex;align-items:center;gap:14px;height:56px}
+  .logo{font-family:var(--display);font-size:20px;font-weight:800}.logo .fin{color:var(--accent2)}
   nav .spacer{flex:1}
-  nav a.navlink{color:var(--muted);font-size:14px;margin-right:16px}
-  nav a.navlink:hover{color:var(--ink)}
-  .btn{display:inline-block;border-radius:9px;padding:9px 16px;font-weight:700;font-size:14px;text-decoration:none}
-  .btn.primary{background:var(--accent);color:#06231d}
-  /* layout with side TOC */
-  .main{display:grid;grid-template-columns:230px 1fr;gap:30px;padding:30px 0}
-  @media(max-width:880px){.main{grid-template-columns:1fr}.toc{display:none}}
-  .toc{position:sticky;top:74px;align-self:start;font-size:13.5px}
-  .toc a{display:block;color:var(--muted);padding:4px 0;text-decoration:none;border-left:2px solid transparent;padding-left:10px}
-  .toc a:hover{color:var(--ink);border-color:var(--accent)}
-  .toc .grp{color:var(--accent2);font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.5px;margin:14px 0 4px;padding-left:10px}
-  article h1{font-size:34px;margin:0 0 8px;letter-spacing:-.5px}
-  article .tagline{color:var(--muted);font-size:17px;margin-bottom:8px}
-  section{padding:18px 0;border-top:1px solid var(--line);scroll-margin-top:70px}
-  section:first-of-type{border-top:none}
-  h2{font-size:24px;margin:18px 0 6px;color:var(--ink)}
-  h3{font-size:17px;margin:18px 0 6px;color:var(--accent2)}
-  p,li{font-size:15px}
+  nav a.nl{color:var(--muted);font-size:14px;text-decoration:none}
+  nav a.nl:hover{color:var(--ink)}
+  .btn{display:inline-block;border-radius:9px;padding:8px 15px;font-weight:700;font-size:14px;text-decoration:none;background:var(--accent);color:#06231d}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .btn.ghost:hover{border-color:var(--accent)}
+  h1{font-family:var(--display);font-size:34px;margin:0 0 6px;letter-spacing:.3px}
+  h2{font-family:var(--display);font-size:24px;margin:18px 0 8px;letter-spacing:.3px}
+  h3{font-size:16px;color:var(--accent2);margin:16px 0 5px}
   .eyebrow{color:var(--accent2);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px}
+  p,li{font-size:15px}
+  /* HUB cards */
+  .hubhero{padding:34px 0 8px}
+  .hubhero p{color:#c4d6d8;max-width:42em;font-size:17px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:18px 0 40px}
+  @media(max-width:820px){.cards{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.cards{grid-template-columns:1fr}}
+  .card{display:block;background:linear-gradient(180deg,var(--panel),#0f2029);border:1px solid var(--line);
+    border-radius:var(--radius);padding:18px;text-decoration:none;color:inherit;transition:transform .08s,border-color .12s}
+  .card:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .card .ic{font-size:30px;line-height:1}
+  .card h3{font-family:var(--display);color:var(--ink);margin:10px 0 4px;font-size:18px}
+  .card p{margin:0;color:#aec3c5;font-size:13.5px}
+  .card .meta{margin-top:8px;font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .startbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;background:#11313a;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:6px}
+  .startbar b{color:var(--ink)}
+  /* PANELS */
+  .panel{display:none;padding:8px 0 30px}
+  .panel.active{display:block;animation:fade .25s ease-out}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  #hub{display:block}
+  body.in-panel #hub{display:none}
+  .crumb{display:flex;align-items:center;gap:10px;margin:18px 0 6px}
+  .crumb a{color:var(--accent2);text-decoration:none;font-size:13px;border:1px solid var(--line);border-radius:7px;padding:5px 10px}
+  .crumb a:hover{border-color:var(--accent)}
+  .panel-sub{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
+  .panel-sub a{font-size:12.5px;color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--line);padding-bottom:1px}
+  .panel-sub a:hover{color:var(--ink)}
+  /* content bits */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr}}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .box h3{margin-top:0}
   .callout{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:12px 16px;margin:14px 0}
+  .callout.gold{border-left-color:var(--gold)}
   table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
   th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
-  th{color:var(--accent2);font-size:12px;text-transform:uppercase;letter-spacing:.4px;position:sticky}
+  th{color:var(--accent2);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
   tr:hover td{background:#0f2029}
   td.f{font-weight:600;color:var(--ink);white-space:nowrap}
-  .tag{display:inline-block;font-size:11px;background:#10333a;border:1px solid var(--line);border-radius:20px;padding:2px 9px;color:var(--accent2);margin:2px 3px 2px 0}
   details{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin:10px 0;overflow:hidden}
-  details>summary{cursor:pointer;padding:11px 14px;font-weight:700;color:var(--accent2);list-style:none}
+  details>summary{cursor:pointer;padding:11px 14px;font-weight:700;color:var(--accent2);list-style:none;font-family:var(--display);letter-spacing:.3px}
   details>summary::-webkit-details-marker{display:none}
   details>summary::after{content:"▾";float:right;color:var(--muted)}
   details[open]>summary::after{content:"▴"}
   details .body{padding:0 14px 14px}
   .src{font-size:12.5px;color:var(--muted)}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:700px){.grid2{grid-template-columns:1fr}}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
-  footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);font-size:13px;margin-top:20px}
-  .disc{font-size:12px;line-height:1.5;max-width:60em}
+  .related{margin-top:22px;padding-top:14px;border-top:1px solid var(--line)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .chip{background:#10333a;border:1px solid var(--line);border-radius:18px;padding:6px 13px;font-size:13px;color:var(--accent2);text-decoration:none}
+  .chip:hover{border-color:var(--accent)}
+  .diagram{background:#0e2730;border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+  .diagram svg{width:100%;height:auto;display:block}
+  .cap{font-size:12px;color:var(--muted);margin-top:6px;text-align:center}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:12px;margin-top:20px}
+  .seg{display:inline-block;font-size:11px;background:#10333a;border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--accent2);margin-left:6px}
 </style>
 </head>
 <body>
 <nav><div class="wrap row">
   <span class="logo">🎣 Fish<span class="fin">Dex</span> <span style="color:var(--muted);font-weight:600;font-size:14px">· Learn</span></span>
   <span class="spacer"></span>
-  <a class="navlink" href="index.html">Home</a>
-  <a class="btn primary" href="app.html">Open the app</a>
+  <a class="nl" href="#hub" id="allTopics" style="display:none;margin-right:14px">▦ All topics</a>
+  <a class="nl" href="index.html" style="margin-right:14px">Home</a>
+  <a class="btn" href="app.html">Open map</a>
 </div></nav>
 
-<div class="wrap main">
-  <aside class="toc">
-    <div class="grp">Start</div>
-    <a href="#start">Where to begin</a>
-    <div class="grp">Fly Fishing</div>
-    <a href="#fly101">Fly Fishing 101</a>
-    <a href="#gear">Rod, reel, line, leader</a>
-    <a href="#weights">Rod-weight progression</a>
-    <a href="#bugs">Entomology & the hatch</a>
-    <a href="#types">Types & styles</a>
-    <a href="#flies">Fly encyclopedia (130+)</a>
-    <a href="#colors">Color & selection</a>
-    <div class="grp">Spin & Baitcast</div>
-    <a href="#spin101">Spin & baitcast 101</a>
-    <a href="#lures">Lures & when</a>
-    <a href="#rigs">Rigs</a>
-    <div class="grp">Reference</div>
-    <a href="#knots">Knots</a>
-    <a href="#glossary">Glossary</a>
-    <a href="#resources">Resources & videos</a>
-  </aside>
+<div class="wrap">
+  <!-- ============ HUB ============ -->
+  <div id="hub">
+    <div class="hubhero">
+      <span class="eyebrow">FishDex Learn</span>
+      <h1>Learn to fish — start anywhere.</h1>
+      <p>From a size-22 dry on a 2-weight in a mountain creek to a 15-weight for marlin. Pick a topic — each one is a focused, visual mini-guide, cross-linked to the rest.</p>
+    </div>
+    <div class="startbar">
+      <span>👋 <b>New to fishing?</b> Start with one of these:</span>
+      <a class="btn" href="#fly">🪶 Fly Fishing 101</a>
+      <a class="btn ghost" href="#spin">🎣 Spin &amp; Baitcast 101</a>
+    </div>
+    <div class="cards">
+      <a class="card" href="#fly"><div class="ic">🪶</div><h3>Fly Fishing 101</h3><p>How the system works, the casts, your first outfit, and the styles of fly fishing.</p><div class="meta">Start here</div></a>
+      <a class="card" href="#weights"><div class="ic">📏</div><h3>Rod-Weight Progression</h3><p>1–2wt creeks to 15wt marlin — what each rod is for, with a visual scale.</p><div class="meta">Gear</div></a>
+      <a class="card" href="#bugs"><div class="ic">🐛</div><h3>Entomology &amp; Hatches</h3><p>The four bug orders, life cycles, and how to "match the hatch."</p><div class="meta">Science</div></a>
+      <a class="card" href="#flies"><div class="ic">🎏</div><h3>Fly Encyclopedia</h3><p>130+ patterns by type — dries, nymphs, streamers, saltwater &amp; more.</p><div class="meta">Reference</div></a>
+      <a class="card" href="#knots"><div class="ic">🪢</div><h3>Knots &amp; Rigging</h3><p>The handful you actually need, plus leader/tippet "X" sizing.</p><div class="meta">Skills</div></a>
+      <a class="card" href="#spin"><div class="ic">🎣</div><h3>Spin &amp; Baitcast 101</h3><p>Spinning vs. baitcaster, line types, and the complete-beginner setup.</p><div class="meta">Start here</div></a>
+      <a class="card" href="#lures"><div class="ic">🧰</div><h3>Lures &amp; Rigs</h3><p>When to throw each lure, and the 8 essential soft-plastic &amp; bait rigs.</p><div class="meta">Tactics</div></a>
+      <a class="card" href="#glossary"><div class="ic">📖</div><h3>Glossary</h3><p>Fly &amp; spin terminology decoded in plain English.</p><div class="meta">Reference</div></a>
+      <a class="card" href="#resources"><div class="ic">▶️</div><h3>Videos &amp; Resources</h3><p>The best free instruction — Orvis, BassResource, Animated Knots &amp; more.</p><div class="meta">Go deeper</div></a>
+    </div>
+  </div>
 
-  <article>
-    <span class="eyebrow">FishDex Learn</span>
-    <h1>The complete fishing education.</h1>
-    <p class="tagline">From a size-22 dry on a 2-weight in a mountain creek to a 15-weight for marlin — and every spinning reel, soft plastic and Texas rig in between. Start wherever you are.</p>
+  <!-- ============ FLY 101 ============ -->
+  <div class="panel" id="fly">
+    <div class="crumb"><a href="#hub">← All topics</a><span class="eyebrow">🪶 Fly Fishing 101</span></div>
+    <div class="panel-sub"><a href="#weights">Rod weights →</a><a href="#bugs">Entomology →</a><a href="#flies">Fly encyclopedia →</a><a href="#knots">Knots →</a></div>
+    <h2>The idea: the line is the weight</h2>
+    <p>The fly is almost weightless, so you load a flexible rod with a thick, tapered <b>fly line</b> and "cast the line," letting the fly ride along. That's the whole trick — and why fly casting feels different from spin casting.</p>
+    <div class="grid2">
+      <div class="box"><h3>The four pieces</h3><p style="font-size:14px"><b>Rod</b> — rated 1–15 ("weight"); higher = bigger fish/flies/wind. <b>Reel</b> — line storage on trout rods; a real drag matters for big fish. <b>Fly line</b> — the tapered casting weight; <b>weight-forward floating (WF-F)</b> covers ~90% of fishing. <b>Leader &amp; tippet</b> — clear mono/fluoro tapering down to a fine tippet (sized by "X").</p></div>
+      <div class="box"><h3>The two casts to learn</h3><p style="font-size:14px">The <b>overhead cast</b> (pick up, crisp stops at 10 &amp; 2 o'clock, let it straighten) and the <b>roll cast</b> (when there's no room behind you). Tight, abrupt stops form tight loops. Twenty minutes of lawn-casting with no fly teaches more than anything.</p></div>
+    </div>
+    <h3>Your first outfit</h3>
+    <table>
+      <tr><th>Piece</th><th>Beginner pick</th><th>Why</th></tr>
+      <tr><td class="f">Rod</td><td>9' 5-weight, medium action</td><td>The universal trout rod — forgiving &amp; versatile.</td></tr>
+      <tr><td class="f">Reel</td><td>Matching 5/6, sealed drag if possible</td><td>Balances the rod; drag only matters on bigger fish.</td></tr>
+      <tr><td class="f">Line</td><td>Weight-forward floating (WF-5-F)</td><td>Easiest to cast; floats dries &amp; indicators.</td></tr>
+      <tr><td class="f">Leader / tippet</td><td>9' tapered 4X–5X + spools of 4X/5X/6X</td><td>Turns the fly over; rebuild the fine end as you go.</td></tr>
+    </table>
+    <div class="diagram">
+      <svg viewBox="0 0 720 90" xmlns="http://www.w3.org/2000/svg">
+        <line x1="20" y1="45" x2="700" y2="45" stroke="#244553" stroke-width="1"/>
+        <path d="M20 45 q120 0 200 0" stroke="#5aa9d6" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <path d="M220 45 q120 0 200 0" stroke="#74c7d6" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <path d="M420 45 q120 0 180 0" stroke="#9bd1cf" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M600 45 q60 0 90 0" stroke="#cfe0e2" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <circle cx="700" cy="45" r="6" fill="none" stroke="#e9c96b" stroke-width="2"/>
+        <text x="110" y="32" fill="#90a8af" font-size="12" text-anchor="middle">Fly line (WF-F)</text>
+        <text x="320" y="32" fill="#90a8af" font-size="12" text-anchor="middle">Leader butt</text>
+        <text x="510" y="32" fill="#90a8af" font-size="12" text-anchor="middle">Mid-taper</text>
+        <text x="650" y="70" fill="#90a8af" font-size="12" text-anchor="middle">Tippet (X)</text>
+        <text x="700" y="72" fill="#e9c96b" font-size="12" text-anchor="middle">fly</text>
+      </svg>
+      <div class="cap">The taper: thick fly line → leader butt → fine tippet → fly. Energy flows down the taper to turn the fly over.</div>
+    </div>
+    <h2>Types &amp; styles of fly fishing</h2>
+    <div class="grid2">
+      <div class="box"><h3>Dry fly</h3><p style="font-size:14px;margin:0">Floating fly imitating an adult insect — the visual, classic style; you see the eat.</p></div>
+      <div class="box"><h3>Nymphing</h3><p style="font-size:14px;margin:0">Subsurface, where trout feed ~80% of the time. Indicator, <b>Euro/tight-line</b>, and high-stick variants.</p></div>
+      <div class="box"><h3>Dry-dropper</h3><p style="font-size:14px;margin:0">A buoyant dry with a nymph hung below — searches two depths at once. Deadly all-rounder.</p></div>
+      <div class="box"><h3>Streamer</h3><p style="font-size:14px;margin:0">Stripping baitfish/leech flies to trigger predators. Big-fish tactic; sink-tips, 6–8wt.</p></div>
+      <div class="box"><h3>Swing / Spey</h3><p style="font-size:14px;margin:0">Soft-hackles or two-hand rods swinging flies down-and-across for trout, steelhead &amp; salmon.</p></div>
+      <div class="box"><h3>Saltwater &amp; warmwater</h3><p style="font-size:14px;margin:0">Flats (bonefish, permit, tarpon, redfish) and bluewater on 8–15wt; poppers &amp; big flies for bass, pike &amp; muskie.</p></div>
+    </div>
+    <div class="callout"><b>Regional reality:</b> the same sport looks different by region — Western big-water dry-dropper &amp; streamer fishing, Appalachian small-stream wild-trout dries, Driftless spring-creek nymphing, Florida-Keys flats slams, Pacific-NW steelhead spey. <span class="src">See each fish's profile for the local version.</span></div>
+    <div class="related"><span class="eyebrow">Keep going</span><div class="chips"><a class="chip" href="#weights">📏 Rod weights</a><a class="chip" href="#bugs">🐛 Entomology</a><a class="chip" href="#flies">🎏 Fly encyclopedia</a><a class="chip" href="#knots">🪢 Knots</a></div></div>
+  </div>
 
-    <section id="start">
-      <h2>Where to begin</h2>
-      <p>Fishing splits into two big families of tackle. <b>Fly fishing</b> casts a weighted <em>line</em> to deliver a nearly weightless fly — it's about imitation and presentation. <b>Spin &amp; baitcast</b> fishing casts a weighted <em>lure or bait</em> on thin line — it's faster to learn and covers water quickly. Neither is "better"; they're different tools. Most well-rounded anglers do both.</p>
-      <div class="grid2">
-        <div class="card"><h3 style="margin-top:0">New &amp; want it easy?</h3><p>Start with a <b>spinning rod</b>, 6–8 lb mono, and a handful of lures. You'll be catching panfish and bass in an afternoon. Jump to <a href="#spin101">Spin &amp; Baitcast 101</a>.</p></div>
-        <div class="card"><h3 style="margin-top:0">Drawn to trout &amp; rivers?</h3><p>Start fly fishing with a <b>9' 5-weight</b> outfit — the do-everything trout rod. Learn two casts and two knots and you're fishing. Jump to <a href="#fly101">Fly Fishing 101</a>.</p></div>
-      </div>
-      <p class="src">The single best free curriculum to pair with this page is the <a href="https://howtoflyfish.orvis.com/" target="_blank" rel="noopener">Orvis Learning Center</a> (video lessons, in order) and, for spin/bass, <a href="https://www.bassresource.com/" target="_blank" rel="noopener">BassResource</a>.</p>
-    </section>
+  <!-- ============ ROD WEIGHTS ============ -->
+  <div class="panel" id="weights">
+    <div class="crumb"><a href="#hub">← All topics</a><span class="eyebrow">📏 Rod-Weight Progression</span></div>
+    <div class="panel-sub"><a href="#fly">Fly 101 →</a><a href="#flies">Fly encyclopedia →</a></div>
+    <h2>2wt creeks to 15wt marlin</h2>
+    <p>The spine of fly fishing: rod "weight" scales with the fish, fly and wind you'll face.</p>
+    <div class="diagram">
+      <svg viewBox="0 0 720 110" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="rw" x1="0" x2="1"><stop offset="0" stop-color="#74c7d6"/><stop offset=".5" stop-color="#37b6a0"/><stop offset="1" stop-color="#5a6fd6"/></linearGradient></defs>
+        <rect x="20" y="40" width="680" height="14" rx="7" fill="url(#rw)"/>
+        <g fill="#e9f3f2" font-size="12" text-anchor="middle" font-weight="700">
+          <text x="40" y="34">1–2</text><text x="150" y="34">4</text><text x="290" y="34">5</text><text x="410" y="34">8</text><text x="520" y="34">10</text><text x="610" y="34">12</text><text x="690" y="34">15</text></g>
+        <g fill="#90a8af" font-size="11" text-anchor="middle">
+          <text x="40" y="78">creek</text><text x="40" y="92">brookies</text>
+          <text x="220" y="78">all-around</text><text x="220" y="92">trout</text>
+          <text x="410" y="78">bass · bonefish</text><text x="410" y="92">redfish · salmon</text>
+          <text x="560" y="78">pike · permit</text><text x="560" y="92">stripers</text>
+          <text x="685" y="78">tarpon · tuna</text><text x="685" y="92">marlin</text></g>
+      </svg>
+      <div class="cap">Heavier number = heavier line = bigger fish, bigger flies, more wind.</div>
+    </div>
+    <table>
+      <tr><th>Wt</th><th>Targets</th><th>Flies</th></tr>
+      <tr><td class="f">1–2</td><td>Brookies &amp; wild trout in tiny creeks; panfish</td><td>#18–24 dries, micro-nymphs</td></tr>
+      <tr><td class="f">3–4</td><td>Small–medium trout streams; delicate presentations</td><td>#14–22 dries, light nymphs</td></tr>
+      <tr><td class="f">5</td><td>The do-everything trout rod; bluegill, light bass</td><td>Dries, nymphs, small streamers</td></tr>
+      <tr><td class="f">6–7</td><td>Bigger trout/rivers, bass, carp, small pike, light salt</td><td>Streamers, poppers, big nymphs</td></tr>
+      <tr><td class="f">8</td><td>The all-around big-fish/salt rod — bonefish, redfish, bass, salmon, pike</td><td>Clousers, crab/shrimp, big streamers</td></tr>
+      <tr><td class="f">9–10</td><td>Permit, striped bass, big pike &amp; muskie, jacks, small–mid tarpon</td><td>8–12" articulated flies, crabs</td></tr>
+      <tr><td class="f">11–12</td><td>Big tarpon (100 lb+), sailfish, roosterfish, GTs, dorado</td><td>Tarpon toads, big baitfish, poppers</td></tr>
+      <tr><td class="f">13–15</td><td>Sailfish, marlin, big tuna &amp; GTs — the heaviest bluewater</td><td>Billfish poppers &amp; tube flies</td></tr>
+    </table>
+    <div class="related"><span class="eyebrow">Keep going</span><div class="chips"><a class="chip" href="#fly">🪶 Fly 101</a><a class="chip" href="#flies">🎏 Fly encyclopedia</a><a class="chip" href="#knots">🪢 Knots</a></div></div>
+  </div>
 
-    <!-- ===================== FLY 101 ===================== -->
-    <section id="fly101">
-      <h2>Fly Fishing 101</h2>
-      <p>In fly fishing the <b>line is the weight</b>. The fly is almost weightless, so you load a flexible rod with a thick, tapered fly line and "cast the line," letting the fly go along for the ride. That's the whole trick — and why fly casting feels different from spin casting.</p>
-      <h3>The four pieces of the system</h3>
-      <ul>
-        <li><b>Rod</b> — rated by "weight" (1–15, see <a href="#weights">progression</a>). Higher number = heavier line = bigger fish/flies/wind.</li>
-        <li><b>Reel</b> — mostly line storage on trout rods; a real drag matters for big fish (salmon, bonefish, tarpon).</li>
-        <li><b>Fly line</b> — the tapered, coated casting weight. <b>Weight-forward floating (WF-F)</b> covers ~90% of fishing. Sink-tips for streamers/depth.</li>
-        <li><b>Leader &amp; tippet</b> — a tapered clear monofilament/fluoro section from the thick line down to a fine <b>tippet</b> the fly ties to. Tippet is sized by "X" — bigger X = thinner (see <a href="#knots">rigging</a>).</li>
-      </ul>
-      <div class="callout"><b>The bare-minimum kit:</b> rod, reel, line, leader, a spool or two of tippet, nippers (snips), forceps (hemostats), floatant, and a small box of flies. That's it.<br><span class="src">— per the <a href="https://howtoflyfish.orvis.com/" target="_blank" rel="noopener">Orvis Learning Center</a>.</span></div>
-      <h3>The two casts to learn first</h3>
-      <p>The <b>overhead cast</b> (pick up, crisp stop at 10 and 2 o'clock, let the line straighten) and the <b>roll cast</b> (for when there's no room behind you). Tight, abrupt stops form tight loops; "lawn-casting" with no fly for 20 minutes teaches more than anything.</p>
-    </section>
+  <!-- ============ ENTOMOLOGY ============ -->
+  <div class="panel" id="bugs">
+    <div class="crumb"><a href="#hub">← All topics</a><span class="eyebrow">🐛 Entomology &amp; the hatch</span></div>
+    <div class="panel-sub"><a href="#flies">Fly encyclopedia →</a><a href="#fly">Fly 101 →</a></div>
+    <h2>What trout eat — and matching it</h2>
+    <p>"Match the hatch" means picking a fly that mimics the <b>size, shape, color and stage</b> the fish are eating right now. Most trout food comes from four insect orders, each with stages to imitate.</p>
+    <div class="diagram">
+      <svg viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg">
+        <g text-anchor="middle">
+          <circle cx="90" cy="55" r="30" fill="#143b40" stroke="#37b6a0"/><text x="90" y="59" fill="#e9f3f2" font-size="13">Nymph</text><text x="90" y="105" fill="#90a8af" font-size="11">underwater</text>
+          <circle cx="270" cy="55" r="30" fill="#143b40" stroke="#37b6a0"/><text x="270" y="59" fill="#e9f3f2" font-size="13">Emerger</text><text x="270" y="105" fill="#90a8af" font-size="11">in the film</text>
+          <circle cx="450" cy="55" r="30" fill="#143b40" stroke="#37b6a0"/><text x="450" y="59" fill="#e9f3f2" font-size="13">Dun</text><text x="450" y="105" fill="#90a8af" font-size="11">adult, floats off</text>
+          <circle cx="630" cy="55" r="30" fill="#143b40" stroke="#37b6a0"/><text x="630" y="59" fill="#e9f3f2" font-size="13">Spinner</text><text x="630" y="105" fill="#90a8af" font-size="11">mates, falls spent</text>
+          <g stroke="#5ad1bb" stroke-width="2" fill="none" marker-end="url(#ar)">
+            <path d="M125 55 H235"/><path d="M305 55 H415"/><path d="M485 55 H595"/></g>
+          <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#5ad1bb"/></marker></defs>
+        </g>
+      </svg>
+      <div class="cap">The mayfly life cycle — and the four flies that imitate it. (Caddis &amp; midges have their own larva → pupa → adult cycle.)</div>
+    </div>
+    <table>
+      <tr><th>Insect</th><th>Stages to imitate</th><th>When</th></tr>
+      <tr><td class="f">Mayfly</td><td>Nymph → emerger → dun → spinner. The classic dry-fly bug.</td><td>BWO (cool days), PMD/sulphur (late spring–summer), Trico (late-summer mornings)</td></tr>
+      <tr><td class="f">Caddisfly</td><td>Larva → pupa → adult (tent-wing, skittering)</td><td>Late April–Oct; October Caddis in fall</td></tr>
+      <tr><td class="f">Stonefly</td><td>Nymph → adult; crawls to shore to hatch on rocks</td><td>Early-season big-bug nymphing; salmonfly hatches late spring</td></tr>
+      <tr><td class="f">Midge</td><td>Larva → pupa → adult; tiny (#20–28) — the year-round staple</td><td>Year-round; critical on winter tailwaters</td></tr>
+      <tr><td class="f">Terrestrials</td><td>Land bugs that fall in — ants, beetles, hoppers</td><td>Summer, especially windy afternoons</td></tr>
+    </table>
+    <div class="callout"><b>Field shortcut:</b> turn over a few rocks and watch the air. Whatever's crawling and flying tells you the size &amp; color to tie on. Winter? Go tiny with a midge. Summer? Try a terrestrial.</div>
+    <div class="callout gold"><b>Be water-specific (don't assume):</b> bugs are local. <b>Scuds &amp; sowbugs</b> dominate cold tailwaters (the White, Taneycomo, Norfork); freestone mountain streams lean on <b>caddis, terrestrials &amp; small mayflies</b>; big Western rivers get <b>salmonflies</b>. Match what's <em>there</em> — each water's "Local intel" in the app names the specific bugs.</div>
+    <div class="related"><span class="eyebrow">Keep going</span><div class="chips"><a class="chip" href="#flies">🎏 Which flies?</a><a class="chip" href="#fly">🪶 Fly 101</a><a class="chip" href="app.html">🗺️ Find trout water</a></div></div>
+  </div>
 
-    <section id="gear">
-      <h2>Rod, reel, line &amp; leader — choosing your first outfit</h2>
-      <table>
-        <tr><th>Piece</th><th>Beginner pick</th><th>Why</th></tr>
-        <tr><td class="f">Rod</td><td>9' 5-weight, medium action</td><td>The universal trout rod; forgiving and versatile.</td></tr>
-        <tr><td class="f">Reel</td><td>Matching 5/6 reel, sealed drag if possible</td><td>Balances the rod; drag only matters on bigger fish.</td></tr>
-        <tr><td class="f">Line</td><td>Weight-forward floating, 5wt (WF-5-F)</td><td>Easiest to cast; floats your dries & indicators.</td></tr>
-        <tr><td class="f">Leader</td><td>9' tapered, 4X or 5X</td><td>Turns the fly over and fishes most trout flies.</td></tr>
-        <tr><td class="f">Tippet</td><td>Spools of 4X, 5X, 6X (fluoro &/or mono)</td><td>Rebuild the fine end as you change flies.</td></tr>
-      </table>
-      <p class="src">"Match the line weight to the rod weight" is the one rule that matters. Sources: <a href="https://www.tridentflyfishing.com/blogs/all/line-weight-chart" target="_blank" rel="noopener">Trident Fly Fishing</a>, <a href="https://www.fieldandstream.com/fishing/fly-rod-weights" target="_blank" rel="noopener">Field &amp; Stream</a>.</p>
-    </section>
+  <!-- ============ FLY ENCYCLOPEDIA ============ -->
+  <div class="panel" id="flies">
+    <div class="crumb"><a href="#hub">← All topics</a><span class="eyebrow">🎏 Fly Encyclopedia — 130+ patterns</span></div>
+    <div class="panel-sub"><a href="#bugs">Entomology →</a><a href="#weights">Rod weights →</a></div>
+    <p>By type. You don't need them all — a dozen catch fish anywhere — but here's the vocabulary, with what each imitates and when. <b>Tap a category to open it.</b></p>
+    <div class="callout"><b>Picking color &amp; size:</b> size first, then shape, then color. Clear water &amp; bright light → natural, drab, smaller (olive/gray/tan). Stained or low light → dark or bright &amp; bigger (black/chartreuse/white). On trout match the hatch; on predators match the bait.</div>
+    <details open><summary>Dry flies — adults on the surface (≈28)</summary><div class="body"><table>
+      <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
+      <tr><td class="f">Adams / Parachute Adams</td><td>Generic mayfly adult — the #1 searching dry</td><td>12–20</td></tr>
+      <tr><td class="f">Blue-Winged Olive (BWO)</td><td>Baetis mayfly; cool, overcast days</td><td>16–22</td></tr>
+      <tr><td class="f">Pale Morning Dun (PMD)</td><td>Summer mayfly, Western &amp; beyond</td><td>14–18</td></tr>
+      <tr><td class="f">Light Cahill</td><td>Cream mayfly, Eastern evenings</td><td>12–16</td></tr>
+      <tr><td class="f">Sulphur Dun</td><td>Eastern late-spring mayfly</td><td>14–18</td></tr>
+      <tr><td class="f">Hendrickson</td><td>Early-season Eastern mayfly</td><td>12–14</td></tr>
+      <tr><td class="f">March Brown</td><td>Spring mayfly</td><td>10–14</td></tr>
+      <tr><td class="f">Quill Gordon</td><td>Early Appalachian mayfly</td><td>12–14</td></tr>
+      <tr><td class="f">Trico</td><td>Tiny late-summer mayfly, morning spinner falls</td><td>20–24</td></tr>
+      <tr><td class="f">Green / Brown / Gray Drake</td><td>Big mayflies; explosive hatches</td><td>8–12</td></tr>
+      <tr><td class="f">Hexagenia (Hex)</td><td>Giant mayfly; Midwest night hatch for big browns</td><td>6–8</td></tr>
+      <tr><td class="f">Mahogany Dun</td><td>Fall mayfly</td><td>14–18</td></tr>
+      <tr><td class="f">Elk Hair Caddis</td><td>Caddis adult — buoyant searching dry</td><td>12–18</td></tr>
+      <tr><td class="f">X-Caddis / Goddard Caddis</td><td>Caddis cripple / skittering adult</td><td>14–18</td></tr>
+      <tr><td class="f">Stimulator</td><td>Stonefly/caddis attractor; rides high</td><td>8–16</td></tr>
+      <tr><td class="f">Royal Wulff / Royal Coachman</td><td>High-vis attractor, broken water</td><td>10–16</td></tr>
+      <tr><td class="f">H&amp;L Variant / Renegade</td><td>Visible attractors</td><td>12–16</td></tr>
+      <tr><td class="f">Griffith's Gnat</td><td>Midge cluster; winter &amp; tailwater</td><td>18–24</td></tr>
+      <tr><td class="f">Comparadun / Sparkle Dun</td><td>No-hackle mayfly dun, flat water</td><td>14–20</td></tr>
+      <tr><td class="f">Rusty Spinner</td><td>Spent mayfly (spinner fall), evenings</td><td>14–20</td></tr>
+      <tr><td class="f">Humpy / Trude</td><td>Buoyant rough-water attractors</td><td>10–16</td></tr>
+    </table></div></details>
+    <details><summary>Emergers &amp; cripples — in the film (≈6)</summary><div class="body"><table>
+      <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
+      <tr><td class="f">RS2</td><td>Baetis/midge emerger; deadly tailwater</td><td>18–24</td></tr>
+      <tr><td class="f">Barr's Emerger</td><td>Mayfly emerging nymph</td><td>16–20</td></tr>
+      <tr><td class="f">CDC Emerger</td><td>Stuck-in-the-film mayfly</td><td>16–20</td></tr>
+      <tr><td class="f">Klinkhammer</td><td>Emerger hung below a parachute post</td><td>12–18</td></tr>
+      <tr><td class="f">Quigley Cripple</td><td>Failed/crippled emerger — easy meal</td><td>12–18</td></tr>
+      <tr><td class="f">LaFontaine Sparkle Pupa</td><td>Caddis pupa rising through the column</td><td>12–16</td></tr>
+    </table></div></details>
+    <details><summary>Nymphs — subsurface, where trout feed most (≈28)</summary><div class="body"><table>
+      <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
+      <tr><td class="f">Pheasant Tail / BH Pheasant Tail</td><td>Mayfly nymph — universal</td><td>12–20</td></tr>
+      <tr><td class="f">Gold-Ribbed Hare's Ear</td><td>Generic nymph / emerging mayfly</td><td>10–18</td></tr>
+      <tr><td class="f">Prince Nymph</td><td>Attractor stonefly/general</td><td>10–16</td></tr>
+      <tr><td class="f">Copper John</td><td>Heavy attractor anchor nymph</td><td>12–18</td></tr>
+      <tr><td class="f">Zebra Midge</td><td>Midge larva/pupa — tailwater killer</td><td>16–22</td></tr>
+      <tr><td class="f">Brassie / WD-40</td><td>Midge larva / emerger</td><td>16–22</td></tr>
+      <tr><td class="f">Frenchie / Perdigon</td><td>Euro-nymph jig anchors, fast sink</td><td>14–18</td></tr>
+      <tr><td class="f">Rainbow Warrior</td><td>Flashy attractor nymph</td><td>14–18</td></tr>
+      <tr><td class="f">Two-Bit Hooker / Higa's SOS</td><td>Slim mayfly nymphs</td><td>14–20</td></tr>
+      <tr><td class="f">Pat's Rubber Legs / Girdle Bug</td><td>Stonefly nymph — big &amp; buggy</td><td>4–10</td></tr>
+      <tr><td class="f">Kaufmann's Stonefly</td><td>Realistic stonefly nymph</td><td>4–10</td></tr>
+      <tr><td class="f">Czech / UV Scud</td><td>Scud (freshwater shrimp) — tailwaters</td><td>12–18</td></tr>
+      <tr><td class="f">Sowbug</td><td>Sowbug — tailwater staple</td><td>14–18</td></tr>
+      <tr><td class="f">San Juan Worm / Squirmy Wormy</td><td>Aquatic worm; high or stained water</td><td>10–14</td></tr>
+      <tr><td class="f">Egg / Glo-Bug / Y2K</td><td>Trout/salmon egg; behind spawners</td><td>12–16</td></tr>
+      <tr><td class="f">Mop Fly / Walt's Worm</td><td>Cranefly larva / general buggy</td><td>10–14</td></tr>
+      <tr><td class="f">Caddis Larva (Czech)</td><td>Cased/free caddis larva</td><td>12–16</td></tr>
+      <tr><td class="f">Soft-Hackle PT / Hare's Ear</td><td>Emerging nymph on the swing</td><td>12–18</td></tr>
+    </table></div></details>
+    <details><summary>Streamers — baitfish &amp; leeches for predators (≈19)</summary><div class="body"><table>
+      <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
+      <tr><td class="f">Woolly Bugger</td><td>Leech/baitfish/crayfish — the most versatile fly ever</td><td>2–10</td></tr>
+      <tr><td class="f">Muddler Minnow</td><td>Sculpin/grasshopper</td><td>2–10</td></tr>
+      <tr><td class="f">Clouser Minnow</td><td>Baitfish — fresh &amp; salt, jigs in the column</td><td>1/0–8</td></tr>
+      <tr><td class="f">Zonker / Double Bunny</td><td>Rabbit-strip baitfish</td><td>2–6</td></tr>
+      <tr><td class="f">Sculpzilla / Zoo Cougar</td><td>Sculpin for big browns</td><td>2–6</td></tr>
+      <tr><td class="f">Sex Dungeon / Circus Peanut</td><td>Articulated meat for trophy trout</td><td>2–6 artic.</td></tr>
+      <tr><td class="f">Dolly Llama / Kreelex</td><td>Flashy attractor streamers</td><td>2–6</td></tr>
+      <tr><td class="f">Mickey Finn</td><td>Classic bucktail baitfish</td><td>4–8</td></tr>
+      <tr><td class="f">Gray / Black Ghost</td><td>Classic streamers, smelt</td><td>2–8</td></tr>
+      <tr><td class="f">Slumpbuster / Home Invader</td><td>Modern sculpin/baitfish</td><td>2–6</td></tr>
+      <tr><td class="f">Lefty's Deceiver</td><td>Baitfish — fresh &amp; salt staple</td><td>2/0–4</td></tr>
+    </table></div></details>
+    <details><summary>Wets, soft-hackles &amp; terrestrials (≈15)</summary><div class="body"><table>
+      <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
+      <tr><td class="f">Partridge &amp; Orange</td><td>Soft-hackle emerger, swung</td><td>12–16</td></tr>
+      <tr><td class="f">Leadwing Coachman / Carey Special</td><td>Classic wet flies</td><td>8–14</td></tr>
+      <tr><td class="f">Dave's / Morrish Hopper</td><td>Grasshopper — summer</td><td>6–12</td></tr>
+      <tr><td class="f">Chubby Chernobyl / Fat Albert</td><td>Foam attractor / stonefly / hopper</td><td>6–12</td></tr>
+      <tr><td class="f">Chernobyl Ant / Hippie Stomper</td><td>Foam terrestrial / dropper rig</td><td>8–14</td></tr>
+      <tr><td class="f">Foam Beetle</td><td>Beetle — summer streams</td><td>12–18</td></tr>
+      <tr><td class="f">Parachute / Flying Ant</td><td>Ant fall — late summer</td><td>14–20</td></tr>
+    </table></div></details>
+    <details><summary>Warmwater — bass, bluegill, pike &amp; muskie (≈12)</summary><div class="body"><table>
+      <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
+      <tr><td class="f">Boogle Bug / Bass Popper</td><td>Topwater popper — bass &amp; sunfish</td><td>2–8</td></tr>
+      <tr><td class="f">Sneaky Pete</td><td>Slider popper, subtle topwater</td><td>4–8</td></tr>
+      <tr><td class="f">Bream Killer / Sunfish Spider</td><td>Tiny panfish bug</td><td>8–12</td></tr>
+      <tr><td class="f">Murdich Minnow / Game Changer</td><td>Flashy / segmented baitfish (Chocklett)</td><td>2/0–4</td></tr>
+      <tr><td class="f">Meat Whistle</td><td>Jig-style bass crawfish/baitfish</td><td>1/0–4</td></tr>
+      <tr><td class="f">Dahlberg Diver</td><td>Diving deer-hair head; bass &amp; pike</td><td>2/0–4</td></tr>
+      <tr><td class="f">Chocklett's T-Bone / Buford</td><td>8–12" articulated musky/pike flies</td><td>3/0–6/0</td></tr>
+      <tr><td class="f">Pike Bunny / EP Pike</td><td>Big rabbit/EP baitfish for pike</td><td>2/0–4/0</td></tr>
+    </table></div></details>
+    <details><summary>Saltwater — flats &amp; bluewater (≈16)</summary><div class="body"><table>
+      <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
+      <tr><td class="f">Clouser Minnow</td><td>Baitfish — the saltwater workhorse</td><td>2/0–4</td></tr>
+      <tr><td class="f">Lefty's Deceiver</td><td>Larger baitfish — stripers, etc.</td><td>3/0–2</td></tr>
+      <tr><td class="f">Crazy Charlie / Gotcha</td><td>Bonefish shrimp</td><td>4–8</td></tr>
+      <tr><td class="f">Bonefish Bitters</td><td>Bonefish crab/shrimp</td><td>4–8</td></tr>
+      <tr><td class="f">Merkin Crab / Del Brown's Permit</td><td>Permit crab — the grand-slam fly</td><td>1–4</td></tr>
+      <tr><td class="f">EP Baitfish / Surf Candy</td><td>Realistic baitfish — many species</td><td>2/0–2</td></tr>
+      <tr><td class="f">Gurgler</td><td>Surface waker — stripers, snook</td><td>1/0–4</td></tr>
+      <tr><td class="f">Tarpon Toad / Cockroach / Black Death</td><td>Classic tarpon flies</td><td>1/0–4/0</td></tr>
+      <tr><td class="f">Borski Slider / Schminnow</td><td>Redfish &amp; seatrout flats flies</td><td>2–6</td></tr>
+    </table></div></details>
+    <details><summary>Salmon &amp; steelhead (≈8)</summary><div class="body"><table>
+      <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
+      <tr><td class="f">Egg / Glo-Bug</td><td>Roe — salmon &amp; steelhead</td><td>6–12</td></tr>
+      <tr><td class="f">Egg-Sucking Leech</td><td>Leech + egg — Alaska staple</td><td>2–6</td></tr>
+      <tr><td class="f">Intruder</td><td>Big articulated swing fly (steelhead)</td><td>1.5–3"</td></tr>
+      <tr><td class="f">Comet / Polar Shrimp</td><td>Bright steelhead/salmon flies</td><td>4–8</td></tr>
+      <tr><td class="f">Green Butt Skunk</td><td>Classic steelhead swing fly</td><td>4–8</td></tr>
+      <tr><td class="f">Articulated Leech</td><td>Trout/steelhead swung leech</td><td>2–6</td></tr>
+    </table></div></details>
+    <div class="related"><span class="eyebrow">Keep going</span><div class="chips"><a class="chip" href="#bugs">🐛 What they imitate</a><a class="chip" href="#knots">🪢 Rigging</a><a class="chip" href="#resources">▶️ Fly-tying videos</a></div></div>
+  </div>
 
-    <!-- ===================== ROD WEIGHTS ===================== -->
-    <section id="weights">
-      <h2>Rod-weight progression — 2wt creeks to 15wt marlin</h2>
-      <p>This is the spine of fly fishing: the rod "weight" scales with the fish, fly and wind you'll face.</p>
-      <table>
-        <tr><th>Wt</th><th>Rod / setup</th><th>Targets</th><th>Flies</th></tr>
-        <tr><td class="f">1–2</td><td>6'–7'6" · the lightest</td><td>Brookies & wild trout in tiny creeks; panfish</td><td>#18–24 dries, micro-nymphs</td></tr>
-        <tr><td class="f">3</td><td>7'6"–8'6"</td><td>Small spring creeks; spooky, delicate presentations</td><td>#16–22 dries, small nymphs</td></tr>
-        <tr><td class="f">4</td><td>8'–9'</td><td>Small–medium trout streams</td><td>Dries & light nymph rigs</td></tr>
-        <tr><td class="f">5</td><td>9' · the do-everything</td><td>All-around trout, bluegill, light bass</td><td>Dries, nymphs, small streamers</td></tr>
-        <tr><td class="f">6</td><td>9'</td><td>Bigger trout/rivers, bass-lite, wind</td><td>Streamers, hoppers, indicator rigs</td></tr>
-        <tr><td class="f">7</td><td>9'</td><td>Bass, carp, small pike, big-river trout, light salt</td><td>Poppers, streamers, big nymphs</td></tr>
-        <tr><td class="f">8</td><td>9' · the all-around big-fish/salt</td><td>Bonefish, redfish, bass, salmon, pike</td><td>Clousers, crab/shrimp, big streamers</td></tr>
-        <tr><td class="f">9</td><td>9'</td><td>Redfish, permit, striped bass, salmon, muskie-lite, baby tarpon</td><td>Bigger baitfish & crab patterns</td></tr>
-        <tr><td class="f">10</td><td>9'</td><td>Permit, striped bass, big pike & muskie, jacks, small-mid tarpon</td><td>8–12" articulated flies, big crabs</td></tr>
-        <tr><td class="f">11–12</td><td>9' · big-game flats</td><td>Big tarpon (100 lb+), sailfish, roosterfish, GTs, dorado</td><td>Tarpon toads, big baitfish, poppers</td></tr>
-        <tr><td class="f">13–14</td><td>Bluewater</td><td>Sailfish, small marlin, tuna, big GTs</td><td>Billfish poppers & tube flies</td></tr>
-        <tr><td class="f">15</td><td>The heaviest</td><td>Marlin & big tuna (100 lb+)</td><td>Teased-up billfish flies</td></tr>
-      </table>
-      <p class="src">Compiled from <a href="https://www.tridentflyfishing.com/blogs/all/line-weight-chart" target="_blank" rel="noopener">Trident</a>, <a href="https://www.risefishing.com/blogs/news/fly-rod-weight-chart-complete-guide-to-choosing-the-right-rod" target="_blank" rel="noopener">Rise Fishing Co.</a>, <a href="https://www.fieldandstream.com/fishing/fly-rod-weights" target="_blank" rel="noopener">Field &amp; Stream</a>.</p>
-    </section>
+  <!-- ============ SPIN & BAITCAST ============ -->
+  <div class="panel" id="spin">
+    <div class="crumb"><a href="#hub">← All topics</a><span class="eyebrow">🎣 Spin &amp; Baitcast 101</span></div>
+    <div class="panel-sub"><a href="#lures">Lures &amp; rigs →</a><a href="#knots">Knots →</a></div>
+    <h2>The complete-beginner track</h2>
+    <div class="grid2">
+      <div class="box"><h3>Spinning reel <span class="seg">easy</span></h3><p style="font-size:14px;margin:0">Just release the line on the forward cast — fewer tangles. Best for beginners, light lures &amp; line, finesse, panfish/trout/light bass.</p></div>
+      <div class="box"><h3>Baitcaster <span class="seg">advanced</span></h3><p style="font-size:14px;margin:0">Thumb the spool to avoid backlash ("bird's nests"). More power &amp; accuracy for heavier lures &amp; line — jigs, big cranks, flipping.</p></div>
+    </div>
+    <h3>Line: mono vs. fluoro vs. braid</h3>
+    <table>
+      <tr><th>Line</th><th>Feel</th><th>Use it for</th></tr>
+      <tr><td class="f">Monofilament</td><td>Cheap, stretchy, floats, beginner-friendly</td><td>Topwater, beginners, general; 6–12 lb</td></tr>
+      <tr><td class="f">Fluorocarbon</td><td>Nearly invisible, sinks, low stretch = sensitive</td><td>Clear water, bottom baits, leaders; 8–15 lb</td></tr>
+      <tr><td class="f">Braid</td><td>Super strong &amp; thin, no stretch, no memory</td><td>Heavy cover, finesse main line + fluoro leader; 10–30 lb</td></tr>
+    </table>
+    <div class="callout"><b>Great starter combo:</b> a 7' medium spinning rod + 2500–3000 reel, spooled with 10–15 lb braid and a 6–10 lb fluorocarbon leader (or just 8 lb mono to keep it simple).</div>
+    <div class="related"><span class="eyebrow">Keep going</span><div class="chips"><a class="chip" href="#lures">🧰 Lures &amp; rigs</a><a class="chip" href="#knots">🪢 Knots</a><a class="chip" href="app.html">🗺️ Where to fish</a></div></div>
+  </div>
 
-    <!-- ===================== ENTOMOLOGY ===================== -->
-    <section id="bugs">
-      <h2>Entomology &amp; matching the hatch</h2>
-      <p>Trout eat mostly bugs, so trout anglers learn the <b>four orders</b> that dominate cold water and how to imitate each life stage. "Match the hatch" means picking a fly that mimics the <em>size, shape, color and stage</em> the fish are eating right now.</p>
-      <table>
-        <tr><th>Insect</th><th>Life cycle / stages to imitate</th><th>When</th></tr>
-        <tr><td class="f">Mayfly</td><td>Nymph → emerger → dun (sub-imago) → spinner (imago). The classic dry-fly bug; the most diverse.</td><td>Spring–fall; species-specific (BWO cool days, PMD/sulphur late spring–summer, Trico late summer mornings)</td></tr>
-        <tr><td class="f">Caddisfly</td><td>Larva → pupa → adult (complete metamorphosis). Skittering, tent-wing adults.</td><td>Late April–Oct; famous October Caddis in fall</td></tr>
-        <tr><td class="f">Stonefly</td><td>Nymph → adult. The biggest bugs; nymphs crawl to shore to hatch on rocks.</td><td>Early-season "big bug" nymphing; salmonfly/golden stone hatches late spring</td></tr>
-        <tr><td class="f">Midge</td><td>Larva → pupa → adult. Tiny (#20–28) — the year-round staple, often the only food on winter tailwaters.</td><td>Year-round; critical winter & tailwater</td></tr>
-        <tr><td class="f">Terrestrials</td><td>Land bugs that fall in: ants, beetles, hoppers, crickets.</td><td>Summer, especially windy afternoons</td></tr>
-      </table>
-      <div class="callout"><b>Field shortcut:</b> turn over a few rocks and seine the water. Whatever's crawling on the rocks (and what's in the air) tells you the size & color to tie on. When in doubt in winter, go small with a midge; in summer, try a terrestrial.<br><span class="src">— see <a href="https://www.takemefishing.org/fly-fishing/fly-fishing-flies/aquatic-fly-fishing-insects/" target="_blank" rel="noopener">Take Me Fishing</a> &amp; <a href="https://thecatchandthehatch.com/basic-entomology-for-fly-fishing/" target="_blank" rel="noopener">The Catch &amp; The Hatch</a>.</span></div>
-      <p class="callout" style="border-left-color:var(--gold)"><b>Be water-specific (don't assume):</b> bugs are local. Scuds &amp; sowbugs dominate cold tailwaters (the White, Taneycomo, Norfork); freestone mountain streams lean on caddis, terrestrials &amp; small mayflies; big Western rivers get salmonflies. Match what's <em>there</em> — FishDex's water "Local intel" tells you the specific bugs/baits for each named water.</p>
-    </section>
+  <!-- ============ LURES & RIGS ============ -->
+  <div class="panel" id="lures">
+    <div class="crumb"><a href="#hub">← All topics</a><span class="eyebrow">🧰 Lures &amp; Rigs</span></div>
+    <div class="panel-sub"><a href="#spin">Spin 101 →</a><a href="#knots">Knots →</a></div>
+    <h2>Lure categories &amp; when to throw them</h2>
+    <table>
+      <tr><th>Lure</th><th>What it does</th><th>When</th></tr>
+      <tr><td class="f">Soft plastic worm/craw</td><td>Slow, natural; Texas/Carolina/Ned/wacky</td><td>Year-round — the bass confidence bait</td></tr>
+      <tr><td class="f">Jig</td><td>Bottom-bumping crawfish/baitfish; flips cover</td><td>Cold water &amp; cover; year-round</td></tr>
+      <tr><td class="f">Spinnerbait</td><td>Flash &amp; vibration, weedless</td><td>Stained water, spring &amp; fall, wind</td></tr>
+      <tr><td class="f">Chatterbait</td><td>Vibrating bladed swim jig</td><td>Spring &amp; fall, grass</td></tr>
+      <tr><td class="f">Crankbait (squarebill / deep)</td><td>Covers water, deflects off cover/bottom</td><td>Spring &amp; fall; squarebill shallow, deep-diver on ledges</td></tr>
+      <tr><td class="f">Lipless crankbait</td><td>Fast, rattling search bait</td><td>Pre-spawn &amp; fall over grass</td></tr>
+      <tr><td class="f">Jerkbait</td><td>Suspending minnow, twitch-pause</td><td>Cold/clear water — winter &amp; early spring</td></tr>
+      <tr><td class="f">Topwater (popper, walker, frog)</td><td>Surface strikes</td><td>Summer dawn/dusk; frogs over pads</td></tr>
+      <tr><td class="f">Swimbait</td><td>Realistic baitfish, big-fish bait</td><td>Clear water, trophy hunts</td></tr>
+      <tr><td class="f">Spoon</td><td>Flash; cast, troll, vertical jig</td><td>Schooling white bass/stripers; deep winter fish</td></tr>
+      <tr><td class="f">Inline spinner</td><td>Easy flash bait (Mepps/Rooster Tail)</td><td>Trout, panfish, creek bass — a great beginner lure</td></tr>
+    </table>
+    <h2>Essential rigs</h2>
+    <table>
+      <tr><th>Rig</th><th>How &amp; when</th></tr>
+      <tr><td class="f">Texas rig</td><td>Bullet weight + offset worm hook, weedless. Worms/craws in cover — the bass staple.</td></tr>
+      <tr><td class="f">Carolina rig</td><td>Heavy weight + bead + swivel, 1–3' leader. Drags bottom over points/flats.</td></tr>
+      <tr><td class="f">Ned rig</td><td>Small soft stick on a 1/16–1/8 oz mushroom head. Finesse — clear water, pressured fish, smallmouth.</td></tr>
+      <tr><td class="f">Drop-shot</td><td>Hook up the line, weight at the bottom. Suspended/deep finesse — deadly for bass.</td></tr>
+      <tr><td class="f">Wacky rig</td><td>Hook a stick-worm in the middle; subtle quiver. Docks &amp; beds.</td></tr>
+      <tr><td class="f">Slip-bobber (live bait)</td><td>Adjustable float over hook + minnow/worm/leech. Crappie, walleye, trout, panfish.</td></tr>
+      <tr><td class="f">Fish-finder (bait)</td><td>Sliding sinker to a leader + circle hook. Catfish, surf, bottom fish.</td></tr>
+      <tr><td class="f">Hi-lo / pompano (surf)</td><td>Two dropper hooks + pyramid sinker; sand fleas/FishBites for pompano &amp; whiting.</td></tr>
+    </table>
+    <div class="related"><span class="eyebrow">Keep going</span><div class="chips"><a class="chip" href="#spin">🎣 Spin 101</a><a class="chip" href="#knots">🪢 Knots</a><a class="chip" href="app.html">🗺️ Find a lake</a></div></div>
+  </div>
 
-    <!-- ===================== TYPES & STYLES ===================== -->
-    <section id="types">
-      <h2>Types &amp; styles of fly fishing</h2>
-      <div class="grid2">
-        <div class="card"><h3 style="margin-top:0">Dry fly</h3><p>Floating fly on top, imitating an adult insect. The visual, classic style — you see the eat.</p></div>
-        <div class="card"><h3 style="margin-top:0">Nymphing</h3><p>Subsurface, where trout feed 80% of the time. Variants: indicator (bobber) nymphing, <b>Euro/tight-line</b> nymphing (no indicator, heavy jig nymphs), high-stick.</p></div>
-        <div class="card"><h3 style="margin-top:0">Dry-dropper</h3><p>A buoyant dry with a nymph hung below — searches two columns at once. Deadly all-rounder.</p></div>
-        <div class="card"><h3 style="margin-top:0">Streamer</h3><p>Stripping baitfish/leech imitations to trigger predators. Big-fish tactic; sink-tips & 6–8wt.</p></div>
-        <div class="card"><h3 style="margin-top:0">Wet fly / swing</h3><p>Soft-hackles fished down-and-across on the swing — old-school, effective during emergences.</p></div>
-        <div class="card"><h3 style="margin-top:0">Spey / two-hand</h3><p>Long rods swinging flies for steelhead & salmon on big rivers.</p></div>
-        <div class="card"><h3 style="margin-top:0">Tenkara</h3><p>Fixed-line, no reel — simple Japanese method for small mountain streams.</p></div>
-        <div class="card"><h3 style="margin-top:0">Warmwater</h3><p>Poppers & big flies for bass, bluegill, pike & muskie on 6–10wt.</p></div>
-        <div class="card"><h3 style="margin-top:0">Saltwater</h3><p>Sight-fishing flats (bonefish, permit, redfish, tarpon) and bluewater (sailfish, tuna). 8–15wt.</p></div>
-      </div>
-      <h3>Regional styles across the country</h3>
-      <p>The same sport looks different by region: <b>Western</b> big-water dry-dropper & streamer fishing and salmonfly hatches; <b>Appalachian/Southeast</b> small-stream wild-trout dries & nymphs in tight cover; <b>Midwest/Driftless</b> spring-creek technical nymphing; <b>Northeast</b> classic hatch-matching & big browns; <b>Gulf/Southeast flats</b> redfish & tarpon; <b>Florida Keys</b> bonefish/permit/tarpon "grand slam"; <b>Pacific NW</b> steelhead spey; <b>Mountain West tailwaters</b> midge & scud micro-nymphing.</p>
-    </section>
+  <!-- ============ KNOTS ============ -->
+  <div class="panel" id="knots">
+    <div class="crumb"><a href="#hub">← All topics</a><span class="eyebrow">🪢 Knots &amp; Rigging</span></div>
+    <div class="panel-sub"><a href="#fly">Fly 101 →</a><a href="#lures">Rigs →</a></div>
+    <h2>The handful you actually need</h2>
+    <table>
+      <tr><th>Knot</th><th>Use</th><th>How (short)</th></tr>
+      <tr><td class="f">Improved Clinch</td><td>Line/tippet → hook or lure</td><td>Through the eye, 5 wraps, back through the loop by the eye, then under the final turn; wet &amp; cinch.</td></tr>
+      <tr><td class="f">Palomar</td><td>Strongest hook knot (great with braid)</td><td>Double the line through the eye, overhand, pass the loop over the hook, cinch.</td></tr>
+      <tr><td class="f">Surgeon's</td><td>Join two lines (leader→tippet)</td><td>Overlap, loop, pass both ends through twice, wet &amp; pull all four ends.</td></tr>
+      <tr><td class="f">Blood Knot</td><td>Join similar-diameter lines (build leaders)</td><td>Wrap each tag 5× around the other, ends back through the middle from opposite sides; cinch.</td></tr>
+      <tr><td class="f">Non-slip Loop</td><td>Loop at the fly/lure for free movement</td><td>Overhand, through the eye, back through the overhand, wraps, back through; gives action.</td></tr>
+      <tr><td class="f">Nail Knot</td><td>Fly line → leader/backing</td><td>Wrap leader around line + a tube 5–7×, feed back through the tube, cinch &amp; trim.</td></tr>
+      <tr><td class="f">Albright</td><td>Join very different lines (braid→mono)</td><td>Loop the heavy line, wrap the lighter 10× through &amp; around, back through the loop; cinch.</td></tr>
+      <tr><td class="f">Uni / Double Uni</td><td>All-purpose terminal &amp; line-join</td><td>Loop, 5–6 wraps through the loop, cinch to the eye.</td></tr>
+      <tr><td class="f">Loop-to-Loop</td><td>Quick leader→fly-line connection</td><td>Interlock two loops (don't girth-hitch).</td></tr>
+    </table>
+    <p class="src">Best free step-by-step animations: <a href="https://www.animatedknots.com/fishing-knots" target="_blank" rel="noopener">Animated Knots by Grog</a>.</p>
+    <h3>Leader &amp; tippet "X" sizing (fly)</h3>
+    <p>Tippet is rated in "X" — bigger number = thinner: <b>0X</b> (~15 lb, big streamers/bass) → <b>3X–4X</b> (nymphs, hoppers, average trout) → <b>5X–6X</b> (dries, wary trout) → <b>7X–8X</b> (tiny midges, spring creeks). Rough rule: fly size ÷ 3 or 4 = the X (a #16 fly ≈ 4–5X).</p>
+    <div class="related"><span class="eyebrow">Keep going</span><div class="chips"><a class="chip" href="#fly">🪶 Fly 101</a><a class="chip" href="#lures">🧰 Rigs</a><a class="chip" href="#resources">▶️ Knot videos</a></div></div>
+  </div>
 
-    <!-- ===================== FLY ENCYCLOPEDIA ===================== -->
-    <section id="flies">
-      <h2>Fly encyclopedia — 130+ notable patterns</h2>
-      <p>Organized by type. You don't need them all — a dozen will catch fish anywhere — but here's the broad vocabulary, with what each imitates and when to fish it.</p>
+  <!-- ============ GLOSSARY ============ -->
+  <div class="panel" id="glossary">
+    <div class="crumb"><a href="#hub">← All topics</a><span class="eyebrow">📖 Glossary</span></div>
+    <div class="grid2">
+      <div class="box"><h3>Fly fishing</h3><p style="font-size:13.5px"><b>Tippet</b> — fine end of the leader. <b>Dun/Spinner</b> — mayfly adult stages. <b>Emerger</b> — insect rising to hatch. <b>Dead-drift</b> — fly moving at current speed, no drag. <b>Mend</b> — flipping line upstream to prevent drag. <b>Dropper</b> — second fly below the first. <b>Indicator</b> — strike bobber. <b>Hatch</b> — synchronized insect emergence. <b>Streamer</b> — baitfish/leech fly. <b>Backing</b> — line behind the fly line. <b>WF-F</b> — weight-forward floating line.</p></div>
+      <div class="box"><h3>Spin / bait</h3><p style="font-size:13.5px"><b>Backlash</b> — baitcaster spool overrun. <b>Drag</b> — slip system that tires fish. <b>Leader</b> — abrasion/stealth section at the end. <b>Jighead</b> — weighted hook for plastics. <b>Weedless</b> — hook point hidden to dodge snags. <b>Finesse</b> — light line, small baits. <b>Flipping/pitching</b> — short accurate close-cover casts. <b>Topwater</b> — surface lure. <b>Circle hook</b> — self-setting hook for bait. <b>Texas/Carolina/Ned/drop-shot</b> — soft-plastic rigs.</p></div>
+    </div>
+    <div class="related"><span class="eyebrow">Keep going</span><div class="chips"><a class="chip" href="#fly">🪶 Fly 101</a><a class="chip" href="#spin">🎣 Spin 101</a></div></div>
+  </div>
 
-      <details open><summary>Dry flies — adults on the surface (≈28)</summary><div class="body"><table>
-        <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
-        <tr><td class="f">Adams / Parachute Adams</td><td>Generic mayfly adult — the #1 searching dry</td><td>12–20</td></tr>
-        <tr><td class="f">Blue-Winged Olive (BWO)</td><td>Baetis mayfly; cool, overcast days</td><td>16–22</td></tr>
-        <tr><td class="f">Pale Morning Dun (PMD)</td><td>Summer mayfly, Western & beyond</td><td>14–18</td></tr>
-        <tr><td class="f">Light Cahill</td><td>Cream mayfly, Eastern evenings</td><td>12–16</td></tr>
-        <tr><td class="f">Sulphur Dun</td><td>Eastern late-spring mayfly</td><td>14–18</td></tr>
-        <tr><td class="f">Hendrickson</td><td>Early-season Eastern mayfly</td><td>12–14</td></tr>
-        <tr><td class="f">March Brown</td><td>Spring mayfly</td><td>10–14</td></tr>
-        <tr><td class="f">Quill Gordon</td><td>Early Appalachian mayfly</td><td>12–14</td></tr>
-        <tr><td class="f">Trico</td><td>Tiny late-summer mayfly, morning spinner falls</td><td>20–24</td></tr>
-        <tr><td class="f">Green / Brown / Gray Drake</td><td>Big mayflies; explosive hatches</td><td>8–12</td></tr>
-        <tr><td class="f">Hexagenia (Hex)</td><td>Giant mayfly; Midwest night hatch for big browns</td><td>6–8</td></tr>
-        <tr><td class="f">Mahogany Dun</td><td>Fall mayfly</td><td>14–18</td></tr>
-        <tr><td class="f">Elk Hair Caddis</td><td>Caddis adult — buoyant searching dry</td><td>12–18</td></tr>
-        <tr><td class="f">X-Caddis / Goddard Caddis</td><td>Caddis cripple / skittering adult</td><td>14–18</td></tr>
-        <tr><td class="f">Stimulator</td><td>Stonefly/caddis attractor; rides high</td><td>8–16</td></tr>
-        <tr><td class="f">Royal Wulff / Royal Coachman</td><td>High-vis attractor, broken water</td><td>10–16</td></tr>
-        <tr><td class="f">H&L Variant / Renegade</td><td>Visible attractors</td><td>12–16</td></tr>
-        <tr><td class="f">Griffith's Gnat</td><td>Midge cluster; winter & tailwater</td><td>18–24</td></tr>
-        <tr><td class="f">Comparadun / Sparkle Dun</td><td>No-hackle mayfly dun, flat water</td><td>14–20</td></tr>
-        <tr><td class="f">Rusty Spinner</td><td>Spent mayfly (spinner fall), evenings</td><td>14–20</td></tr>
-        <tr><td class="f">Humpy / Trude</td><td>Buoyant rough-water attractors</td><td>10–16</td></tr>
-      </table></div></details>
-
-      <details><summary>Emergers & cripples — in the film (≈6)</summary><div class="body"><table>
-        <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
-        <tr><td class="f">RS2</td><td>Baetis/midge emerger; deadly tailwater</td><td>18–24</td></tr>
-        <tr><td class="f">Barr's Emerger</td><td>Mayfly emerging nymph</td><td>16–20</td></tr>
-        <tr><td class="f">CDC Emerger</td><td>Stuck-in-the-film mayfly</td><td>16–20</td></tr>
-        <tr><td class="f">Klinkhammer</td><td>Emerger hung below a parachute post</td><td>12–18</td></tr>
-        <tr><td class="f">Quigley Cripple</td><td>Failed/crippled emerger — easy meal</td><td>12–18</td></tr>
-        <tr><td class="f">LaFontaine Sparkle Pupa</td><td>Caddis pupa rising through the column</td><td>12–16</td></tr>
-      </table></div></details>
-
-      <details><summary>Nymphs — subsurface, where trout feed most (≈28)</summary><div class="body"><table>
-        <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
-        <tr><td class="f">Pheasant Tail / BH Pheasant Tail</td><td>Mayfly nymph — universal</td><td>12–20</td></tr>
-        <tr><td class="f">Gold-Ribbed Hare's Ear</td><td>Generic nymph / emerging mayfly</td><td>10–18</td></tr>
-        <tr><td class="f">Prince Nymph</td><td>Attractor stonefly/general</td><td>10–16</td></tr>
-        <tr><td class="f">Copper John</td><td>Heavy attractor anchor nymph</td><td>12–18</td></tr>
-        <tr><td class="f">Zebra Midge</td><td>Midge larva/pupa — tailwater killer</td><td>16–22</td></tr>
-        <tr><td class="f">Brassie / WD-40</td><td>Midge larva / emerger</td><td>16–22</td></tr>
-        <tr><td class="f">Frenchie / Perdigon</td><td>Euro-nymph jig anchors, fast sink</td><td>14–18</td></tr>
-        <tr><td class="f">Rainbow Warrior</td><td>Flashy attractor nymph</td><td>14–18</td></tr>
-        <tr><td class="f">Two-Bit Hooker / Higa's SOS</td><td>Slim mayfly nymphs</td><td>14–20</td></tr>
-        <tr><td class="f">Pat's Rubber Legs / Girdle Bug</td><td>Stonefly nymph — big & buggy</td><td>4–10</td></tr>
-        <tr><td class="f">Kaufmann's Stonefly</td><td>Realistic stonefly nymph</td><td>4–10</td></tr>
-        <tr><td class="f">Czech / UV Scud</td><td>Scud (freshwater shrimp) — tailwaters</td><td>12–18</td></tr>
-        <tr><td class="f">Sowbug</td><td>Sowbug — tailwater staple</td><td>14–18</td></tr>
-        <tr><td class="f">San Juan Worm / Squirmy Wormy</td><td>Aquatic worm; high or stained water</td><td>10–14</td></tr>
-        <tr><td class="f">Egg / Glo-Bug / Y2K</td><td>Trout/salmon egg; behind spawners</td><td>12–16</td></tr>
-        <tr><td class="f">Mop Fly / Walt's Worm</td><td>Cranefly larva / general buggy</td><td>10–14</td></tr>
-        <tr><td class="f">Caddis Larva (Czech)</td><td>Cased/free caddis larva</td><td>12–16</td></tr>
-        <tr><td class="f">Soft-Hackle PT / Hare's Ear</td><td>Emerging nymph on the swing</td><td>12–18</td></tr>
-      </table></div></details>
-
-      <details><summary>Streamers — baitfish & leeches for predators (≈19)</summary><div class="body"><table>
-        <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
-        <tr><td class="f">Woolly Bugger</td><td>Leech/baitfish/crayfish — the most versatile fly ever</td><td>2–10</td></tr>
-        <tr><td class="f">Muddler Minnow</td><td>Sculpin/grasshopper</td><td>2–10</td></tr>
-        <tr><td class="f">Clouser Minnow</td><td>Baitfish — fresh &amp; salt, jigs in the water column</td><td>1/0–8</td></tr>
-        <tr><td class="f">Zonker / Double Bunny</td><td>Rabbit-strip baitfish</td><td>2–6</td></tr>
-        <tr><td class="f">Sculpzilla / Zoo Cougar</td><td>Sculpin for big browns</td><td>2–6</td></tr>
-        <tr><td class="f">Sex Dungeon / Circus Peanut</td><td>Articulated meat for trophy trout</td><td>2–6 artic.</td></tr>
-        <tr><td class="f">Dolly Llama / Kreelex</td><td>Flashy attractor streamers</td><td>2–6</td></tr>
-        <tr><td class="f">Mickey Finn</td><td>Classic bucktail baitfish</td><td>4–8</td></tr>
-        <tr><td class="f">Gray / Black Ghost</td><td>Classic streamers, smelt</td><td>2–8</td></tr>
-        <tr><td class="f">Slumpbuster / Home Invader</td><td>Modern sculpin/baitfish</td><td>2–6</td></tr>
-        <tr><td class="f">Complex Twist Bugger</td><td>Bulky baitfish profile</td><td>2–6</td></tr>
-        <tr><td class="f">Lefty's Deceiver</td><td>Baitfish — fresh &amp; salt staple</td><td>2/0–4</td></tr>
-      </table></div></details>
-
-      <details><summary>Wets, soft-hackles & terrestrials (≈15)</summary><div class="body"><table>
-        <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
-        <tr><td class="f">Partridge &amp; Orange</td><td>Soft-hackle emerger, swung</td><td>12–16</td></tr>
-        <tr><td class="f">Leadwing Coachman / Carey Special</td><td>Classic wet flies, lakes & rivers</td><td>8–14</td></tr>
-        <tr><td class="f">Wooly Worm</td><td>Buggy wet / nymph</td><td>6–12</td></tr>
-        <tr><td class="f">Dave's / Morrish Hopper</td><td>Grasshopper — summer</td><td>6–12</td></tr>
-        <tr><td class="f">Chubby Chernobyl / Fat Albert</td><td>Foam attractor / stonefly / hopper</td><td>6–12</td></tr>
-        <tr><td class="f">Chernobyl Ant / Hippie Stomper</td><td>Foam terrestrial attractor / dropper rig</td><td>8–14</td></tr>
-        <tr><td class="f">Foam Beetle</td><td>Beetle — summer, especially streams</td><td>12–18</td></tr>
-        <tr><td class="f">Parachute / Flying Ant</td><td>Ant fall — late summer</td><td>14–20</td></tr>
-      </table></div></details>
-
-      <details><summary>Warmwater — bass, bluegill, pike &amp; muskie (≈12)</summary><div class="body"><table>
-        <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
-        <tr><td class="f">Boogle Bug / Bass Popper</td><td>Topwater popper — bass & sunfish</td><td>2–8</td></tr>
-        <tr><td class="f">Sneaky Pete</td><td>Slider popper, subtle topwater</td><td>4–8</td></tr>
-        <tr><td class="f">Bream Killer / Sunfish Spider</td><td>Tiny panfish bug</td><td>8–12</td></tr>
-        <tr><td class="f">Murdich Minnow / Game Changer</td><td>Flashy / segmented baitfish (Chocklett)</td><td>2/0–4</td></tr>
-        <tr><td class="f">Meat Whistle</td><td>Jig-style bass crawfish/baitfish</td><td>1/0–4</td></tr>
-        <tr><td class="f">Dahlberg Diver</td><td>Diving deer-hair head; bass & pike</td><td>2/0–4</td></tr>
-        <tr><td class="f">Chocklett's T-Bone / Buford</td><td>8–12" articulated musky/pike flies</td><td>3/0–6/0</td></tr>
-        <tr><td class="f">Pike Bunny / EP Pike</td><td>Big rabbit/EP baitfish for pike</td><td>2/0–4/0</td></tr>
-      </table></div></details>
-
-      <details><summary>Saltwater — flats &amp; bluewater (≈16)</summary><div class="body"><table>
-        <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
-        <tr><td class="f">Clouser Minnow</td><td>Baitfish — the saltwater workhorse</td><td>2/0–4</td></tr>
-        <tr><td class="f">Lefty's Deceiver</td><td>Larger baitfish — stripers, etc.</td><td>3/0–2</td></tr>
-        <tr><td class="f">Crazy Charlie / Gotcha</td><td>Bonefish shrimp/shrimpy</td><td>4–8</td></tr>
-        <tr><td class="f">Bonefish Bitters</td><td>Bonefish crab/shrimp</td><td>4–8</td></tr>
-        <tr><td class="f">Merkin Crab / Del Brown's Permit</td><td>Permit crab — the grand-slam fly</td><td>1–4</td></tr>
-        <tr><td class="f">EP Baitfish / Surf Candy</td><td>Realistic baitfish — many species</td><td>2/0–2</td></tr>
-        <tr><td class="f">Gurgler</td><td>Surface waker — stripers, snook, more</td><td>1/0–4</td></tr>
-        <tr><td class="f">Tarpon Toad / Cockroach / Black Death</td><td>Classic tarpon flies</td><td>1/0–4/0</td></tr>
-        <tr><td class="f">Borski Slider / Schminnow</td><td>Redfish & seatrout flats flies</td><td>2–6</td></tr>
-        <tr><td class="f">Bunny Fly</td><td>Snook/redfish baitfish</td><td>1/0–2</td></tr>
-      </table></div></details>
-
-      <details><summary>Salmon &amp; steelhead (≈8)</summary><div class="body"><table>
-        <tr><th>Fly</th><th>Imitates / use</th><th>Sizes</th></tr>
-        <tr><td class="f">Egg / Glo-Bug</td><td>Roe — salmon & steelhead</td><td>6–12</td></tr>
-        <tr><td class="f">Egg-Sucking Leech</td><td>Leech + egg — Alaska staple</td><td>2–6</td></tr>
-        <tr><td class="f">Intruder</td><td>Big articulated swing fly (steelhead)</td><td>1.5–3"</td></tr>
-        <tr><td class="f">Comet / Polar Shrimp</td><td>Bright steelhead/salmon flies</td><td>4–8</td></tr>
-        <tr><td class="f">Green Butt Skunk</td><td>Classic steelhead swing fly</td><td>4–8</td></tr>
-        <tr><td class="f">Articulated Leech</td><td>Trout/steelhead swung leech</td><td>2–6</td></tr>
-      </table></div></details>
-    </section>
-
-    <section id="colors">
-      <h2>Color, size &amp; selection</h2>
-      <p>Three quick rules cover most decisions:</p>
-      <ul>
-        <li><b>Size first, then shape, then color.</b> Trout key on silhouette and size more than exact color — get those right before fussing over shade.</li>
-        <li><b>Water clarity drives color.</b> Clear water &amp; bright light → natural, drab, smaller (olive, gray, tan). Stained/muddy water or low light → dark or bright &amp; bigger (black, chartreuse, white) so fish can find it.</li>
-        <li><b>"Match the hatch" on trout; "match the bait" on predators.</b> For bass/stripers/salt, imitate the dominant forage (shad, mullet, crawfish) in size &amp; color.</li>
-      </ul>
-    </section>
-
-    <!-- ===================== SPIN & BAITCAST ===================== -->
-    <section id="spin101">
-      <h2>Spin &amp; baitcast 101 — the complete-beginner track</h2>
-      <h3>Spinning vs. baitcaster</h3>
-      <table>
-        <tr><th>Reel</th><th>Learning curve</th><th>Best for</th></tr>
-        <tr><td class="f">Spinning</td><td>Easy — just release the line on the forward cast. Fewer tangles.</td><td>Beginners, light lures & line, finesse, panfish/trout/light bass</td></tr>
-        <tr><td class="f">Baitcaster</td><td>Harder — thumb the spool to avoid backlash ("bird's nests").</td><td>Heavier lures & line, accuracy, power; jigs, big cranks, flipping</td></tr>
-      </table>
-      <p class="src">Start spinning, graduate to a baitcaster once you're flipping heavier baits. Sources: <a href="https://www.wired2fish.com/tackle-tips/baitcaster-vs-spinning-reel-which-is-best" target="_blank" rel="noopener">Wired2Fish</a>, <a href="https://www.bassresource.com/fishing/spinning-baitcasting-choice.html" target="_blank" rel="noopener">BassResource</a>.</p>
-      <h3>Line: mono vs. fluoro vs. braid</h3>
-      <table>
-        <tr><th>Line</th><th>Feel</th><th>Use it for</th></tr>
-        <tr><td class="f">Monofilament</td><td>Cheap, stretchy, floats, beginner-friendly, easy knots</td><td>Topwater, beginners, general use; 6–12 lb</td></tr>
-        <tr><td class="f">Fluorocarbon</td><td>Nearly invisible, sinks, low stretch = sensitive</td><td>Clear water, bottom baits, leaders; 8–15 lb</td></tr>
-        <tr><td class="f">Braid</td><td>Super strong &amp; thin, no stretch, no memory, floats</td><td>Heavy cover, finesse main line (add a fluoro leader); 10–30 lb</td></tr>
-      </table>
-      <p class="callout"><b>Great starter combo:</b> 7' medium spinning rod + 2500–3000 reel, spooled with 10–15 lb braid and a 6–10 lb fluorocarbon leader (or just 8 lb mono to keep it simple).<br><span class="src">— per <a href="https://www.strikeking.com/en/learn/fishing-line-breakdown" target="_blank" rel="noopener">Strike King</a> &amp; <a href="https://handingfishing.com/blogs/news/fishing-line-types-mono-fluoro-braid-guide" target="_blank" rel="noopener">Handing Fishing</a>.</span></p>
-    </section>
-
-    <section id="lures">
-      <h2>Lure categories &amp; when to throw them</h2>
-      <table>
-        <tr><th>Lure</th><th>What it does</th><th>When</th></tr>
-        <tr><td class="f">Soft plastic worm/craw</td><td>Slow, natural; Texas/Carolina/Ned/wacky rigs</td><td>Year-round — the bass confidence bait</td></tr>
-        <tr><td class="f">Jig</td><td>Bottom-bumping crawfish/baitfish; flip cover</td><td>Cold water & cover; year-round</td></tr>
-        <tr><td class="f">Spinnerbait</td><td>Flash & vibration, weedless</td><td>Stained water, spring & fall, wind</td></tr>
-        <tr><td class="f">Chatterbait (bladed jig)</td><td>Vibrating swim jig</td><td>Spring & fall, grass</td></tr>
-        <tr><td class="f">Crankbait (square-bill / deep)</td><td>Covers water, deflects off cover/bottom</td><td>Spring & fall; squarebill shallow, deep-diver on ledges</td></tr>
-        <tr><td class="f">Lipless crankbait</td><td>Fast, rattling search bait</td><td>Pre-spawn & fall over grass</td></tr>
-        <tr><td class="f">Jerkbait</td><td>Suspending minnow, twitch-pause</td><td>Cold/clear water — winter & early spring</td></tr>
-        <tr><td class="f">Topwater (popper, walker, frog)</td><td>Surface strikes</td><td>Summer dawn/dusk; frogs over pads & grass</td></tr>
-        <tr><td class="f">Swimbait</td><td>Realistic baitfish, big-fish bait</td><td>Clear water, big-fish hunts</td></tr>
-        <tr><td class="f">Spoon</td><td>Flash; casting, trolling, vertical jigging</td><td>White bass/stripers schooling; deep winter fish</td></tr>
-        <tr><td class="f">Inline spinner</td><td>Easy flash bait (Mepps/Rooster Tail)</td><td>Trout, panfish, creek bass — a great beginner lure</td></tr>
-      </table>
-    </section>
-
-    <section id="rigs">
-      <h2>Essential rigs (soft plastics &amp; bait)</h2>
-      <table>
-        <tr><th>Rig</th><th>How &amp; when</th></tr>
-        <tr><td class="f">Texas rig</td><td>Bullet weight + offset worm hook, weedless. Worms/craws in cover — the bass staple.</td></tr>
-        <tr><td class="f">Carolina rig</td><td>Heavy weight + bead + swivel, 1–3' leader to the bait. Drags bottom over points/flats.</td></tr>
-        <tr><td class="f">Ned rig</td><td>Small soft stick on a 1/16–1/8 oz mushroom jighead. Finesse — clear water, pressured fish, smallmouth.</td></tr>
-        <tr><td class="f">Drop-shot</td><td>Hook up the line, weight at the bottom. Suspended/deep finesse — deadly for bass.</td></tr>
-        <tr><td class="f">Wacky rig</td><td>Hook a stick-worm in the middle; subtle quiver. Docks & beds.</td></tr>
-        <tr><td class="f">Slip-bobber (live bait)</td><td>Adjustable float over a hook + minnow/worm/leech. Crappie, walleye, trout, panfish.</td></tr>
-        <tr><td class="f">Carolina/fish-finder (bait)</td><td>Sliding sinker to a leader + circle hook. Catfish (cut bait), surf, bottom fish.</td></tr>
-        <tr><td class="f">Hi-lo / pompano rig (surf)</td><td>Two dropper hooks + pyramid sinker; sand fleas/FishBites for pompano & whiting.</td></tr>
-      </table>
-    </section>
-
-    <!-- ===================== KNOTS ===================== -->
-    <section id="knots">
-      <h2>Knots — the handful you actually need</h2>
-      <table>
-        <tr><th>Knot</th><th>Use</th><th>How (short)</th></tr>
-        <tr><td class="f">Improved Clinch</td><td>Line/tippet → hook or lure</td><td>Through the eye, 5 wraps, back through the loop by the eye, then under the final turn; wet &amp; cinch.</td></tr>
-        <tr><td class="f">Palomar</td><td>Strongest hook knot (great with braid)</td><td>Double the line through the eye, tie an overhand, pass the loop over the hook, cinch.</td></tr>
-        <tr><td class="f">Surgeon's</td><td>Join two lines (leader→tippet), even different sizes</td><td>Overlap, form a loop, pass both ends through twice, wet &amp; pull all four ends.</td></tr>
-        <tr><td class="f">Blood Knot</td><td>Join similar-diameter lines (build leaders)</td><td>Wrap each tag 5× around the other, ends back through the middle from opposite sides; cinch.</td></tr>
-        <tr><td class="f">Double/Non-slip Loop</td><td>Loop at the fly/lure for free movement</td><td>Overhand, through the eye, back through the overhand, wraps, back through; gives action.</td></tr>
-        <tr><td class="f">Nail Knot</td><td>Fly line → leader/backing</td><td>Wrap leader around line + a tube 5–7×, feed back through the tube, cinch &amp; trim.</td></tr>
-        <tr><td class="f">Albright</td><td>Join very different lines (braid→mono, leader→fly line)</td><td>Loop the heavy line, wrap the lighter 10× through &amp; around, back through the loop; cinch.</td></tr>
-        <tr><td class="f">Uni (Duncan)</td><td>All-purpose terminal &amp; line-join (double uni)</td><td>Loop, 5–6 wraps through the loop, cinch down to the eye.</td></tr>
-        <tr><td class="f">Loop-to-Loop</td><td>Quick leader→fly-line connection</td><td>Interlock two loops (don't girth-hitch them).</td></tr>
-      </table>
-      <p class="src">Best free knot tutorials with step-by-step animations: <a href="https://www.animatedknots.com/fishing-knots" target="_blank" rel="noopener">Animated Knots by Grog</a>. Also the <a href="https://dnr.maryland.gov/fisheries/documents/knots.pdf" target="_blank" rel="noopener">Maryland DNR knot guide (PDF)</a>.</p>
-      <h3>Leader &amp; tippet "X" sizing (fly)</h3>
-      <p>Tippet is rated in "X" — the bigger the number, the thinner: <b>0X</b> (~15 lb, big streamers/bass) → <b>3X–4X</b> (nymphs, hoppers, average trout) → <b>5X–6X</b> (dries, wary trout) → <b>7X–8X</b> (tiny midges, spring creeks). Rough rule: divide the fly size by 3 or 4 for the X (a #16 fly ≈ 4–5X).</p>
-    </section>
-
-    <section id="glossary">
-      <h2>Glossary</h2>
-      <div class="grid2">
-        <div class="card">
-          <h3 style="margin-top:0">Fly fishing</h3>
-          <p style="font-size:13.5px"><b>Tippet</b> — fine end of the leader. <b>Dun/Spinner</b> — mayfly adult stages. <b>Emerger</b> — insect rising to hatch. <b>Dead-drift</b> — fly moving at current speed, no drag. <b>Mend</b> — flipping line upstream to prevent drag. <b>Dropper</b> — second fly below the first. <b>Indicator</b> — strike bobber. <b>Hatch</b> — synchronized insect emergence. <b>Streamer</b> — baitfish/leech fly. <b>Backing</b> — line behind the fly line. <b>WF-F</b> — weight-forward floating line.</p>
-        </div>
-        <div class="card">
-          <h3 style="margin-top:0">Spin / bait</h3>
-          <p style="font-size:13.5px"><b>Backlash</b> — baitcaster spool overrun ("bird's nest"). <b>Drag</b> — slip system that tires fish. <b>Leader</b> — abrasion/stealth section at the end. <b>Jighead</b> — weighted hook for plastics. <b>Weedless</b> — hook point hidden to dodge snags. <b>Finesse</b> — light line, small baits, subtle. <b>Flipping/pitching</b> — short accurate close-cover casts. <b>Topwater</b> — surface lure. <b>Circle hook</b> — self-setting hook for bait. <b>Texas/Carolina/Ned/drop-shot</b> — soft-plastic rigs.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== RESOURCES ===================== -->
-    <section id="resources">
-      <h2>Resources &amp; videos</h2>
-      <div class="grid2">
-        <div class="card">
-          <h3 style="margin-top:0">🪶 Fly fishing</h3>
-          <ul style="font-size:14px">
-            <li><a href="https://howtoflyfish.orvis.com/" target="_blank" rel="noopener">Orvis Learning Center</a> — free video lessons in order (best starting point)</li>
-            <li><a href="https://www.youtube.com/results?search_query=Orvis+how+to+fly+fish" target="_blank" rel="noopener">Orvis YouTube</a> — casting & technique</li>
-            <li><a href="https://www.youtube.com/results?search_query=In+The+Riffle+fly+tying" target="_blank" rel="noopener">In The Riffle</a> — step-by-step fly tying</li>
-            <li><a href="https://www.takemefishing.org/fly-fishing/" target="_blank" rel="noopener">Take Me Fishing</a> — basics & entomology</li>
-            <li><a href="https://thecatchandthehatch.com/basic-entomology-for-fly-fishing/" target="_blank" rel="noopener">The Catch &amp; The Hatch</a> — entomology</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3 style="margin-top:0">🎣 Spin &amp; bass</h3>
-          <ul style="font-size:14px">
-            <li><a href="https://www.youtube.com/results?search_query=Flukemaster+bass+fishing" target="_blank" rel="noopener">Flukemaster</a> — beginner-friendly technique tutorials</li>
-            <li><a href="https://www.bassresource.com/" target="_blank" rel="noopener">BassResource</a> — deep how-to library</li>
-            <li><a href="https://www.wired2fish.com/" target="_blank" rel="noopener">Wired2Fish</a> — gear & technique</li>
-            <li><a href="https://www.youtube.com/results?search_query=Googan+Squad" target="_blank" rel="noopener">Googan Squad</a> — fun, high-production bass content</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3 style="margin-top:0">🪢 Knots</h3>
-          <ul style="font-size:14px">
-            <li><a href="https://www.animatedknots.com/fishing-knots" target="_blank" rel="noopener">Animated Knots by Grog</a> — animated, step-by-step</li>
-            <li><a href="https://www.orvis.co.uk/blogs/explore-orvis/fly-fishing-knots-mastering-the-essentials" target="_blank" rel="noopener">Orvis — essential knots</a></li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3 style="margin-top:0">📈 Rod weights &amp; gear</h3>
-          <ul style="font-size:14px">
-            <li><a href="https://www.tridentflyfishing.com/blogs/all/line-weight-chart" target="_blank" rel="noopener">Trident — line-weight chart</a></li>
-            <li><a href="https://www.fieldandstream.com/fishing/fly-rod-weights" target="_blank" rel="noopener">Field &amp; Stream — species-by-species</a></li>
-            <li><a href="https://www.strikeking.com/en/learn/fishing-line-breakdown" target="_blank" rel="noopener">Strike King — line breakdown</a></li>
-          </ul>
-        </div>
-      </div>
-      <p style="margin-top:14px"><a class="btn primary" href="app.html">← Back to the FishDex map — find where to use all this</a></p>
-    </section>
-  </article>
+  <!-- ============ RESOURCES ============ -->
+  <div class="panel" id="resources">
+    <div class="crumb"><a href="#hub">← All topics</a><span class="eyebrow">▶️ Videos &amp; Resources</span></div>
+    <div class="grid2">
+      <div class="box"><h3>🪶 Fly fishing</h3><ul style="font-size:14px;margin:6px 0 0;padding-left:18px">
+        <li><a href="https://howtoflyfish.orvis.com/" target="_blank" rel="noopener">Orvis Learning Center</a> — free video lessons in order</li>
+        <li><a href="https://www.youtube.com/results?search_query=In+The+Riffle+fly+tying" target="_blank" rel="noopener">In The Riffle</a> — step-by-step fly tying</li>
+        <li><a href="https://www.takemefishing.org/fly-fishing/" target="_blank" rel="noopener">Take Me Fishing</a> — basics &amp; entomology</li></ul></div>
+      <div class="box"><h3>🎣 Spin &amp; bass</h3><ul style="font-size:14px;margin:6px 0 0;padding-left:18px">
+        <li><a href="https://www.youtube.com/results?search_query=Flukemaster+bass+fishing" target="_blank" rel="noopener">Flukemaster</a> — beginner tutorials</li>
+        <li><a href="https://www.bassresource.com/" target="_blank" rel="noopener">BassResource</a> — deep how-to library</li>
+        <li><a href="https://www.wired2fish.com/" target="_blank" rel="noopener">Wired2Fish</a> — gear &amp; technique</li></ul></div>
+      <div class="box"><h3>🪢 Knots</h3><ul style="font-size:14px;margin:6px 0 0;padding-left:18px">
+        <li><a href="https://www.animatedknots.com/fishing-knots" target="_blank" rel="noopener">Animated Knots by Grog</a></li></ul></div>
+      <div class="box"><h3>📈 Gear &amp; rod weights</h3><ul style="font-size:14px;margin:6px 0 0;padding-left:18px">
+        <li><a href="https://www.tridentflyfishing.com/blogs/all/line-weight-chart" target="_blank" rel="noopener">Trident — line-weight chart</a></li>
+        <li><a href="https://www.strikeking.com/en/learn/fishing-line-breakdown" target="_blank" rel="noopener">Strike King — line breakdown</a></li></ul></div>
+    </div>
+    <p style="margin-top:16px"><a class="btn" href="app.html">🗺️ Back to the map — find where to use all this</a></p>
+  </div>
 </div>
 
-<footer><div class="wrap">
-  <p class="disc">This guide is educational and general. Techniques, regulations and seasons vary by water and year — always confirm local rules before you fish, and let conservation guide your handling and harvest. External links go to third-party sites for further learning; FishDex isn't affiliated with them. © <span id="yr"></span> FishDex.</p>
-</div></footer>
-<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<footer><div class="wrap">This guide is educational and general. Techniques, regulations &amp; seasons vary by water and year — confirm local rules before you fish. External links go to third-party sites. © <span id="yr"></span> FishDex.</div></footer>
+
+<script>
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  const panels=[...document.querySelectorAll('.panel')];
+  function route(){
+    const id=(location.hash||'#hub').slice(1);
+    const target=document.getElementById(id);
+    const isPanel=target && target.classList.contains('panel');
+    panels.forEach(p=>p.classList.toggle('active', p.id===id));
+    document.body.classList.toggle('in-panel', isPanel);
+    document.getElementById('allTopics').style.display = isPanel ? 'inline' : 'none';
+    window.scrollTo({top:0,behavior:'instant' in window?'instant':'auto'});
+  }
+  window.addEventListener('hashchange',route);
+  route();
+</script>
 </body>
 </html>
