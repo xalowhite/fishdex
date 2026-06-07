@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FishDex — Angler's Field Guide to North America</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root{
+    --bg:#0d1b24; --panel:#12252f; --panel2:#173039; --line:#244553;
+    --ink:#e9f3f2; --muted:#8fa9b0; --accent:#37b6a0; --accent2:#5ad1bb;
+    --warn:#e6a23c; --peak:#3ddc84; --good:#9bd95a; --slow:#5d7681;
+    --chip:#1d3a44; --shadow:0 4px 18px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  #app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(90deg,#0e2530,#12313d);
+    border-bottom:1px solid var(--line);flex:0 0 auto}
+  header h1{font-size:18px;margin:0;letter-spacing:.5px;font-weight:700}
+  header h1 .fin{color:var(--accent2)}
+  header .tag{font-size:12px;color:var(--muted);margin-left:2px}
+  header .spacer{flex:1}
+  .main{display:flex;flex:1;min-height:0}
+
+  /* ---------- Rolodex (left) ---------- */
+  .rolodex{width:38%;max-width:480px;min-width:300px;display:flex;flex-direction:column;
+    background:var(--panel);border-right:1px solid var(--line)}
+  .rolodex .search{padding:10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+  .rolodex input[type=text]{width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);font-size:14px;outline:none}
+  .rolodex input::placeholder{color:var(--muted)}
+  .ctxbar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);min-height:18px}
+  .ctxbar b{color:var(--accent2)}
+  .ctxbar button{margin-left:auto;background:var(--chip);border:1px solid var(--line);color:var(--ink);
+    border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer}
+  .grp{padding:8px 12px 3px;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);
+    position:sticky;top:0;background:var(--panel);z-index:1}
+  .list{overflow-y:auto;flex:1;padding-bottom:24px}
+  .card{margin:6px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);
+    cursor:pointer;transition:border-color .15s,transform .05s}
+  .card:hover{border-color:var(--accent)}
+  .card.sel{border-color:var(--accent2);background:#16323c;box-shadow:var(--shadow)}
+  .card.dim{opacity:.42}
+  .card .row1{display:flex;align-items:center;gap:10px}
+  .thumb{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:46px;height:30px;
+    background:#0e222b;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:none}
+  .card .nm{font-weight:600;font-size:15px}
+  .card .sci{font-size:11px;color:var(--muted);font-style:italic}
+  .card .meta{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px}
+  .pill{font-size:10.5px;padding:2px 7px;border-radius:20px;background:var(--chip);color:var(--accent2);border:1px solid var(--line)}
+  .pill.fight{color:#e9c96b;letter-spacing:1px}
+  .bite{margin-left:auto;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .bite.peak{background:#103a26;color:var(--peak);border:1px solid #1f6b46}
+  .bite.good{background:#2e3a16;color:var(--good);border:1px solid #4d6b1f}
+  .bite.slow{background:#23323a;color:var(--slow);border:1px solid var(--line)}
+  .subs{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);display:none;flex-direction:column;gap:4px}
+  .card.open .subs{display:flex}
+  .sub{display:flex;gap:8px;align-items:center;font-size:12.5px;padding:3px 6px;border-radius:6px;cursor:pointer}
+  .sub:hover{background:#1b3540}
+  .sub.sel{background:#16323c;color:var(--accent2)}
+  .sub .sn{font-weight:600}
+  .sub .ss{color:var(--muted);font-style:italic;font-size:10.5px}
+
+  /* ---------- Right side ---------- */
+  .right{flex:1;display:flex;flex-direction:column;min-width:0}
+  .filters{flex:0 0 auto;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .filters .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .toggle{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  .switch{width:42px;height:23px;border-radius:20px;background:var(--line);position:relative;transition:.2s;flex:0 0 auto}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;
+    background:#cfe;transition:.2s}
+  .toggle.on .switch{background:var(--accent)}
+  .toggle.on .switch::after{left:21px}
+  .toggle .lbl{font-size:13px;font-weight:600}
+  .toggle .sub{font-size:11px;color:var(--muted)}
+  #nowBtn{background:var(--accent);border:none;color:#06231d;font-weight:700;border-radius:7px;
+    padding:7px 12px;font-size:12.5px;cursor:pointer}
+  #nowBtn:hover{background:var(--accent2)}
+  .ghostbtn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:7px;
+    padding:7px 12px;font-size:12.5px;cursor:pointer}
+  .ghostbtn.on{background:#23464f;border-color:var(--accent);color:var(--accent2);font-weight:700}
+  .anglefilters{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px}
+  .anglefilters.hide{display:none}
+  .fgroup{display:flex;flex-direction:column;gap:5px}
+  .fgroup .h{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+  .seg{display:flex;flex-wrap:wrap;gap:4px}
+  .seg button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:6px;
+    padding:4px 9px;font-size:12px;cursor:pointer}
+  .seg button.on{background:var(--accent);border-color:var(--accent);color:#06231d;font-weight:700}
+  select.mon{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 8px;font-size:12px}
+  .mapwrap{flex:1;position:relative;min-height:0}
+  #map{position:absolute;inset:0;background:#0a141a}
+  .legend{position:absolute;right:12px;bottom:18px;z-index:500;background:rgba(15,33,41,.92);
+    border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:11.5px;line-height:1.7;color:var(--ink);box-shadow:var(--shadow)}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  .info{position:absolute;left:12px;top:12px;z-index:500;width:330px;max-width:calc(100% - 24px);background:rgba(15,33,41,.96);
+    border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);display:none;
+    max-height:calc(100% - 24px);overflow:hidden auto}
+  .info.show{display:block}
+  .info .hero{width:100%;height:150px;object-fit:cover;display:none;background:#0e222b;border-bottom:1px solid var(--line)}
+  .info .pad{padding:12px 14px}
+  .info .ihead{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+  .info .iart{background:#0e222b;border:1px solid var(--line);border-radius:8px;padding:3px 5px;display:flex}
+  .info h3{margin:0 0 2px;font-size:16px}
+  .info h3 .subname{font-size:12px;color:var(--accent2);font-weight:600}
+  .info .sci{font-size:11px;color:var(--muted);font-style:italic}
+  .info .kv{font-size:12px;margin:4px 0;color:var(--muted);line-height:1.45}
+  .info .kv b{color:var(--ink);font-weight:600}
+  .info .stars{color:#e9c96b;letter-spacing:1px}
+  .info .baits{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .info .reglink{display:inline-block;margin-top:8px;background:var(--accent);color:#06231d;font-weight:700;
+    text-decoration:none;border-radius:7px;padding:7px 11px;font-size:12.5px}
+  .info .reglink:hover{background:var(--accent2)}
+  .info .disclaimer{font-size:10.5px;color:var(--muted);margin-top:8px;line-height:1.4}
+  .info .speclist{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+  .info .speclist .pill{cursor:pointer}
+  .info .credit{font-size:9.5px;color:#5d7681;margin-top:6px}
+  .info .waters{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .info .waterchip{font-size:11px;padding:3px 8px;border-radius:7px;background:#143138;color:var(--accent2);
+    border:1px solid var(--line);cursor:pointer}
+  .info .waterchip:hover{border-color:var(--accent);background:#1a3c44}
+  /* Leaflet popup theming for water pins */
+  .wpopwrap .leaflet-popup-content-wrapper{background:#10242d;color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+  .wpopwrap .leaflet-popup-tip{background:#10242d;border:1px solid var(--line)}
+  .wpopwrap .leaflet-popup-content{margin:10px 12px;font-size:12px;line-height:1.4}
+  .wpop .wph{display:flex;align-items:center;gap:7px;font-size:14px}
+  .wpop .wdot{width:11px;height:11px;border-radius:50%;display:inline-block;border:1px solid #08131a}
+  .wpop .wtype{font-size:11px;color:var(--muted);margin:2px 0 6px}
+  .wpop .wnote{color:#cfe0e2;margin-bottom:6px}
+  .wpop .wmeta{font-size:11px;color:#aebfc2;margin:2px 0;line-height:1.35}
+  .wpop .wmeta b{color:var(--accent2);font-weight:600;margin-right:4px}
+  .wpop .wsp{display:flex;flex-wrap:wrap;gap:4px}
+  .wpop .wchip{font-size:10.5px;padding:2px 7px;border-radius:20px;background:var(--chip);color:var(--accent2);border:1px solid var(--line);cursor:pointer}
+  .wpop .wchip:hover{border-color:var(--accent)}
+  .leaflet-tooltip.leaflet-tooltip-top{background:#0e2530;border:1px solid var(--accent);color:var(--ink);font-weight:600}
+  .wpin span{display:block;width:14px;height:14px;border-radius:50%;border:2px solid #eef7f6;
+    box-shadow:0 1px 4px rgba(0,0,0,.6);box-sizing:border-box}
+  .wpin:hover span{transform:scale(1.25);transition:transform .1s}
+  .leaflet-tooltip.stt{background:#0e2530;border:1px solid var(--accent);color:var(--ink);font-weight:600}
+  .leaflet-tooltip.eco{background:#241f12;border:1px solid #b78b3a;color:#f1e3c4;font-weight:600}
+  .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;z-index:600}
+  @media (max-width:760px){
+    .main{flex-direction:column}
+    .rolodex{width:100%;max-width:none;height:42%;border-right:none;border-bottom:1px solid var(--line)}
+    .right{height:58%}
+    .info{width:240px}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>🎣 Fish<span class="fin">Dex</span></h1>
+    <span class="tag">North American angler's field guide</span>
+    <span class="spacer"></span>
+    <span class="tag" id="count"></span>
+  </header>
+  <div class="main">
+    <aside class="rolodex">
+      <div class="search">
+        <input id="q" type="text" placeholder="Search species, family, bait, diet…" autocomplete="off" />
+        <div class="ctxbar" id="ctx"><span>Showing all North American game fish</span></div>
+      </div>
+      <div class="list" id="list"></div>
+    </aside>
+    <section class="right">
+      <div class="filters">
+        <div class="top">
+          <label class="toggle" id="angleToggle">
+            <span class="switch"></span>
+            <span><span class="lbl">Angling mode</span><br><span class="sub">rank by season, month & time of day</span></span>
+          </label>
+          <button id="nowBtn">🎣 What's biting now</button>
+          <button id="ecoBtn" class="ghostbtn">🗺️ Ecoregions: off</button>
+          <div class="ctxbar" style="margin-left:auto" id="hint">Tip: click any state, province, or Mexican state to see what swims there.</div>
+        </div>
+        <div class="anglefilters hide" id="angleFilters">
+          <div class="fgroup">
+            <div class="h">Month</div>
+            <select class="mon" id="month"><option value="">Any month</option></select>
+          </div>
+          <div class="fgroup"><div class="h">Time of day</div><div class="seg" id="tod"></div></div>
+          <div class="fgroup"><div class="h">Water type</div><div class="seg" id="water"></div></div>
+        </div>
+      </div>
+      <div class="mapwrap">
+        <div id="map"></div>
+        <div class="loading" id="loading">Loading North America…</div>
+        <div class="info" id="info"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+    </section>
+  </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ============================================================
+   FishDex data v2 — curated North American game fish
+   Coverage: USA (incl. AK & HI), Canada (provinces/territories),
+   Mexico (states). Ranges are approximate native+established
+   distributions by state/province. Seasons/months/time reflect
+   typical PEAK angling activity, not absolute presence.
+   Educational starting set — edit & expand freely.
+
+   Fields per fish:
+     id, name, sci, family, emoji, shape (svg silhouette key)
+     water[]    : habitat types (used as a hard filter)
+     habitat    : one-line description
+     states[]   : state/province/Mexican-state names (accent-insensitive match)
+     bestMonths : 1-12 peak months
+     tod[]      : peak times of day
+     tempF      : preferred water temp band
+     baits[]    : top producers
+     diet       : primary forage
+     fight      : 1-5 sportfighting rating
+     record     : approx. IGFA all-tackle world record (lb)
+     regs       : generic regulation reminder
+     tide       : tide/solunar relevance note ("" if N/A)
+     tip        : tactical note
+     subs[]     : optional subspecies {n, s, states[]}
+   ============================================================ */
+
+// -------- Region presets (names match GeoJSON "name", accent-insensitive) --------
+const REGION = {
+  // USA
+  PNW:        ["Washington","Oregon","Idaho"],
+  CALIF:      ["California"],
+  GREATBASIN: ["Nevada","Utah"],
+  ROCKIES:    ["Montana","Wyoming","Colorado","Idaho","Utah"],
+  SOUTHWEST:  ["Arizona","New Mexico"],
+  PLAINS:     ["North Dakota","South Dakota","Nebraska","Kansas","Oklahoma"],
+  MIDWEST:    ["Minnesota","Wisconsin","Iowa","Missouri","Illinois","Indiana","Michigan","Ohio"],
+  GREATLAKES: ["Minnesota","Wisconsin","Michigan","Illinois","Indiana","Ohio","New York","Pennsylvania"],
+  NORTHEAST:  ["New York","Pennsylvania","New Jersey","Connecticut","Rhode Island","Massachusetts",
+               "Vermont","New Hampshire","Maine"],
+  MIDATL:     ["Maryland","Delaware","Virginia","West Virginia","North Carolina"],
+  SOUTHEAST:  ["Virginia","North Carolina","South Carolina","Georgia","Florida","Alabama",
+               "Tennessee","Kentucky","Mississippi"],
+  GULF:       ["Florida","Alabama","Mississippi","Louisiana","Texas"],
+  SOUTHCENT:  ["Texas","Oklahoma","Arkansas","Louisiana","Missouri"],
+  ATLANTIC:   ["Maine","New Hampshire","Massachusetts","Rhode Island","Connecticut","New York",
+               "New Jersey","Delaware","Maryland","Virginia","North Carolina","South Carolina",
+               "Georgia","Florida"],
+  PACIFICUS:  ["California","Oregon","Washington","Alaska"],
+  ALASKA:     ["Alaska"],
+  HAWAII:     ["Hawaii"],
+  // Canada
+  CAN_BC:     ["British Columbia"],
+  CAN_WEST:   ["British Columbia","Alberta","Yukon"],
+  CAN_PRAIRIE:["Alberta","Saskatchewan","Manitoba"],
+  CAN_CENT:   ["Ontario","Quebec"],
+  CAN_ATL:    ["New Brunswick","Nova Scotia","Prince Edward Island","Newfoundland and Labrador"],
+  CAN_NORTH:  ["Yukon","Northwest Territories","Nunavut"],
+  CAN_ALL:    ["British Columbia","Alberta","Saskatchewan","Manitoba","Ontario","Quebec",
+               "New Brunswick","Nova Scotia","Prince Edward Island","Newfoundland and Labrador",
+               "Yukon","Northwest Territories","Nunavut"],
+  // Mexico
+  MX_BAJA:    ["Baja California","Baja California Sur"],
+  MX_CORTEZ:  ["Baja California Sur","Sonora","Sinaloa"],
+  MX_PACIFIC: ["Baja California","Baja California Sur","Sonora","Sinaloa","Nayarit","Jalisco",
+               "Colima","Michoacán","Guerrero","Oaxaca","Chiapas"],
+  MX_GULF:    ["Tamaulipas","Veracruz","Tabasco","Campeche"],
+  MX_CARIB:   ["Quintana Roo","Yucatán"]
+};
+function union(){ const s=new Set(); for(const a of arguments){ (REGION[a]||a).forEach(x=>s.add(x)); } return [...s]; }
+
+const FISH = [
+  /* ===================== BLACK BASS ===================== */
+  { id:"largemouth", name:"Largemouth Bass", sci:"Micropterus salmoides", family:"Black Bass", emoji:"🐟", shape:"bass",
+    water:["lake","pond","reservoir","river"], habitat:"Weedy lakes, ponds & slow rivers; relates to cover.",
+    states:union("SOUTHEAST","SOUTHCENT","MIDWEST","MIDATL","NORTHEAST","CALIF","SOUTHWEST",["Oregon","Washington"],"MX_GULF",["Tamaulipas"]),
+    bestMonths:[4,5,6,9,10], tod:["dawn","dusk","morning","night"], tempF:"65–80°F",
+    baits:["Plastic worms","Jigs","Spinnerbaits","Topwater frogs","Crankbaits"],
+    diet:"Baitfish, crayfish, frogs", fight:4, record:22.25, regs:"Often 12–15\" minimum; check slot limits.", tide:"",
+    tip:"Pre-spawn (spring) and fall feed-up are prime. Fish shallow cover early & late.",
+    subs:[ {n:"Florida Largemouth", s:"M. s. floridanus", states:["Florida","Texas","California"]},
+           {n:"Northern Largemouth", s:"M. s. salmoides", states:union("MIDWEST","NORTHEAST","SOUTHEAST")} ] },
+
+  { id:"smallmouth", name:"Smallmouth Bass", sci:"Micropterus dolomieu", family:"Black Bass", emoji:"🐟", shape:"bass",
+    water:["lake","river","stream","reservoir"], habitat:"Cool, clear rocky lakes & current-swept rivers.",
+    states:union("GREATLAKES","NORTHEAST","MIDWEST","MIDATL",["Tennessee","Kentucky","Missouri","Arkansas","Oklahoma","Washington","Oregon","Idaho"],"CAN_CENT",["Manitoba"]),
+    bestMonths:[5,6,7,9,10], tod:["dawn","dusk","morning"], tempF:"60–72°F",
+    baits:["Tube jigs","Ned rigs","Crankbaits","Drop-shot","Jerkbaits"],
+    diet:"Crayfish, minnows", fight:5, record:11.94, regs:"Check seasonal closures during spawn.", tide:"",
+    tip:"Loves rocky points & current seams. Pound-for-pound the hardest-fighting bass." },
+
+  { id:"spotted", name:"Spotted Bass", sci:"Micropterus punctulatus", family:"Black Bass", emoji:"🐟", shape:"bass",
+    water:["reservoir","river","lake"], habitat:"Clear reservoirs & rocky rivers of the South-Central US.",
+    states:union("SOUTHCENT",["Georgia","Alabama","Tennessee","Kentucky","Mississippi","North Carolina","South Carolina","Kansas"]),
+    bestMonths:[4,5,6,10], tod:["dawn","morning","dusk"], tempF:"63–78°F",
+    baits:["Finesse jigs","Drop-shot","Spoons","Crankbaits"],
+    diet:"Shad, crayfish", fight:4, record:10.5, regs:"Often grouped with bass limits.", tide:"",
+    tip:"Holds deeper than largemouth; chase suspended fish over points & bluffs." },
+
+  /* ===================== TEMPERATE BASS ===================== */
+  { id:"striper", name:"Striped Bass", sci:"Morone saxatilis", family:"Temperate Bass", emoji:"🐠", shape:"striper",
+    water:["saltwater","brackish","river","reservoir"], habitat:"Coastal migrations + landlocked reservoirs.",
+    states:union("ATLANTIC",["California","Tennessee","Texas","Oklahoma","Arkansas","Alabama","Georgia"],"CAN_ATL",["Quebec"]),
+    bestMonths:[4,5,6,10,11], tod:["dawn","dusk","night"], tempF:"55–68°F",
+    baits:["Bunker/menhaden","Bucktail jigs","Topwater plugs","Live shad","Swimbaits"],
+    diet:"Menhaden, herring, shad", fight:5, record:81.88, regs:"Strict slot & seasons on the coast — verify.", tide:"Tide-driven; fish moving water around dawn/dusk.",
+    tip:"Follow the bait. Spring/fall coastal runs and reservoir schooling produce blitzes." },
+
+  { id:"whitebass", name:"White Bass", sci:"Morone chrysops", family:"Temperate Bass", emoji:"🐠", shape:"striper",
+    water:["reservoir","river","lake"], habitat:"Open-water schools in big reservoirs & tributaries.",
+    states:union("MIDWEST","SOUTHCENT","PLAINS",["Tennessee","Kentucky","Ohio","Pennsylvania"]),
+    bestMonths:[4,5,6], tod:["morning","midday","dusk"], tempF:"58–68°F",
+    baits:["Inline spinners","Small jigs","Spoons","Live minnows"],
+    diet:"Shad, insects", fight:3, record:6.81, regs:"Generous limits in most states.", tide:"",
+    tip:"Spring spawning runs up rivers create fast, frenzied light-tackle action." },
+
+  /* ===================== TROUT ===================== */
+  { id:"rainbow", name:"Rainbow Trout", sci:"Oncorhynchus mykiss", family:"Trout", emoji:"🌈", shape:"trout",
+    water:["stream","river","lake"], habitat:"Cold, oxygen-rich streams, tailwaters & stocked lakes.",
+    states:union("PNW","ROCKIES","CALIF","NORTHEAST","GREATLAKES",["North Carolina","Tennessee","Georgia","Virginia","West Virginia","Arizona","New Mexico","Missouri","Arkansas"],"CAN_WEST",["Ontario"]),
+    bestMonths:[3,4,5,6,9,10], tod:["dawn","morning","dusk"], tempF:"50–62°F",
+    baits:["Dry flies","Nymphs","Spinners","PowerBait","Salmon eggs"],
+    diet:"Insects, eggs, baitfish", fight:4, record:48, regs:"Check stocking schedules & creel limits.", tide:"",
+    tip:"Match the hatch on rivers; still-fish stocked lakes after spring stocking.",
+    subs:[ {n:"Steelhead (sea-run)", s:"O. m. irideus", states:union("PNW","CALIF","GREATLAKES","CAN_BC",["Alaska"])},
+           {n:"Redband Trout", s:"O. m. gairdneri", states:["Oregon","Idaho","Washington","Nevada","California"]} ] },
+
+  { id:"brown", name:"Brown Trout", sci:"Salmo trutta", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["river","stream","lake"], habitat:"Bigger, warmer water than brookies; wary & predatory.",
+    states:union("ROCKIES","NORTHEAST","GREATLAKES","PNW","CALIF",["North Carolina","Tennessee","Virginia","Arkansas","Missouri","Wisconsin"],["Ontario"]),
+    bestMonths:[4,5,6,9,10,11], tod:["dusk","night","dawn"], tempF:"48–65°F",
+    baits:["Streamers","Nymphs","Jerkbaits","Nightcrawlers","Spinners"],
+    diet:"Insects, baitfish, mice", fight:4, record:44.3, regs:"Fall spawn closures common.", tide:"",
+    tip:"Trophy browns feed hard at dusk and after dark, especially fall pre-spawn." },
+
+  { id:"brook", name:"Brook Trout", sci:"Salvelinus fontinalis", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["stream","river","lake"], habitat:"Small, cold, pristine headwaters & northern ponds.",
+    states:union("NORTHEAST","ROCKIES",["Michigan","Wisconsin","Minnesota","North Carolina","Tennessee","Virginia","West Virginia","Georgia"],"CAN_ATL","CAN_CENT",["Manitoba"]),
+    bestMonths:[5,6,7,9], tod:["morning","dusk"], tempF:"45–58°F",
+    baits:["Dry flies","Small spinners","Worms","Nymphs"],
+    diet:"Insects, small baitfish", fight:3, record:14.5, regs:"Low creel limits protect natives.", tide:"",
+    tip:"A true cold-water char. Tiny brookies hammer dry flies in mountain creeks." },
+
+  { id:"cutthroat", name:"Cutthroat Trout", sci:"Oncorhynchus clarkii", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["stream","river","lake"], habitat:"Cold western streams & high-mountain lakes.",
+    states:union("ROCKIES","PNW",["Nevada","California","Alaska","New Mexico"],"CAN_BC",["Alberta"]),
+    bestMonths:[6,7,8,9], tod:["morning","midday","dusk"], tempF:"48–60°F",
+    baits:["Attractor dry flies","Nymphs","Small spinners"],
+    diet:"Insects, crustaceans", fight:3, record:41, regs:"Many waters catch-and-release for natives.", tide:"",
+    tip:"Eager surface feeders once snowmelt clears. Many subspecies by drainage.",
+    subs:[ {n:"Yellowstone Cutthroat", s:"O. c. bouvieri", states:["Wyoming","Montana","Idaho"]},
+           {n:"Lahontan Cutthroat", s:"O. c. henshawi", states:["Nevada","California"]},
+           {n:"Westslope Cutthroat", s:"O. c. lewisi", states:["Montana","Idaho","Washington","British Columbia","Alberta"]},
+           {n:"Coastal Cutthroat", s:"O. c. clarkii", states:["Washington","Oregon","Alaska","California","British Columbia"]} ] },
+
+  { id:"goldentrout", name:"Golden Trout", sci:"Oncorhynchus aguabonita", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["stream","lake"], habitat:"High-elevation Sierra lakes & alpine creeks.",
+    states:["California","Wyoming","Montana","Idaho","Washington"],
+    bestMonths:[7,8,9], tod:["morning","midday"], tempF:"48–58°F",
+    baits:["Small dry flies","Tiny spinners","Nymphs"],
+    diet:"Insects", fight:2, record:11, regs:"Remote alpine waters — light limits.", tide:"",
+    tip:"California's state fish. A backcountry hike-in reward in late summer." },
+
+  { id:"bulltrout", name:"Bull Trout", sci:"Salvelinus confluentus", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["river","lake","stream"], habitat:"Cold, clean Northwest & Rockies rivers; native char.",
+    states:union(["Montana","Idaho","Washington","Oregon"],"CAN_BC",["Alberta"]),
+    bestMonths:[8,9,10], tod:["morning","dusk"], tempF:"40–54°F",
+    baits:["Large streamers","Swimbaits","Spoons"],
+    diet:"Whitefish, trout, sculpins", fight:4, record:32, regs:"Often protected/closed — verify carefully.", tide:"",
+    tip:"A predatory native char. Many populations are protected; know the rules before targeting." },
+
+  { id:"laketrout", name:"Lake Trout", sci:"Salvelinus namaycush", family:"Trout", emoji:"🐟", shape:"trout",
+    water:["lake"], habitat:"Deep, cold northern lakes; near thermocline in summer.",
+    states:union("GREATLAKES","NORTHEAST","ROCKIES","ALASKA",["Minnesota"],"CAN_ALL"),
+    bestMonths:[1,2,3,5,11,12], tod:["morning","midday"], tempF:"40–52°F",
+    baits:["Spoons","Tube jigs","Lake-trout flies","Live ciscoes"],
+    diet:"Ciscoes, whitefish, smelt", fight:4, record:72, regs:"Slot/size limits on many lakes.", tide:"",
+    tip:"Shallow right after ice-out and through the ice; go deep with downriggers in summer." },
+
+  /* ===================== CHAR / GRAYLING ===================== */
+  { id:"arcticchar", name:"Arctic Char", sci:"Salvelinus alpinus", family:"Char", emoji:"🐟", shape:"trout",
+    water:["river","lake","saltwater"], habitat:"Far-north rivers & lakes; sea-run & landlocked forms.",
+    states:union(["Alaska"],"CAN_NORTH",["Quebec","Newfoundland and Labrador"]),
+    bestMonths:[7,8,9], tod:["midday","afternoon"], tempF:"39–50°F",
+    baits:["Spoons","Spinners","Egg flies","Streamers"],
+    diet:"Insects, baitfish, eggs", fight:4, record:32.6, regs:"Remote fly-in fisheries; guide rules apply.", tide:"Sea-run fish stage on tides at river mouths.",
+    tip:"Spawning-color males glow red-orange. Late-summer runs are the window." },
+
+  { id:"grayling", name:"Arctic Grayling", sci:"Thymallus arcticus", family:"Char", emoji:"🐟", shape:"trout",
+    water:["river","stream","lake"], habitat:"Clear, cold northern rivers; sail-like dorsal fin.",
+    states:union(["Alaska","Montana"],"CAN_WEST","CAN_NORTH",["Saskatchewan","Manitoba"]),
+    bestMonths:[6,7,8], tod:["morning","midday","dusk"], tempF:"42–55°F",
+    baits:["Dry flies","Small nymphs","Tiny spinners"],
+    diet:"Insects", fight:2, record:5.9, regs:"Often catch-and-release in the Lower 48.", tide:"",
+    tip:"Greedy surface feeders — a fly-rod delight on northern rivers." },
+
+  /* ===================== SALMON ===================== */
+  { id:"chinook", name:"Chinook (King) Salmon", sci:"Oncorhynchus tshawytscha", family:"Salmon", emoji:"🐟", shape:"salmon",
+    water:["river","lake","saltwater"], habitat:"Pacific rivers/ocean + stocked Great Lakes.",
+    states:union("PNW","ALASKA","CALIF",["Michigan","Wisconsin","New York","Indiana","Ohio","Illinois"],"CAN_BC"),
+    bestMonths:[8,9,10], tod:["dawn","dusk"], tempF:"45–58°F",
+    baits:["Spoons","Spinners","Cured roe","Plugs","Flies"],
+    diet:"Herring, anchovies, squid", fight:5, record:97.25, regs:"Tight quotas & closures — check daily.", tide:"Time tide changes in estuaries & river mouths.",
+    tip:"Fall spawning runs up tributaries are the classic shot at the biggest salmon." },
+
+  { id:"coho", name:"Coho (Silver) Salmon", sci:"Oncorhynchus kisutch", family:"Salmon", emoji:"🐟", shape:"salmon",
+    water:["river","lake","saltwater"], habitat:"Pacific coast + Great Lakes; aggressive & acrobatic.",
+    states:union("PNW","ALASKA","CALIF",["Michigan","Wisconsin","Illinois","New York","Indiana"],"CAN_BC"),
+    bestMonths:[9,10,11], tod:["dawn","morning","dusk"], tempF:"45–55°F",
+    baits:["Spinners","Spoons","Flies","Roe"],
+    diet:"Baitfish, squid", fight:4, record:33.6, regs:"Marked-hatchery-only in some rivers.", tide:"Incoming tide stacks fish at river mouths.",
+    tip:"Chrome silvers strike hard and jump often; great fly-rod target in fall." },
+
+  { id:"sockeye", name:"Sockeye (Red) Salmon", sci:"Oncorhynchus nerka", family:"Salmon", emoji:"🐟", shape:"salmon",
+    water:["river","lake","saltwater"], habitat:"Plankton-feeders that flood Pacific rivers in summer.",
+    states:union(["Alaska","Washington"],"CAN_BC"),
+    bestMonths:[6,7,8], tod:["morning","midday"], tempF:"46–55°F",
+    baits:["Sparse flies (flossing)","Coho flies","Small spoons"],
+    diet:"Plankton, insects", fight:4, record:15.2, regs:"Strict bag limits during runs.", tide:"",
+    tip:"They rarely 'bite' — sight-fish dense schools with short-line fly tactics." },
+
+  { id:"pinksalmon", name:"Pink (Humpy) Salmon", sci:"Oncorhynchus gorbuscha", family:"Salmon", emoji:"🐟", shape:"salmon",
+    water:["river","saltwater"], habitat:"Smallest Pacific salmon; huge odd-year runs.",
+    states:union(["Alaska","Washington"],"CAN_BC"),
+    bestMonths:[8,9], tod:["morning","dusk"], tempF:"45–55°F",
+    baits:["Small pink jigs","Pink flies","Tiny spoons"],
+    diet:"Plankton, small baitfish", fight:2, record:14.9, regs:"Generous limits in run years.", tide:"Tide pushes fresh schools to the beach.",
+    tip:"Pink is the magic color. Great, fast action for kids in run years." },
+
+  { id:"atlanticsalmon", name:"Atlantic Salmon", sci:"Salmo salar", family:"Salmon", emoji:"🐟", shape:"salmon",
+    water:["river","lake","saltwater"], habitat:"Cold Northeast/Canadian rivers + landlocked lakes.",
+    states:union(["Maine","New Hampshire","Vermont","New York"],"CAN_ATL",["Quebec"]),
+    bestMonths:[6,7,9], tod:["morning","dusk"], tempF:"46–58°F",
+    baits:["Classic wet flies","Streamers","Smelt imitations"],
+    diet:"Smelt, baitfish, insects", fight:5, record:79.2, regs:"Fly-only & C&R on many rivers; licenses required.", tide:"",
+    tip:"\"The fish of kings.\" Landlocked salmon chase smelt — troll just after ice-out." },
+
+  /* ===================== PIKE / ESOX ===================== */
+  { id:"pike", name:"Northern Pike", sci:"Esox lucius", family:"Pike", emoji:"🐊", shape:"pike",
+    water:["lake","river","reservoir"], habitat:"Weedy bays & slow rivers across the northern tier.",
+    states:union("MIDWEST","NORTHEAST","ROCKIES","PLAINS","ALASKA",["Pennsylvania","New York","Ohio"],"CAN_ALL"),
+    bestMonths:[1,2,5,6,11,12], tod:["morning","midday","afternoon"], tempF:"50–65°F",
+    baits:["Large spoons","Spinnerbaits","Swimbaits","Live suckers","Jerkbaits"],
+    diet:"Fish, frogs, ducklings", fight:4, record:55, regs:"Slot limits protect big females.", tide:"",
+    tip:"Ambush predator — cast big baits along weed edges. Excellent through the ice." },
+
+  { id:"muskie", name:"Muskellunge", sci:"Esox masquinongy", family:"Pike", emoji:"🐊", shape:"pike",
+    water:["lake","river","reservoir"], habitat:"Large lakes & rivers of the Upper Midwest, Northeast & Ontario.",
+    states:union(["Minnesota","Wisconsin","Michigan","Illinois","Indiana","Ohio","Pennsylvania","New York","Kentucky","Tennessee","West Virginia","Iowa","North Carolina","Virginia"],["Ontario","Quebec","Manitoba"]),
+    bestMonths:[6,7,9,10,11], tod:["midday","afternoon","dusk"], tempF:"60–70°F",
+    baits:["Bucktails","Large glide baits","Topwater","Rubber baits"],
+    diet:"Suckers, ciscoes, panfish", fight:5, record:67.5, regs:"High minimum lengths (often 40–54\").", tide:"",
+    tip:"\"The fish of 10,000 casts.\" Cold-front fall feeding produces the giants." },
+
+  { id:"pickerel", name:"Chain Pickerel", sci:"Esox niger", family:"Pike", emoji:"🐊", shape:"pike",
+    water:["pond","lake","river"], habitat:"Vegetated ponds & slow streams of the East.",
+    states:union("NORTHEAST","SOUTHEAST","MIDATL",["Florida","Texas","Louisiana"],"CAN_ATL"),
+    bestMonths:[1,2,3,11,12], tod:["morning","midday"], tempF:"45–62°F",
+    baits:["Spinnerbaits","Spoons","Jerkbaits","Live shiners"],
+    diet:"Minnows, small fish", fight:3, record:9.4, regs:"Generous limits.", tide:"",
+    tip:"Active in cold water when bass sulk — a fun winter target on light tackle." },
+
+  /* ===================== PERCH / WALLEYE ===================== */
+  { id:"walleye", name:"Walleye", sci:"Sander vitreus", family:"Perch", emoji:"🐟", shape:"walleye",
+    water:["lake","river","reservoir"], habitat:"Big lakes & rivers; light-sensitive eyes favor low light.",
+    states:union("MIDWEST","PLAINS","GREATLAKES",["Pennsylvania","New York","Tennessee","Kentucky","Montana","Colorado","Arkansas","West Virginia","North Carolina"],"CAN_ALL"),
+    bestMonths:[4,5,6,9,10], tod:["dawn","dusk","night"], tempF:"55–68°F",
+    baits:["Jig + minnow","Crawler harnesses","Crankbaits","Blade baits"],
+    diet:"Yellow perch, shad", fight:3, record:25, regs:"Slot limits & spring closures common.", tide:"",
+    tip:"Bite turns on at dusk & after dark. Spring river runs concentrate fish below dams." },
+
+  { id:"sauger", name:"Sauger", sci:"Sander canadensis", family:"Perch", emoji:"🐟", shape:"walleye",
+    water:["river","reservoir"], habitat:"Turbid big rivers & reservoirs; tolerant of current & silt.",
+    states:union("SOUTHCENT","PLAINS",["Tennessee","Kentucky","Montana","North Dakota","Minnesota","Illinois","Ohio","West Virginia"],["Manitoba","Saskatchewan","Ontario","Quebec"]),
+    bestMonths:[2,3,4,11,12], tod:["dusk","night","midday"], tempF:"48–60°F",
+    baits:["Jigs","Blade baits","Minnows"],
+    diet:"Shad, minnows", fight:3, record:8.75, regs:"Often shares walleye limits.", tide:"",
+    tip:"Stacks below dams in late winter — a cold-season tailwater staple." },
+
+  { id:"yellowperch", name:"Yellow Perch", sci:"Perca flavescens", family:"Perch", emoji:"🐟", shape:"perch",
+    water:["lake","pond","river"], habitat:"Cool lakes & ponds; schools near bottom structure.",
+    states:union("MIDWEST","NORTHEAST","GREATLAKES","PLAINS",["Pennsylvania","Maryland","Virginia","Washington","Montana"],"CAN_ALL"),
+    bestMonths:[1,2,6,7,12], tod:["morning","midday"], tempF:"50–66°F",
+    baits:["Small jigs","Minnows","Worms","Spoons (ice)"],
+    diet:"Insects, minnows, eggs", fight:2, record:4.19, regs:"High limits; great table fare.", tide:"",
+    tip:"A panfish favorite and prime ice-fishing target. Find one, find the school." },
+
+  /* ===================== SUNFISH / PANFISH ===================== */
+  { id:"bluegill", name:"Bluegill", sci:"Lepomis macrochirus", family:"Sunfish", emoji:"🐟", shape:"panfish",
+    water:["pond","lake","reservoir","river"], habitat:"Nearly everywhere warm — ponds, lakes, slow rivers.",
+    states:union("SOUTHEAST","SOUTHCENT","MIDWEST","NORTHEAST","MIDATL","PLAINS","CALIF","SOUTHWEST",["Oregon","Washington"],["Ontario","Quebec"]),
+    bestMonths:[5,6,7,8], tod:["morning","afternoon","dusk"], tempF:"65–80°F",
+    baits:["Worms","Crickets","Small jigs","Poppers (fly)"],
+    diet:"Insects, larvae", fight:2, record:4.75, regs:"Generous limits — kid-friendly.", tide:"",
+    tip:"Spawning beds in late spring make for nonstop action — perfect for kids." },
+
+  { id:"redear", name:"Redear Sunfish (Shellcracker)", sci:"Lepomis microlophus", family:"Sunfish", emoji:"🐟", shape:"panfish",
+    water:["lake","pond","reservoir"], habitat:"Warm lakes & ponds; bottom-oriented snail crusher.",
+    states:union("SOUTHEAST","SOUTHCENT","CALIF",["Arizona","Nevada","Maryland","Virginia"]),
+    bestMonths:[4,5,6], tod:["morning","afternoon"], tempF:"68–80°F",
+    baits:["Red worms","Crickets","Small jigs near bottom"],
+    diet:"Snails, clams, larvae", fight:2, record:6.3, regs:"Often combined panfish limits.", tide:"",
+    tip:"Bigger than most bluegill. Spring bed-fishing on the bottom is the trick." },
+
+  { id:"rockbass", name:"Rock Bass", sci:"Ambloplites rupestris", family:"Sunfish", emoji:"🐟", shape:"panfish",
+    water:["river","lake","stream"], habitat:"Rocky rivers & clear lakes; red-eyed scrapper.",
+    states:union("GREATLAKES","NORTHEAST","MIDWEST","MIDATL",["Tennessee","Kentucky","Missouri","Arkansas"],["Ontario","Quebec","Manitoba"]),
+    bestMonths:[5,6,7,8], tod:["morning","dusk"], tempF:"60–75°F",
+    baits:["Small crankbaits","Jigs","Worms","Crayfish"],
+    diet:"Crayfish, insects, minnows", fight:2, record:3, regs:"Generous limits.", tide:"",
+    tip:"Hangs with smallmouth on rocky banks — a fun bycatch on light tackle." },
+
+  { id:"blackcrappie", name:"Black Crappie", sci:"Pomoxis nigromaculatus", family:"Sunfish", emoji:"🐟", shape:"crappie",
+    water:["lake","reservoir","pond","river"], habitat:"Brushy, clear lakes & reservoirs; suspends near cover.",
+    states:union("SOUTHEAST","SOUTHCENT","MIDWEST","NORTHEAST","MIDATL","PLAINS",["California"],["Ontario"]),
+    bestMonths:[3,4,5,10], tod:["dawn","dusk","morning"], tempF:"58–68°F",
+    baits:["Marabou jigs","Minnows","Small spinners"],
+    diet:"Minnows, insects", fight:2, record:5.46, regs:"9–10\" minimums on some lakes.", tide:"",
+    tip:"Spring spawn pushes slabs shallow to brush & docks — a beloved spring run." },
+
+  { id:"whitecrappie", name:"White Crappie", sci:"Pomoxis annularis", family:"Sunfish", emoji:"🐟", shape:"crappie",
+    water:["reservoir","river","lake"], habitat:"More tolerant of murky water than black crappie.",
+    states:union("SOUTHCENT","MIDWEST","PLAINS",["Georgia","Alabama","Tennessee","Kentucky","Mississippi","Ohio","Pennsylvania"]),
+    bestMonths:[3,4,5,10], tod:["dawn","dusk","morning"], tempF:"58–68°F",
+    baits:["Jigs","Minnows","Spider-rigging"],
+    diet:"Shad, minnows", fight:2, record:5.31, regs:"Often pooled crappie limits.", tide:"",
+    tip:"Suspends over standing timber & creek channels in reservoirs." },
+
+  /* ===================== CATFISH ===================== */
+  { id:"channelcat", name:"Channel Catfish", sci:"Ictalurus punctatus", family:"Catfish", emoji:"🐡", shape:"catfish",
+    water:["river","lake","reservoir","pond"], habitat:"Adaptable bottom feeder in nearly all warm waters.",
+    states:union("SOUTHEAST","SOUTHCENT","MIDWEST","PLAINS","MIDATL","NORTHEAST","SOUTHWEST","CALIF",["Manitoba","Saskatchewan","Ontario"]),
+    bestMonths:[5,6,7,8,9], tod:["dusk","night","afternoon"], tempF:"70–85°F",
+    baits:["Cut bait","Chicken liver","Stinkbait","Nightcrawlers"],
+    diet:"Anything — true omnivore", fight:3, record:58, regs:"Generous limits; trophy slots in spots.", tide:"",
+    tip:"Summer nights are prime. Fish current breaks & holes after dark." },
+
+  { id:"flathead", name:"Flathead Catfish", sci:"Pylodictis olivaris", family:"Catfish", emoji:"🐡", shape:"catfish",
+    water:["river","reservoir","lake"], habitat:"Big rivers & reservoirs; loves log jams & deep cover.",
+    states:union("SOUTHCENT","MIDWEST","PLAINS",["Georgia","Alabama","Tennessee","Kentucky","Pennsylvania","Ohio","North Carolina","South Carolina"]),
+    bestMonths:[6,7,8,9], tod:["dusk","night"], tempF:"72–85°F",
+    baits:["Live bluegill","Live shad","Big cut bait"],
+    diet:"Live fish", fight:5, record:123, regs:"Trophy-protection slots in many rivers.", tide:"",
+    tip:"A true predator — uses LIVE bait near woody cover at night for trophies." },
+
+  { id:"bluecat", name:"Blue Catfish", sci:"Ictalurus furcatus", family:"Catfish", emoji:"🐡", shape:"catfish",
+    water:["river","reservoir","brackish"], habitat:"Large rivers & reservoirs; roams open water.",
+    states:union("SOUTHCENT","SOUTHEAST",["Virginia","Maryland","Tennessee","Kentucky","Missouri","Illinois","Kansas","Nebraska","South Dakota"]),
+    bestMonths:[1,2,6,7,11,12], tod:["dusk","night","midday"], tempF:"55–80°F",
+    baits:["Fresh cut shad","Skipjack","Drum"],
+    diet:"Shad, herring, fish", fight:5, record:143, regs:"Trophy slots — release the giants.", tide:"Tidal rivers (e.g. James) fish best on moving water.",
+    tip:"Trophy blues bite all winter. Drift cut bait across channel ledges." },
+
+  /* ===================== STURGEON / BIG FRESHWATER ===================== */
+  { id:"whitesturgeon", name:"White Sturgeon", sci:"Acipenser transmontanus", family:"Sturgeon", emoji:"🐉", shape:"sturgeon",
+    water:["river","brackish"], habitat:"Big West-coast rivers (Columbia, Fraser, Sacramento).",
+    states:union(["Washington","Oregon","Idaho","California"],"CAN_BC"),
+    bestMonths:[4,5,6,9,10], tod:["midday","afternoon"], tempF:"50–66°F",
+    baits:["Cured roe","Squid","Lamprey","Smelt"],
+    diet:"Eulachon, shad, crustaceans", fight:5, record:468, regs:"Almost entirely catch-and-release; barbless hooks.", tide:"Lower rivers fish best on tide changes.",
+    tip:"North America's largest freshwater fish. Strictly C&R on the Fraser — pure adrenaline." },
+
+  { id:"lakesturgeon", name:"Lake Sturgeon", sci:"Acipenser fulvescens", family:"Sturgeon", emoji:"🐉", shape:"sturgeon",
+    water:["river","lake"], habitat:"Great Lakes basin & large northern rivers.",
+    states:union("GREATLAKES",["Minnesota","Wisconsin","Tennessee","Missouri"],["Ontario","Quebec","Manitoba"]),
+    bestMonths:[6,7,9], tod:["afternoon","dusk"], tempF:"55–70°F",
+    baits:["Nightcrawler gobs","Cut bait"],
+    diet:"Insects, mollusks, leeches", fight:5, record:168, regs:"Highly protected; tightly regulated seasons.", tide:"",
+    tip:"A living fossil. Trophy C&R seasons (e.g. Rainy River) are bucket-list trips." },
+
+  { id:"carp", name:"Common Carp", sci:"Cyprinus carpio", family:"Other Freshwater", emoji:"🐟", shape:"carp",
+    water:["lake","river","pond","reservoir"], habitat:"Warm, fertile waters nationwide; wary & powerful.",
+    states:union("SOUTHEAST","SOUTHCENT","MIDWEST","NORTHEAST","MIDATL","PLAINS","CALIF","SOUTHWEST",["Oregon","Washington"],["Ontario","Quebec"]),
+    bestMonths:[5,6,7,8,9], tod:["morning","afternoon","dusk"], tempF:"65–82°F",
+    baits:["Sweet corn","Boilies","Dough bait","Bread"],
+    diet:"Detritus, insects, seeds", fight:4, record:75.2, regs:"Often unregulated (non-native).", tide:"",
+    tip:"A serious sportfish abroad and increasingly here — chum with corn and hold on." },
+
+  { id:"freshdrum", name:"Freshwater Drum", sci:"Aplodinotus grunniens", family:"Other Freshwater", emoji:"🐟", shape:"perch",
+    water:["river","lake","reservoir"], habitat:"Big rivers & lakes; grunts audibly, bottom feeder.",
+    states:union("MIDWEST","SOUTHCENT","PLAINS","GREATLAKES",["Tennessee","Alabama","Louisiana"],["Ontario","Manitoba"]),
+    bestMonths:[5,6,7,8], tod:["afternoon","dusk","night"], tempF:"65–80°F",
+    baits:["Nightcrawlers","Jigs","Cut bait","Crankbaits"],
+    diet:"Mussels, crayfish, insects", fight:3, record:54.5, regs:"No limits in most states.", tide:"",
+    tip:"Hard-pulling and abundant — a great light-tackle bonus on river drifts." },
+
+  { id:"bowfin", name:"Bowfin", sci:"Amia calva", family:"Other Freshwater", emoji:"🐊", shape:"pike",
+    water:["river","lake","pond"], habitat:"Vegetated backwaters & swamps of the East & South.",
+    states:union("SOUTHEAST","GULF","SOUTHCENT",["Minnesota","Wisconsin","Michigan","New York","Pennsylvania"],["Ontario","Quebec"]),
+    bestMonths:[5,6,7,8,9], tod:["morning","dusk","night"], tempF:"70–85°F",
+    baits:["Cut bait","Soft plastics","Spinnerbaits","Live shiners"],
+    diet:"Fish, crayfish, frogs", fight:5, record:21.5, regs:"Usually no limits.", tide:"",
+    tip:"\"Mudfish\" / \"dogfish\" — a prehistoric brawler that destroys tackle. Underrated fun." },
+
+  { id:"alligatorgar", name:"Alligator Gar", sci:"Atractosteus spatula", family:"Other Freshwater", emoji:"🐊", shape:"gar",
+    water:["river","reservoir","brackish"], habitat:"Big sluggish Southern rivers, bayous & reservoirs.",
+    states:union("GULF","SOUTHCENT",["Tennessee","Arkansas"],"MX_GULF",["Tamaulipas","Veracruz"]),
+    bestMonths:[5,6,7,8], tod:["afternoon","dusk","night"], tempF:"75–88°F",
+    baits:["Cut carp/mullet","Large circle hooks"],
+    diet:"Fish, crabs, waterfowl", fight:5, record:279, regs:"Protected in places (e.g. 1-fish in TX zones).", tide:"",
+    tip:"Largest gar — a 6-foot apex predator. Heavy gear & patience; mostly C&R." },
+
+  /* ===================== INSHORE SALTWATER ===================== */
+  { id:"redfish", name:"Redfish (Red Drum)", sci:"Sciaenops ocellatus", family:"Inshore", emoji:"🐠", shape:"redfish",
+    water:["saltwater","brackish"], habitat:"Gulf & Atlantic flats, marshes, oyster bars & surf.",
+    states:union("GULF",["Georgia","South Carolina","North Carolina","Virginia"],"MX_GULF","MX_CARIB"),
+    bestMonths:[9,10,11,4,5], tod:["dawn","morning","dusk"], tempF:"60–80°F",
+    baits:["Gold spoons","Soft plastics","Live shrimp","Cut mullet"],
+    diet:"Shrimp, crabs, mullet", fight:4, record:94.2, regs:"Tight slot limits (often 18–27\").", tide:"Sight-fish tailing reds on a falling tide.",
+    tip:"Fall bull-red runs hit the beaches & passes. A flats-fishing staple." },
+
+  { id:"snook", name:"Snook", sci:"Centropomus undecimalis", family:"Inshore", emoji:"🐠", shape:"snook",
+    water:["saltwater","brackish"], habitat:"Subtropical mangroves, passes, beaches & bridges.",
+    states:union(["Florida","Texas"],"MX_GULF","MX_CARIB","MX_PACIFIC"),
+    bestMonths:[5,6,7,8,9], tod:["dusk","night","dawn"], tempF:"70–85°F",
+    baits:["Live pilchards","Jerkbaits","Bucktails","Topwater"],
+    diet:"Baitfish, shrimp", fight:5, record:53.8, regs:"Seasonal closures & slot in FL — verify.", tide:"Ambush feeders on outgoing tide around lights & structure.",
+    tip:"Cold snaps push them upriver. Night-fishing dock lights is deadly." },
+
+  { id:"seatrout", name:"Spotted Seatrout", sci:"Cynoscion nebulosus", family:"Inshore", emoji:"🐠", shape:"snook",
+    water:["saltwater","brackish"], habitat:"Seagrass flats & marsh estuaries of the Gulf & Atlantic.",
+    states:union("GULF",["Georgia","South Carolina","North Carolina","Virginia"],"MX_GULF"),
+    bestMonths:[4,5,6,10,11], tod:["dawn","dusk"], tempF:"65–80°F",
+    baits:["Popping cork + shrimp","Soft plastics","Topwater plugs"],
+    diet:"Shrimp, baitfish", fight:3, record:17.5, regs:"Slot & bag limits vary by state.", tide:"Work grass flats on moving tide, low light.",
+    tip:"Bigger \"gator\" trout favor low light & bigger baits." },
+
+  { id:"flounder", name:"Southern Flounder", sci:"Paralichthys lethostigma", family:"Inshore", emoji:"🐠", shape:"flounder",
+    water:["saltwater","brackish"], habitat:"Sandy/muddy estuary bottoms, inlets & channels.",
+    states:union("GULF",["Georgia","South Carolina","North Carolina","Virginia"],"MX_GULF"),
+    bestMonths:[9,10,11], tod:["morning","midday"], tempF:"60–75°F",
+    baits:["Live mud minnows","Gulp jigs","Finger mullet"],
+    diet:"Baitfish, shrimp", fight:2, record:20.5, regs:"Fall closures protect the run in some states.", tide:"Fall \"flounder run\" toward inlets on the tide.",
+    tip:"Drag baits slow on bottom; let them chew before setting the hook." },
+
+  { id:"tarpon", name:"Tarpon", sci:"Megalops atlanticus", family:"Inshore", emoji:"🐠", shape:"tarpon",
+    water:["saltwater","brackish"], habitat:"Beaches, passes, bridges & backcountry of the Gulf/Atlantic.",
+    states:union(["Florida","Texas","Louisiana","Alabama","Mississippi","Georgia","South Carolina","North Carolina"],"MX_GULF","MX_CARIB"),
+    bestMonths:[5,6,7], tod:["dawn","dusk","night"], tempF:"74–88°F",
+    baits:["Live crabs","Live mullet","Swimbaits","Flies"],
+    diet:"Baitfish, crabs", fight:5, record:286.6, regs:"Catch-and-release; kill tags required to harvest.", tide:"Time bridge & pass bites to strong tide flows.",
+    tip:"\"The Silver King.\" Spring/early-summer migration along beaches is the show — bow to the king on jumps." },
+
+  { id:"bonefish", name:"Bonefish", sci:"Albula vulpes", family:"Inshore", emoji:"🐠", shape:"bonefish",
+    water:["saltwater"], habitat:"Shallow tropical flats of the Florida Keys & Mexican Caribbean.",
+    states:union(["Florida"],"MX_CARIB"),
+    bestMonths:[3,4,5,9,10], tod:["morning","midday","afternoon"], tempF:"72–84°F",
+    baits:["Shrimp/crab flies","Live shrimp","Small jigs"],
+    diet:"Shrimp, crabs, worms", fight:4, record:19.1, regs:"Catch-and-release fly fishery.", tide:"Fish tailing bones on a pushing tide onto the flat.",
+    tip:"\"Ghost of the flats.\" Sight-fishing on foot or poled skiff — blistering runs." },
+
+  { id:"permit", name:"Permit", sci:"Trachinotus falcatus", family:"Inshore", emoji:"🐠", shape:"permit",
+    water:["saltwater"], habitat:"Flats, wrecks & channels of South Florida & the Caribbean.",
+    states:union(["Florida"],"MX_CARIB"),
+    bestMonths:[3,4,5,6], tod:["morning","midday"], tempF:"74–86°F",
+    baits:["Live crabs","Crab flies","Jigs"],
+    diet:"Crabs, shrimp, urchins", fight:5, record:60, regs:"Special permit zones in FL; mostly C&R.", tide:"Flats fish best on rising tide; wrecks on slack.",
+    tip:"The flats grand-slam's toughest leg — maddeningly picky, brutally strong." },
+
+  { id:"bluefish", name:"Bluefish", sci:"Pomatomus saltatrix", family:"Inshore", emoji:"🐠", shape:"bluefish",
+    water:["saltwater","brackish"], habitat:"Atlantic beaches, inlets & bays; toothy blitz feeders.",
+    states:union("ATLANTIC"),
+    bestMonths:[5,6,9,10], tod:["dawn","dusk"], tempF:"60–72°F",
+    baits:["Metal lures","Poppers","Cut bunker","Swimbaits"],
+    diet:"Menhaden, anything", fight:4, record:31.8, regs:"Bag limits on the coast.", tide:"Blitzes fire on moving tide when bait gets pinned.",
+    tip:"Use wire or heavy mono — those teeth shred everything. Pure chaos in a blitz." },
+
+  /* ===================== NEARSHORE / REEF ===================== */
+  { id:"redsnapper", name:"Red Snapper", sci:"Lutjanus campechanus", family:"Nearshore", emoji:"🐠", shape:"snapper",
+    water:["saltwater"], habitat:"Gulf & SE Atlantic reefs, wrecks & oil rigs.",
+    states:union("GULF",["Georgia","South Carolina","North Carolina"],"MX_GULF"),
+    bestMonths:[6,7,8], tod:["morning","midday"], tempF:"62–75°F",
+    baits:["Cut bait","Live pinfish","Vertical jigs"],
+    diet:"Fish, crustaceans", fight:4, record:50.4, regs:"Very short federal seasons — check open dates.", tide:"",
+    tip:"Drop to structure in 60–300 ft. Federal season windows are tight — plan around them." },
+
+  { id:"lingcod", name:"Lingcod", sci:"Ophiodon elongatus", family:"Nearshore", emoji:"🐠", shape:"lingcod",
+    water:["saltwater"], habitat:"Pacific rocky reefs & pinnacles from CA to AK.",
+    states:union("PACIFICUS","CAN_BC"),
+    bestMonths:[3,4,5,6], tod:["morning","midday"], tempF:"45–55°F",
+    baits:["Swimbaits","Jigs","Live greenling"],
+    diet:"Fish, octopus, crabs", fight:4, record:82.7, regs:"Depth & seasonal closures (rockfish rules).", tide:"Slack-tide windows make deep reef fishing fishable.",
+    tip:"Aggressive ambusher with a huge mouth — they'll eat a hooked rockfish on the way up." },
+
+  { id:"pacifichalibut", name:"Pacific Halibut", sci:"Hippoglossus stenolepis", family:"Nearshore", emoji:"🐠", shape:"flounder",
+    water:["saltwater"], habitat:"Sand/gravel flats off AK, BC & the Pacific NW.",
+    states:union(["Alaska","Washington","Oregon","California"],"CAN_BC"),
+    bestMonths:[5,6,7,8], tod:["morning","midday"], tempF:"40–52°F",
+    baits:["Herring","Salmon bellies","Large jigs"],
+    diet:"Fish, crabs, octopus", fight:4, record:459, regs:"Strict charter limits & size rules.", tide:"Anchor or drift the slack-to-moving tide on the flats.",
+    tip:"Barn-door flatfish to 300+ lb. Subsistence/charter rules are strict — know your limit." },
+
+  /* ===================== OFFSHORE / PELAGIC ===================== */
+  { id:"mahi", name:"Mahi-Mahi (Dorado)", sci:"Coryphaena hippurus", family:"Offshore", emoji:"🐠", shape:"mahi",
+    water:["saltwater"], habitat:"Warm blue water near weedlines, debris & buoys, both coasts.",
+    states:union(["Florida","North Carolina","South Carolina","Georgia","Texas","Louisiana","California"],"MX_PACIFIC","MX_CARIB","MX_GULF","HAWAII"),
+    bestMonths:[5,6,7,8,9], tod:["morning","midday"], tempF:"72–84°F",
+    baits:["Ballyhoo","Trolled lures","Bucktails","Live bait"],
+    diet:"Flying fish, squid", fight:5, record:88, regs:"Bag limits coastwide; fast-growing.", tide:"",
+    tip:"Run weedlines & floating debris. Acrobatic, fast-growing and superb eating." },
+
+  { id:"yellowfin", name:"Yellowfin Tuna", sci:"Thunnus albacares", family:"Offshore", emoji:"🐠", shape:"tuna",
+    water:["saltwater"], habitat:"Offshore canyons, rips & FADs of the Gulf, Atlantic & Pacific.",
+    states:union(["Louisiana","Florida","North Carolina","Massachusetts","New Jersey","Texas","California"],"MX_PACIFIC","MX_BAJA","HAWAII"),
+    bestMonths:[6,7,8,9,10], tod:["dawn","morning","dusk"], tempF:"72–82°F",
+    baits:["Trolled lures","Live hardtails","Chunked bait","Poppers"],
+    diet:"Baitfish, squid", fight:5, record:427, regs:"HMS permit & size limits required.", tide:"",
+    tip:"Run to the canyons & rips. Brutal, lung-busting fights on stand-up gear." },
+
+  { id:"roosterfish", name:"Roosterfish", sci:"Nematistius pectoralis", family:"Offshore", emoji:"🐠", shape:"rooster",
+    water:["saltwater"], habitat:"Sandy surf & rocky points of the Mexican Pacific & Baja.",
+    states:union("MX_PACIFIC","MX_BAJA","MX_CORTEZ"),
+    bestMonths:[6,7,8,9], tod:["dawn","morning"], tempF:"74–85°F",
+    baits:["Live mullet/ladyfish","Poppers","Big swimbaits"],
+    diet:"Mullet, baitfish", fight:5, record:114, regs:"Catch-and-release prized in Baja.", tide:"Beach bite fires at first light on the incoming.",
+    tip:"That comb of dorsal spines and a screaming run — the Baja beach prize. Almost always released." },
+
+  { id:"yellowtail", name:"California Yellowtail", sci:"Seriola dorsalis", family:"Offshore", emoji:"🐠", shape:"tuna",
+    water:["saltwater"], habitat:"Kelp beds, reefs & offshore banks of SoCal & Baja.",
+    states:union(["California"],"MX_BAJA","MX_CORTEZ"),
+    bestMonths:[5,6,7,8,9], tod:["dawn","morning"], tempF:"64–72°F",
+    baits:["Live sardines","Surface iron","Yo-yo jigs"],
+    diet:"Sardines, squid, mackerel", fight:5, record:114, regs:"Size & bag limits in CA waters.", tide:"",
+    tip:"A reef-diving bulldog — hook one near structure and it's a knife-fight to the rocks." },
+
+  { id:"stripedmarlin", name:"Striped Marlin", sci:"Kajikia audax", family:"Offshore", emoji:"🐠", shape:"marlin",
+    water:["saltwater"], habitat:"Blue water off Baja & the SoCal bight; billfish capital is Cabo.",
+    states:union(["California"],"MX_BAJA","MX_PACIFIC"),
+    bestMonths:[10,11,12,1], tod:["morning","midday"], tempF:"70–80°F",
+    baits:["Trolled lures","Bait-and-switch ballyhoo","Live bait"],
+    diet:"Mackerel, sardines, squid", fight:5, record:494, regs:"Billfish are release-first; tags to keep.", tide:"",
+    tip:"Cabo's fall season stacks stripies. Bait-and-switch teasing makes for fly/light-tackle shots." },
+
+  { id:"sailfish", name:"Sailfish", sci:"Istiophorus platypterus", family:"Offshore", emoji:"🐠", shape:"marlin",
+    water:["saltwater"], habitat:"Warm offshore edges of FL, the Gulf, & the Mexican Pacific.",
+    states:union(["Florida","North Carolina","South Carolina","Georgia","Texas","Louisiana"],"MX_PACIFIC","MX_CARIB","MX_GULF"),
+    bestMonths:[11,12,1,2], tod:["morning","midday"], tempF:"72–82°F",
+    baits:["Kite-fished live bait","Ballyhoo","Dredges + teasers"],
+    diet:"Sardines, ballyhoo, squid", fight:5, record:142, regs:"Release-only fishery in practice.", tide:"",
+    tip:"Fastest fish in the sea. South FL winter sailfish runs on kites are world-class." }
+];
+
+const TOD_ORDER = ["dawn","morning","midday","afternoon","dusk","night"];
+const TOD_LABEL = {dawn:"Dawn",morning:"Morning",midday:"Midday",afternoon:"Afternoon",dusk:"Dusk",night:"Night"};
+const WATER_LABEL = {lake:"Lake",pond:"Pond",reservoir:"Reservoir",river:"River",stream:"Stream",
+  brackish:"Brackish",saltwater:"Saltwater"};
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+// Family accent color for silhouettes / cards
+const FAMILY_COLOR = {
+  "Black Bass":"#4e9e5a","Temperate Bass":"#6fa8c7","Trout":"#d98b5f","Char":"#cf6f6f",
+  "Salmon":"#e0796b","Pike":"#7fae54","Perch":"#cdb24e","Sunfish":"#5bbf9b",
+  "Catfish":"#9a8c79","Sturgeon":"#7d8a99","Other Freshwater":"#8aa36f",
+  "Inshore":"#5ec2c0","Nearshore":"#5aa9d6","Offshore":"#5a86d6"
+};
+
+/* ============================================================
+   Wikipedia article titles for runtime photo lookup
+   (REST summary endpoint follows redirects, but exact is safer)
+   ============================================================ */
+const WIKI = {
+  largemouth:"Largemouth bass", smallmouth:"Smallmouth bass", spotted:"Spotted bass",
+  striper:"Striped bass", whitebass:"White bass",
+  rainbow:"Rainbow trout", brown:"Brown trout", brook:"Brook trout", cutthroat:"Cutthroat trout",
+  goldentrout:"California golden trout", bulltrout:"Bull trout", laketrout:"Lake trout",
+  arcticchar:"Arctic char", grayling:"Arctic grayling",
+  chinook:"Chinook salmon", coho:"Coho salmon", sockeye:"Sockeye salmon", pinksalmon:"Pink salmon",
+  atlanticsalmon:"Atlantic salmon",
+  pike:"Northern pike", muskie:"Muskellunge", pickerel:"Chain pickerel",
+  walleye:"Walleye", sauger:"Sauger", yellowperch:"Yellow perch",
+  bluegill:"Bluegill", redear:"Redear sunfish", rockbass:"Rock bass",
+  blackcrappie:"Black crappie", whitecrappie:"White crappie",
+  channelcat:"Channel catfish", flathead:"Flathead catfish", bluecat:"Blue catfish",
+  whitesturgeon:"White sturgeon", lakesturgeon:"Lake sturgeon",
+  carp:"Common carp", freshdrum:"Freshwater drum", bowfin:"Bowfin", alligatorgar:"Alligator gar",
+  redfish:"Red drum", snook:"Common snook", seatrout:"Spotted seatrout", flounder:"Southern flounder",
+  tarpon:"Atlantic tarpon", bonefish:"Bonefish", permit:"Permit (fish)", bluefish:"Bluefish",
+  redsnapper:"Northern red snapper", lingcod:"Lingcod", pacifichalibut:"Pacific halibut",
+  mahi:"Mahi-mahi", yellowfin:"Yellowfin tuna", roosterfish:"Roosterfish",
+  yellowtail:"Seriola dorsalis", stripedmarlin:"Striped marlin", sailfish:"Sailfish"
+};
+
+/* ============================================================
+   Official fishing-regulation / license sources by state.
+   We deep-link to the authoritative agency rather than hardcode
+   bag/size limits (which change yearly and by waterbody).
+   { agency, url }
+   ============================================================ */
+const STATE_REGS = {
+  // ---- USA ----
+  "Alabama":{agency:"AL Dept. of Conservation & Natural Resources",url:"https://www.outdooralabama.com/fishing"},
+  "Alaska":{agency:"Alaska Dept. of Fish & Game",url:"https://www.adfg.alaska.gov/index.cfm?adfg=fishingSportFishingInfo.main"},
+  "Arizona":{agency:"Arizona Game & Fish Dept.",url:"https://www.azgfd.com/fishing/regulations/"},
+  "Arkansas":{agency:"Arkansas Game & Fish Commission",url:"https://www.agfc.com/fishing/"},
+  "California":{agency:"CA Dept. of Fish & Wildlife",url:"https://wildlife.ca.gov/Fishing"},
+  "Colorado":{agency:"Colorado Parks & Wildlife",url:"https://cpw.state.co.us/thingstodo/Pages/Fishing.aspx"},
+  "Connecticut":{agency:"CT DEEP Fisheries",url:"https://portal.ct.gov/DEEP/Fishing/General-Information/Fishing-in-Connecticut"},
+  "Delaware":{agency:"Delaware DNREC Fish & Wildlife",url:"https://dnrec.delaware.gov/fish-wildlife/fishing/"},
+  "Florida":{agency:"Florida FWC",url:"https://myfwc.com/fishing/"},
+  "Georgia":{agency:"Georgia DNR Wildlife Resources",url:"https://georgiawildlife.com/fishing"},
+  "Hawaii":{agency:"Hawaii DLNR Aquatic Resources",url:"https://dlnr.hawaii.gov/dar/fishing/fishing-regulations/"},
+  "Idaho":{agency:"Idaho Fish & Game",url:"https://idfg.idaho.gov/rules/fish"},
+  "Illinois":{agency:"Illinois DNR",url:"https://dnr.illinois.gov/fishing.html"},
+  "Indiana":{agency:"Indiana DNR Fish & Wildlife",url:"https://www.in.gov/dnr/fish-and-wildlife/fishing/"},
+  "Iowa":{agency:"Iowa DNR",url:"https://www.iowadnr.gov/Things-to-Do/Fishing"},
+  "Kansas":{agency:"Kansas Dept. of Wildlife & Parks",url:"https://ksoutdoors.com/Fishing"},
+  "Kentucky":{agency:"Kentucky Fish & Wildlife",url:"https://fw.ky.gov/Fish/Pages/default.aspx"},
+  "Louisiana":{agency:"LA Dept. of Wildlife & Fisheries",url:"https://www.wlf.louisiana.gov/page/fishing"},
+  "Maine":{agency:"Maine Inland Fisheries & Wildlife",url:"https://www.maine.gov/ifw/fishing-boating/fishing/"},
+  "Maryland":{agency:"Maryland DNR Fisheries",url:"https://dnr.maryland.gov/fisheries/Pages/default.aspx"},
+  "Massachusetts":{agency:"MassWildlife",url:"https://www.mass.gov/fishing"},
+  "Michigan":{agency:"Michigan DNR",url:"https://www.michigan.gov/dnr/things-to-do/fishing"},
+  "Minnesota":{agency:"Minnesota DNR",url:"https://www.dnr.state.mn.us/fishing/index.html"},
+  "Mississippi":{agency:"MS Dept. of Wildlife, Fisheries & Parks",url:"https://www.mdwfp.com/fishing-boating/"},
+  "Missouri":{agency:"Missouri Dept. of Conservation",url:"https://mdc.mo.gov/fishing"},
+  "Montana":{agency:"Montana Fish, Wildlife & Parks",url:"https://fwp.mt.gov/fish"},
+  "Nebraska":{agency:"Nebraska Game & Parks",url:"https://outdoornebraska.gov/fishing/"},
+  "Nevada":{agency:"Nevada Dept. of Wildlife",url:"https://www.ndow.org/activity/fishing/"},
+  "New Hampshire":{agency:"NH Fish & Game",url:"https://www.wildlife.nh.gov/fishing-new-hampshire"},
+  "New Jersey":{agency:"NJ Div. of Fish & Wildlife",url:"https://dep.nj.gov/njfw/fishing/"},
+  "New Mexico":{agency:"New Mexico Dept. of Game & Fish",url:"https://www.wildlife.state.nm.us/fishing/"},
+  "New York":{agency:"NY DEC",url:"https://dec.ny.gov/things-to-do/freshwater-fishing"},
+  "North Carolina":{agency:"NC Wildlife Resources Commission",url:"https://www.ncwildlife.org/fishing"},
+  "North Dakota":{agency:"North Dakota Game & Fish",url:"https://gf.nd.gov/fishing"},
+  "Ohio":{agency:"Ohio DNR Div. of Wildlife",url:"https://ohiodnr.gov/discover-and-learn/safety-conservation/about-ODNR/wildlife/fishing"},
+  "Oklahoma":{agency:"Oklahoma Dept. of Wildlife Conservation",url:"https://www.wildlifedepartment.com/fishing"},
+  "Oregon":{agency:"Oregon Dept. of Fish & Wildlife",url:"https://myodfw.com/fishing"},
+  "Pennsylvania":{agency:"PA Fish & Boat Commission",url:"https://www.fishandboat.com/Fish/Pages/default.aspx"},
+  "Rhode Island":{agency:"RI DEM Fish & Wildlife",url:"https://dem.ri.gov/natural-resources-bureau/fish-and-wildlife/freshwater-fisheries"},
+  "South Carolina":{agency:"SC DNR",url:"https://www.dnr.sc.gov/fishing.html"},
+  "South Dakota":{agency:"South Dakota Game, Fish & Parks",url:"https://gfp.sd.gov/fishing/"},
+  "Tennessee":{agency:"Tennessee Wildlife Resources Agency",url:"https://www.tn.gov/twra/fishing.html"},
+  "Texas":{agency:"Texas Parks & Wildlife",url:"https://tpwd.texas.gov/fishboat/fish/"},
+  "Utah":{agency:"Utah Div. of Wildlife Resources",url:"https://wildlife.utah.gov/fishing-in-utah.html"},
+  "Vermont":{agency:"Vermont Fish & Wildlife",url:"https://vtfishandwildlife.com/fish"},
+  "Virginia":{agency:"Virginia Dept. of Wildlife Resources",url:"https://dwr.virginia.gov/fishing/"},
+  "Washington":{agency:"Washington Dept. of Fish & Wildlife",url:"https://wdfw.wa.gov/fishing"},
+  "West Virginia":{agency:"West Virginia DNR",url:"https://wvdnr.gov/fishing/"},
+  "Wisconsin":{agency:"Wisconsin DNR",url:"https://dnr.wisconsin.gov/topic/fishing"},
+  "Wyoming":{agency:"Wyoming Game & Fish Dept.",url:"https://wgfd.wyo.gov/fishing-and-boating"},
+  // ---- Canada ----
+  "British Columbia":{agency:"Freshwater Fisheries Society of BC",url:"https://www.gofishbc.com/"},
+  "Alberta":{agency:"My Wild Alberta (Govt. of Alberta)",url:"https://mywildalberta.ca/fishing/"},
+  "Saskatchewan":{agency:"Govt. of Saskatchewan — Angling",url:"https://www.saskatchewan.ca/residents/environment-public-health-and-safety/wildlife-issues/fishing-hunting-and-trapping/angling"},
+  "Manitoba":{agency:"Manitoba Natural Resources — Fishing",url:"https://www.gov.mb.ca/nrnd/fish-wildlife/fishing/"},
+  "Ontario":{agency:"Ontario — Fishing",url:"https://www.ontario.ca/page/fishing"},
+  "Quebec":{agency:"Québec — Sport Fishing",url:"https://www.quebec.ca/en/tourism-and-recreation/sport-hunting-fishing/sport-fishing"},
+  "New Brunswick":{agency:"Govt. of New Brunswick — Fishing",url:"https://www2.gnb.ca/content/gnb/en/departments/erd/natural_resources/content/fish_and_wildlife.html"},
+  "Nova Scotia":{agency:"Nova Scotia — Sportfishing",url:"https://novascotia.ca/fish/sportfishing/"},
+  "Prince Edward Island":{agency:"PEI — Fishing",url:"https://www.princeedwardisland.ca/en/topic/fishing"},
+  "Newfoundland and Labrador":{agency:"DFO — Recreational Fisheries (NL)",url:"https://www.dfo-mpo.gc.ca/fisheries-peches/recreational-recreative/index-eng.html"},
+  "Yukon":{agency:"Yukon — Fishing",url:"https://yukon.ca/en/outdoor-recreation-and-wildlife/fishing"},
+  "Northwest Territories":{agency:"NWT — Sport Fishing",url:"https://www.gov.nt.ca/ecc/en/services/sport-fishing"},
+  "Nunavut":{agency:"Nunavut — Fisheries",url:"https://www.gov.nu.ca/environment"}
+};
+const MX_REGS = {agency:"CONAPESCA — Mexican sportfishing license",url:"https://www.gob.mx/conapesca"};
+const MX_STATES = new Set(["Baja California","Baja California Sur","Sonora","Sinaloa","Nayarit","Jalisco",
+  "Colima","Michoacán","Guerrero","Oaxaca","Chiapas","Tamaulipas","Veracruz","Tabasco","Campeche",
+  "Quintana Roo","Yucatán"]);
+
+/* ============================================================
+   Ecoregion overlay sources (EPA Level III US / CEC North America).
+   Loaded at runtime when the user toggles the layer; degrades
+   gracefully if the host is unavailable.
+   ============================================================ */
+// EPA Level III ecoregions (simplified server-side via maxAllowableOffset). CORS-enabled.
+const ECOREGION_SOURCES = [
+  "https://gispub.epa.gov/arcgis/rest/services/ORD/USEPA_Ecoregions_Level_III_and_IV/MapServer/11/query?where=1%3D1&outFields=US_L3NAME,NA_L1NAME&f=geojson&outSR=4326&maxAllowableOffset=0.05&geometryPrecision=3&returnGeometry=true"
+];
+
+/* ============================================================
+   ECOREGION RANGES (US only — EPA Level III, contiguous 48).
+   Sharper than whole-state ranges for FRESHWATER species.
+   Marine/inshore species and Alaska/Hawaii/Canada/Mexico
+   coverage stay state/province-based (no eco entry).
+   Names must match US_L3NAME exactly (matched via norm()).
+   ============================================================ */
+const ECO = {
+  APPALACHIA:["Blue Ridge","Ridge and Valley","Central Appalachians","Southwestern Appalachians","Western Allegheny Plateau","Northern Allegheny Plateau","North Central Appalachians"],
+  NORTHEAST:["Acadian Plains and Hills","Northeastern Highlands","Northeastern Coastal Zone","Eastern Great Lakes Lowlands","Northern Piedmont","Atlantic Coastal Pine Barrens"],
+  NORTHWOODS:["Northern Lakes and Forests","Northern Minnesota Wetlands","North Central Hardwood Forests","Driftless Area"],
+  GREATLAKES_PLAIN:["Huron/Erie Lake Plains","Erie Drift Plain","Southern Michigan/Northern Indiana Drift Plains","Southeastern Wisconsin Till Plains","Eastern Corn Belt Plains","Eastern Great Lakes Lowlands"],
+  CORNBELT:["Central Corn Belt Plains","Eastern Corn Belt Plains","Western Corn Belt Plains","Central Irregular Plains","Interior River Valleys and Hills"],
+  OZARK:["Ozark Highlands","Boston Mountains","Ouachita Mountains","Arkansas Valley"],
+  INTERIOR:["Interior Plateau"],
+  SOUTHEAST:["Southeastern Plains","Piedmont","Southern Coastal Plain","Mississippi Valley Loess Plains","Mississippi Alluvial Plain","South Central Plains"],
+  ATLANTIC_CP:["Middle Atlantic Coastal Plain","Southern Coastal Plain","Atlantic Coastal Pine Barrens"],
+  FLORIDA:["Southern Florida Coastal Plain","Southern Coastal Plain"],
+  TEXAS:["Texas Blackland Prairies","East Central Texas Plains","Cross Timbers","Edwards Plateau","Western Gulf Coastal Plain","Southern Texas Plains"],
+  PLAINS:["Central Great Plains","High Plains","Northwestern Great Plains","Northern Glaciated Plains","Northwestern Glaciated Plains","Lake Agassiz Plain","Nebraska Sand Hills","Flint Hills","Southwestern Tablelands"],
+  ROCKIES:["Southern Rockies","Middle Rockies","Northern Rockies","Idaho Batholith","Canadian Rockies","Wasatch and Uinta Mountains"],
+  PNW:["Cascades","North Cascades","Eastern Cascades Slopes and Foothills","Blue Mountains","Klamath Mountains/California High North Coast Range","Coast Range","Puget Lowland","Willamette Valley","Columbia Plateau","Snake River Plain"],
+  SIERRA:["Sierra Nevada","Southern California Mountains","Central California Foothills and Coastal Mountains"],
+  CALVALLEY:["Central California Valley","Central California Foothills and Coastal Mountains","Southern California/Northern Baja Coast"],
+  DESERT:["Mojave Basin and Range","Sonoran Basin and Range","Chihuahuan Deserts","Arizona/New Mexico Plateau","Arizona/New Mexico Mountains","Colorado Plateaus","Madrean Archipelago","Central Basin and Range","Northern Basin and Range"],
+  GREATBASIN:["Central Basin and Range","Northern Basin and Range","Snake River Plain","Columbia Plateau"]
+};
+function EU(){ const s=new Set(); for(const a of arguments){ (ECO[a]||(Array.isArray(a)?a:[a])).forEach(x=>s.add(x)); } return [...s]; }
+
+const ECO_RANGE = {
+  // ----- Black Bass -----
+  largemouth: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","TEXAS","CORNBELT","OZARK","INTERIOR","GREATLAKES_PLAIN","PLAINS","CALVALLEY","DESERT","PNW"),
+  smallmouth: EU("APPALACHIA","NORTHEAST","NORTHWOODS","GREATLAKES_PLAIN","OZARK","INTERIOR","CORNBELT","PNW","ROCKIES"),
+  spotted: EU("OZARK","INTERIOR","SOUTHEAST","TEXAS"),
+  // ----- Temperate Bass -----
+  whitebass: EU("CORNBELT","PLAINS","TEXAS","OZARK","INTERIOR","GREATLAKES_PLAIN"),
+  // ----- Trout -----
+  rainbow: EU("PNW","ROCKIES","SIERRA","APPALACHIA","NORTHEAST","NORTHWOODS","GREATBASIN","DESERT","OZARK"),
+  brown: EU("ROCKIES","PNW","SIERRA","APPALACHIA","NORTHEAST","NORTHWOODS","OZARK","INTERIOR","GREATBASIN"),
+  brook: EU("APPALACHIA","NORTHEAST","NORTHWOODS"),
+  cutthroat: EU("ROCKIES","PNW","GREATBASIN","SIERRA"),
+  goldentrout: ["Sierra Nevada","Middle Rockies","Southern Rockies"],
+  bulltrout: ["Northern Rockies","Idaho Batholith","Cascades","North Cascades","Blue Mountains","Canadian Rockies","Eastern Cascades Slopes and Foothills"],
+  laketrout: EU("NORTHWOODS","NORTHEAST",["Northern Rockies","Middle Rockies","Southern Rockies"]),
+  // ----- Salmon (lower-48 portion; AK via states) -----
+  chinook: EU("PNW","GREATLAKES_PLAIN","NORTHWOODS",["Central California Valley","Klamath Mountains/California High North Coast Range","Sierra Nevada"]),
+  coho: EU("PNW","GREATLAKES_PLAIN","NORTHWOODS",["Klamath Mountains/California High North Coast Range"]),
+  sockeye: ["Cascades","North Cascades","Columbia Plateau","Puget Lowland"],
+  pinksalmon: ["Puget Lowland","North Cascades","Coast Range"],
+  atlanticsalmon: EU("NORTHEAST"),
+  // ----- Pike -----
+  pike: EU("NORTHWOODS","NORTHEAST","GREATLAKES_PLAIN","CORNBELT","PLAINS","ROCKIES"),
+  muskie: EU("NORTHWOODS","GREATLAKES_PLAIN","APPALACHIA","INTERIOR","NORTHEAST"),
+  pickerel: EU("ATLANTIC_CP","SOUTHEAST","NORTHEAST","FLORIDA"),
+  // ----- Perch / Walleye -----
+  walleye: EU("NORTHWOODS","NORTHEAST","GREATLAKES_PLAIN","CORNBELT","PLAINS","APPALACHIA","INTERIOR","ROCKIES","OZARK"),
+  sauger: EU("PLAINS","CORNBELT","INTERIOR","OZARK","GREATLAKES_PLAIN",["Middle Rockies"]),
+  yellowperch: EU("NORTHWOODS","NORTHEAST","GREATLAKES_PLAIN","CORNBELT","PLAINS","APPALACHIA"),
+  // ----- Sunfish / Panfish -----
+  bluegill: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","TEXAS","CORNBELT","OZARK","INTERIOR","GREATLAKES_PLAIN","PLAINS","CALVALLEY","DESERT","PNW","NORTHEAST"),
+  redear: EU("SOUTHEAST","FLORIDA","TEXAS","ATLANTIC_CP","CALVALLEY","DESERT"),
+  rockbass: EU("APPALACHIA","NORTHEAST","NORTHWOODS","GREATLAKES_PLAIN","OZARK","INTERIOR"),
+  blackcrappie: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","TEXAS","CORNBELT","OZARK","INTERIOR","GREATLAKES_PLAIN","PLAINS","NORTHEAST","CALVALLEY"),
+  whitecrappie: EU("SOUTHEAST","TEXAS","CORNBELT","OZARK","INTERIOR","PLAINS","GREATLAKES_PLAIN"),
+  // ----- Catfish -----
+  channelcat: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","TEXAS","CORNBELT","OZARK","INTERIOR","GREATLAKES_PLAIN","PLAINS","CALVALLEY","DESERT","NORTHEAST"),
+  flathead: EU("OZARK","INTERIOR","SOUTHEAST","TEXAS","CORNBELT","PLAINS","APPALACHIA"),
+  bluecat: EU("OZARK","INTERIOR","SOUTHEAST","TEXAS","CORNBELT","PLAINS","ATLANTIC_CP"),
+  // ----- Sturgeon -----
+  whitesturgeon: ["Columbia Plateau","Cascades","Coast Range","Willamette Valley","Snake River Plain","Central California Valley","Klamath Mountains/California High North Coast Range"],
+  lakesturgeon: EU("NORTHWOODS","GREATLAKES_PLAIN","NORTHEAST","CORNBELT","INTERIOR"),
+  // ----- Other Freshwater -----
+  carp: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","TEXAS","CORNBELT","OZARK","INTERIOR","GREATLAKES_PLAIN","PLAINS","CALVALLEY","DESERT","NORTHEAST","PNW"),
+  freshdrum: EU("CORNBELT","INTERIOR","OZARK","SOUTHEAST","TEXAS","PLAINS","GREATLAKES_PLAIN"),
+  bowfin: EU("SOUTHEAST","ATLANTIC_CP","FLORIDA","NORTHWOODS","GREATLAKES_PLAIN","NORTHEAST"),
+  alligatorgar: EU("SOUTHEAST","TEXAS")
+};
+
+</script>
+<script>
+/* ============================================================
+   NOTABLE WATERS — named destination fisheries (curated, not
+   exhaustive). Showcase states: MO, FL, NC, AR, IL.
+   Each: { name, region, type, lat, lon, species:[fishId], note,
+           best, how, size, [depth] }
+     best  : season & timing
+     how   : tactics, top baits/lures, and access
+     size  : acreage / river length + nearest town/launch
+     depth : marine zones only
+   Coordinates are approximate pin placements.
+   ============================================================ */
+const WATER_TYPE = {
+  tailwater:{label:"Trout tailwater",color:"#5aa9d6"},
+  troutpark:{label:"Trout park",color:"#7cc0e0"},
+  troutstream:{label:"Wild trout stream",color:"#4f93c4"},
+  smbriver:{label:"Smallmouth river",color:"#6fae54"},
+  reservoir:{label:"Reservoir / lake",color:"#37b6a0"},
+  greatlake:{label:"Great Lake",color:"#3f7fb0"},
+  bigriver:{label:"Big river",color:"#b08d5b"},
+  flats:{label:"Inshore flats",color:"#5ec2c0"},
+  nearshore:{label:"Nearshore / reef",color:"#5aa9d6"},
+  offshore:{label:"Offshore / bluewater",color:"#5a86d6"}
+};
+
+const WATERS = [
+  /* ===================== MISSOURI ===================== */
+  // ---- Trout: tailwater, parks & wild streams ----
+  { name:"Lake Taneycomo", region:"Missouri", type:"tailwater", lat:36.643, lon:-93.225,
+    species:["rainbow","brown"], note:"Cold tailwater below Table Rock Dam; stocked rainbows plus trophy browns.",
+    best:"Year-round; brown bite peaks Nov–Feb. Fish low water early.", how:"Drift scuds, jigs & micro-jigs on light line; wade the upper end on low generation, troll/drift below.", size:"~2,000 ac tailwater · Branson" },
+  { name:"Roaring River (State Park)", region:"Missouri", type:"troutpark", lat:36.581, lon:-93.832,
+    species:["rainbow"], note:"Spring-fed put-and-take trout park near Cassville.", best:"C&K season Mar 1–Oct 31; opening day is a tradition.", how:"Daily stocked rainbows; flies in the fly zone, dough bait/spinners elsewhere. Bank & wade.", size:"Spring branch · Cassville" },
+  { name:"Bennett Spring (State Park)", region:"Missouri", type:"troutpark", lat:37.717, lon:-92.853,
+    species:["rainbow"], note:"One of MO's busiest trout parks near Lebanon.", best:"Mar–Oct season; winter C&R weekends.", how:"Heavy stocking; flies-only zone up top, bait/spinners below. Wade & bank.", size:"Niangua headwater · Lebanon" },
+  { name:"Montauk (State Park)", region:"Missouri", type:"troutpark", lat:37.452, lon:-91.693,
+    species:["rainbow"], note:"Headwaters of the Current River.", best:"Mar–Oct; wild-trout water downstream fishes year-round.", how:"Stocked park up top; nymphs & small streamers in the wild section below. Wade.", size:"Current R. headwater · Salem" },
+  { name:"Maramec Spring Park", region:"Missouri", type:"troutpark", lat:37.954, lon:-91.531,
+    species:["rainbow"], note:"Privately-run trout park fed by MO's 5th-largest spring.", best:"Mar–Oct C&K season.", how:"Stocked rainbows on flies, spinners or dough bait. Bank & wade.", size:"Spring branch · St. James" },
+  { name:"North Fork of the White River", region:"Missouri", type:"troutstream", lat:36.78, lon:-92.13,
+    species:["rainbow","brown"], note:"Blue-ribbon wild trout water — self-sustaining rainbows and big browns.", best:"Spring & fall; sulphur hatch in May.", how:"Spring-creek tactics — small nymphs, dry-dropper; float-and-wade. Canoe access.", size:"~10 mi trophy section · West Plains" },
+  { name:"Crane Creek", region:"Missouri", type:"troutstream", lat:36.90, lon:-93.57,
+    species:["rainbow"], note:"Tiny stream holding rare wild McCloud-strain rainbows.", best:"Cool months; very low/clear in summer.", how:"Stealth, fine tippet, tiny flies; strictly catch-and-release. Walk-in.", size:"Small creek · Crane" },
+  { name:"Little Piney Creek", region:"Missouri", type:"troutstream", lat:37.88, lon:-91.83,
+    species:["rainbow","brown"], note:"Ozark wild-trout creek with naturally reproducing rainbows.", best:"Spring & fall; low summer flows.", how:"Light tackle, nymphs & small spinners; wade. Walk-in access points.", size:"Small Ozark creek · Newburg" },
+  { name:"Blue Springs Creek", region:"Missouri", type:"troutstream", lat:38.18, lon:-91.18,
+    species:["rainbow"], note:"Cold spring-fed wild rainbow stream feeding the Meramec.", best:"Year-round; best in cooler water.", how:"Small dries & nymphs; catch-and-release ethic. Wade/walk-in.", size:"Small creek · Bourbon" },
+  { name:"Roubidoux Creek", region:"Missouri", type:"troutstream", lat:37.83, lon:-92.20,
+    species:["rainbow"], note:"Stocked + holdover rainbows through Waynesville.", best:"Winter C&R Nov–Feb; stocked in season.", how:"Spinners, small jigs and flies; easy bank & wade access in town.", size:"Town creek · Waynesville" },
+  { name:"Eleven Point River (MO)", region:"Missouri", type:"troutstream", lat:36.78, lon:-91.30,
+    species:["rainbow","smallmouth"], note:"Scenic Ozark float — trout up high (Greer Spring), smallmouth lower.", best:"Spring & fall floats; summer for smallmouth.", how:"Canoe float; flies/spinners for trout, soft plastics for smallmouth.", size:"Wild & Scenic river · Alton" },
+  // ---- Smallmouth (Ozark) rivers ----
+  { name:"Current River (lower)", region:"Missouri", type:"smbriver", lat:37.18, lon:-91.18,
+    species:["smallmouth","rockbass","walleye"], note:"Classic Ozark float — smallmouth, goggle-eye and river walleye.", best:"Apr–Jun & Sep–Oct; dawn/dusk.", how:"Tube jigs, topwater & crankbaits along bluff pools; canoe/kayak float.", size:"NPS Riverways · Van Buren" },
+  { name:"Jacks Fork River", region:"Missouri", type:"smbriver", lat:37.18, lon:-91.36,
+    species:["smallmouth","rockbass"], note:"Clear, spring-fed tributary of the Current.", best:"Late spring–summer when floatable.", how:"Wade or float; small tubes, Ned rigs, poppers. Upper section seasonal.", size:"Spring-fed float · Eminence" },
+  { name:"Big River", region:"Missouri", type:"smbriver", lat:38.05, lon:-90.62,
+    species:["smallmouth","rockbass","largemouth"], note:"Eastern-Ozark smallmouth with C&R special-management stretches.", best:"Apr–Jun & fall.", how:"Wade or kayak; jerkbaits, tubes, crawfish colors on gravel runs.", size:"~140 mi · Potosi/De Soto" },
+  { name:"Meramec River", region:"Missouri", type:"smbriver", lat:38.24, lon:-91.10,
+    species:["smallmouth","walleye","channelcat","rockbass"], note:"Big float river — smallmouth up top, walleye & cats lower.", best:"Spring smallmouth; winter walleye below.", how:"Crankbaits & tubes for smb; jigs/minnows for walleye. Many access points.", size:"~218 mi · Sullivan/St. Clair" },
+  { name:"Gasconade River", region:"Missouri", type:"smbriver", lat:37.95, lon:-91.95,
+    species:["smallmouth","walleye","channelcat"], note:"Longest river entirely within MO.", best:"Apr–Jun smb; spring walleye run.", how:"Float and fish wood/gravel; tubes, jerkbaits, jig-and-minnow.", size:"~280 mi · Waynesville/Vienna" },
+  { name:"Big Piney River", region:"Missouri", type:"smbriver", lat:37.55, lon:-92.00,
+    species:["smallmouth","rockbass"], note:"Gasconade tributary; quality smallmouth on a quieter float.", best:"Spring & early summer.", how:"Wade/float; small crankbaits & soft plastics on rocky runs.", size:"Ozark float · Houston" },
+  { name:"Elk River", region:"Missouri", type:"smbriver", lat:36.63, lon:-94.48,
+    species:["smallmouth","rockbass"], note:"Far-SW Missouri smallmouth float.", best:"Summer wade-and-paddle.", how:"Light tackle; tubes, grubs, topwater at dawn. Outfitter floats.", size:"SW Ozark float · Noel" },
+  { name:"St. Francis River", region:"Missouri", type:"smbriver", lat:37.30, lon:-90.50,
+    species:["smallmouth","rockbass"], note:"Rocky shut-in stretches in the St. Francois Mountains.", best:"Spring (also whitewater season).", how:"Wade the shut-ins; tubes & small jerkbaits in pocket water.", size:"Shut-ins reach · Fredericktown" },
+  { name:"Black River", region:"Missouri", type:"smbriver", lat:37.30, lon:-90.78,
+    species:["smallmouth","rockbass","largemouth"], note:"Clear Ozark river above Clearwater Lake.", best:"Late spring–summer.", how:"Float/wade; tubes, spinnerbaits and topwater on gravel bars.", size:"Ozark float · Lesterville" },
+  { name:"Huzzah Creek", region:"Missouri", type:"smbriver", lat:37.92, lon:-91.18,
+    species:["smallmouth","rockbass"], note:"Spring-fed Meramec tributary, popular summer float.", best:"May–Sep.", how:"Kayak/canoe; small soft plastics and poppers.", size:"Clear creek · Steelville" },
+  { name:"Courtois Creek", region:"Missouri", type:"smbriver", lat:37.92, lon:-91.10,
+    species:["smallmouth","rockbass"], note:"Scenic Meramec-basin float stream.", best:"Late spring–summer.", how:"Wade/float; tubes & grubs in the pools.", size:"Clear creek · Steelville" },
+  { name:"Bourbeuse River", region:"Missouri", type:"smbriver", lat:38.30, lon:-91.10,
+    species:["smallmouth","largemouth","channelcat"], note:"Slow, winding Meramec tributary.", best:"Spring & fall.", how:"Float; spinnerbaits & plastics around wood; cats on cut bait.", size:"Meandering river · Union" },
+  { name:"Sac River", region:"Missouri", type:"smbriver", lat:37.55, lon:-93.70,
+    species:["smallmouth","largemouth","whitebass"], note:"Feeds Stockton Lake; smallmouth above, white bass run below dam.", best:"Spring white-bass run; summer smb.", how:"Inline spinners & jigs in the run; tubes upstream.", size:"Stockton feeder · Greenfield" },
+  { name:"Big Sugar Creek", region:"Missouri", type:"smbriver", lat:36.60, lon:-94.30,
+    species:["smallmouth","rockbass"], note:"Elk River headwater with feisty smallmouth.", best:"Summer.", how:"Wade; small tubes, grubs, topwater early.", size:"SW Ozark creek · Pineville" },
+  // ---- Reservoirs ----
+  { name:"Lake of the Ozarks", region:"Missouri", type:"reservoir", lat:38.13, lon:-92.66,
+    species:["largemouth","spotted","whitecrappie","blackcrappie","whitebass","channelcat","bluecat","flathead","bluegill","carp"], note:"MO's signature reservoir.", best:"Mar–May crappie & bass spawn; summer night bite; fall white bass.", how:"Docks & brush for crappie/bass; cut bait in the channel for cats. Many ramps.", size:"~54,000 ac · Osage Beach" },
+  { name:"Table Rock Lake", region:"Missouri", type:"reservoir", lat:36.60, lon:-93.31,
+    species:["largemouth","smallmouth","spotted","whitebass","blackcrappie","channelcat"], note:"Clear highland reservoir, bass capital.", best:"Spring & fall for bass; summer deep.", how:"Finesse — drop-shot, Ned rig, jerkbaits on bluffs/points.", size:"~43,000 ac · Branson/Kimberling City" },
+  { name:"Truman Lake", region:"Missouri", type:"reservoir", lat:38.27, lon:-93.41,
+    species:["blackcrappie","whitecrappie","whitebass","channelcat","flathead","walleye","largemouth"], note:"Flooded-timber crappie & catfish factory.", best:"Apr–May crappie spawn; summer cats.", how:"Jigs/minnows in timber; trotlines & cut bait for cats. Ramps at Warsaw.", size:"~55,600 ac · Warsaw" },
+  { name:"Stockton Lake", region:"Missouri", type:"reservoir", lat:37.65, lon:-93.78,
+    species:["walleye","smallmouth","whitebass","blackcrappie","largemouth"], note:"Deep, clear — MO's top walleye bite.", best:"Spring walleye; summer smallmouth deep.", how:"Crawler harnesses & jigs for walleye; tubes for smb on points. Windy — a sailing lake.", size:"~24,900 ac · Stockton" },
+  { name:"Pomme de Terre Lake", region:"Missouri", type:"reservoir", lat:37.90, lon:-93.32,
+    species:["muskie","walleye","blackcrappie","whitecrappie","largemouth"], note:"Missouri's premier muskie lake (stocked).", best:"Muskie fall & spring; crappie in spring.", how:"Big bucktails/glides for muskie; jigs for crappie. Ramps at Hermitage.", size:"~7,800 ac · Hermitage" },
+  { name:"Mark Twain Lake", region:"Missouri", type:"reservoir", lat:39.53, lon:-91.63,
+    species:["blackcrappie","channelcat","largemouth","whitebass"], note:"NE Missouri's big-water crappie & catfish lake.", best:"Apr–May crappie; summer catfish.", how:"Spider-rig jigs/minnows; cut bait on flats. Ramps near Monroe City.", size:"~18,600 ac · Monroe City" },
+  { name:"Smithville Lake", region:"Missouri", type:"reservoir", lat:39.42, lon:-94.57,
+    species:["walleye","muskie","blackcrappie","channelcat","largemouth"], note:"KC-area lake stocked with muskie & walleye.", best:"Spring walleye/crappie; muskie fall.", how:"Crawler rigs for walleye; bucktails for muskie. Ramps in the park.", size:"~7,200 ac · Smithville" },
+  { name:"Bull Shoals Lake (MO arm)", region:"Missouri", type:"reservoir", lat:36.55, lon:-92.86,
+    species:["largemouth","smallmouth","spotted","whitebass","walleye","channelcat"], note:"Deep, clear MO/AR border lake.", best:"Spring & fall bass; summer deep.", how:"Jerkbaits, jigs, drop-shot on bluffs; troll for walleye.", size:"~45,000 ac · Theodosia" },
+  { name:"Lake Wappapello", region:"Missouri", type:"reservoir", lat:36.93, lon:-90.32,
+    species:["blackcrappie","channelcat","largemouth","bluegill"], note:"SE Missouri crappie & catfish lake.", best:"Spring crappie; summer cats & bream.", how:"Jigs/minnows on brush; cut bait on the flats.", size:"~8,400 ac · Williamsville" },
+  { name:"Clearwater Lake", region:"Missouri", type:"reservoir", lat:37.14, lon:-90.78,
+    species:["largemouth","blackcrappie","channelcat","bluegill","whitebass"], note:"Clear Ozark lake on the Black River.", best:"Spring spawn; summer evenings.", how:"Plastics on points, crappie on brush, cats below the dam.", size:"~1,630 ac · Piedmont" },
+  { name:"Thomas Hill Reservoir", region:"Missouri", type:"reservoir", lat:39.57, lon:-92.65,
+    species:["largemouth","blackcrappie","channelcat","whitebass"], note:"Warm-water cooling lake — bass bite all winter.", best:"Year-round; great cold-season bass.", how:"Fish the warm discharge in winter; crankbaits & jigs.", size:"~4,950 ac · Macon" },
+  { name:"Long Branch Lake", region:"Missouri", type:"reservoir", lat:39.78, lon:-92.55,
+    species:["largemouth","blackcrappie","channelcat","whitebass"], note:"NE Missouri lake near Macon.", best:"Spring crappie & bass.", how:"Jigs on brush; spinnerbaits in the spring.", size:"~2,400 ac · Macon" },
+  { name:"Fellows Lake", region:"Missouri", type:"reservoir", lat:37.30, lon:-93.25,
+    species:["walleye","largemouth","blackcrappie","muskie"], note:"Springfield water-supply lake, stocked walleye & muskie.", best:"Spring walleye; muskie cool months.", how:"Jigs/crawlers for walleye; no-wake, electric-friendly. Marina ramp.", size:"~820 ac · Springfield" },
+  { name:"Lake Jacomo", region:"Missouri", type:"reservoir", lat:38.94, lon:-94.38,
+    species:["largemouth","blackcrappie","walleye","channelcat"], note:"Kansas City metro lake in Fleming Park.", best:"Spring spawn; summer mornings.", how:"Plastics & jigs around docks; rental boats available.", size:"~970 ac · Blue Springs" },
+  { name:"Montrose Lake", region:"Missouri", type:"reservoir", lat:38.27, lon:-94.00,
+    species:["largemouth","blackcrappie","channelcat","bluegill"], note:"Warm-water power-plant lake — winter bass.", best:"Cold months for active bass.", how:"Fish the warm-water area; crankbaits & plastics.", size:"~1,500 ac · Clinton" },
+  // ---- Big rivers ----
+  { name:"Missouri River (Boonville reach)", region:"Missouri", type:"bigriver", lat:38.98, lon:-92.74,
+    species:["bluecat","flathead","channelcat","sauger","freshdrum","carp"], note:"Trophy blue & flathead catfish.", best:"Summer cats; winter sauger.", how:"Anchor wing-dikes with fresh cut shad; jigs for sauger. Ramps along the river.", size:"Lower Missouri R. · Boonville" },
+  { name:"Missouri River (Kansas City)", region:"Missouri", type:"bigriver", lat:39.12, lon:-94.58,
+    species:["bluecat","flathead","channelcat","sauger","freshdrum"], note:"Urban big-river trophy blue cat run.", best:"Late summer & fall for big blues.", how:"Cut bait on dike fields & holes; heavy gear.", size:"Lower Missouri R. · Kansas City" },
+  { name:"Mississippi River (Cape Girardeau)", region:"Missouri", type:"bigriver", lat:37.31, lon:-89.52,
+    species:["bluecat","flathead","channelcat","sauger","freshdrum"], note:"Big-river trophy blue cats.", best:"Fall–winter for giant blues.", how:"Anchor scour holes & current seams with fresh cut shad/skipjack.", size:"Middle Mississippi · Cape Girardeau" },
+  { name:"Mississippi River (St. Louis area)", region:"Missouri", type:"bigriver", lat:38.80, lon:-90.18,
+    species:["bluecat","flathead","channelcat","whitebass","freshdrum"], note:"Tailwater & wing-dike catfishing near the confluence.", best:"Summer & fall.", how:"Cut bait below the dams; white bass on spoons in spring.", size:"Mississippi/Missouri confluence · St. Louis" },
+  { name:"Osage River (below Bagnell Dam)", region:"Missouri", type:"bigriver", lat:38.20, lon:-92.62,
+    species:["whitebass","blackcrappie","channelcat","flathead","freshdrum"], note:"Tailwater below Lake of the Ozarks.", best:"Spring white-bass run; summer cats.", how:"Jigs & spoons in the run; cut bait in the holes. Bank & boat below the dam.", size:"Osage tailwater · Lake Ozark" }
+  ,
+  /* ===================== FLORIDA ===================== */
+  // ---- Freshwater ----
+  { name:"Lake Okeechobee", region:"Florida", type:"reservoir", lat:26.95, lon:-80.80,
+    species:["largemouth","blackcrappie","bluegill","redear"], note:"Florida's 'Big O' — trophy Florida-strain largemouth and winter specks.", best:"Dec–Apr trophy bass & crappie spawn.", how:"Wild shiners & flip the grass for bass; jig the rim canals for crappie. Many ramps.", size:"~730 sq mi · Okeechobee/Clewiston" },
+  { name:"St. Johns River", region:"Florida", type:"bigriver", lat:29.00, lon:-81.40,
+    species:["largemouth","blackcrappie","channelcat","bluegill","bowfin","pickerel"], note:"Slow blackwater river — bass, slab specks, panfish, bowfin.", best:"Winter/spring crappie & bass.", how:"Drift jigs/minnows for specks; shiners for bass. Boat ramps throughout.", size:"~310 mi · Palatka/Sanford" },
+  { name:"Rodman Reservoir", region:"Florida", type:"reservoir", lat:29.52, lon:-81.80,
+    species:["largemouth","blackcrappie","bluegill"], note:"Trophy-bass reservoir on the Ocklawaha.", best:"Winter–spring for giant bass.", how:"Flip standing timber/hydrilla; wild shiners. Kenwood/Orange Springs ramps.", size:"~9,500 ac · Palatka" },
+  { name:"Lake Tohopekaliga (Toho)", region:"Florida", type:"reservoir", lat:28.18, lon:-81.37,
+    species:["largemouth","blackcrappie","bluegill"], note:"Kissimmee-chain trophy bass factory.", best:"Jan–Mar pre-spawn giants.", how:"Wild shiners, flipping & swimbaits in the grass; specks on jigs. Ramps at Kissimmee.", size:"~18,800 ac · Kissimmee" },
+  { name:"Harris Chain of Lakes", region:"Florida", type:"reservoir", lat:28.77, lon:-81.78,
+    species:["largemouth","blackcrappie","bluegill"], note:"Connected central-Florida lakes near Leesburg.", best:"Winter–spring bass & crappie.", how:"Grass lines & pads; shiners and soft plastics. Several public ramps.", size:"~50,000 ac chain · Leesburg" },
+  { name:"Lake George", region:"Florida", type:"reservoir", lat:29.28, lon:-81.60,
+    species:["largemouth","blackcrappie","channelcat","bluegill"], note:"Florida's 2nd-largest lake, on the St. Johns.", best:"Spring spawn; summer panfish.", how:"Shiners along edges; jigs for specks; cats on cut bait. Ramps at Georgetown.", size:"~46,000 ac · Astor" },
+  { name:"Lake Seminole", region:"Florida", type:"reservoir", lat:30.73, lon:-84.86,
+    species:["largemouth","blackcrappie","bluegill"], note:"Grassy panhandle border lake (GA/FL).", best:"Spring spawn.", how:"Hydrilla edges with frogs/swimbaits; crappie on brush. Sneads ramps.", size:"~37,500 ac · Sneads" },
+  { name:"Withlacoochee River", region:"Florida", type:"bigriver", lat:28.90, lon:-82.20,
+    species:["largemouth","redear","bluegill","bowfin"], note:"Winding cypress river of the Nature Coast.", best:"Spring panfish & bass.", how:"Crickets/worms for bream; plastics for bass around cypress. Small-boat access.", size:"~140 mi · Inverness" },
+  // ---- Inshore flats / passes ----
+  { name:"Florida Keys flats (Islamorada)", region:"Florida", type:"flats", depth:"0–6 ft", lat:24.92, lon:-80.63,
+    species:["bonefish","permit","tarpon"], note:"Skinny-water sight-fishing for the flats grand slam.", best:"Apr–Jun tarpon migration; bones/permit spring–fall.", how:"Poled skiff, sight-cast crab/shrimp flies or live crabs. Hire a guide.", size:"Backcountry flats · Islamorada" },
+  { name:"Biscayne Bay (Miami)", region:"Florida", type:"flats", depth:"0–8 ft", lat:25.50, lon:-80.22,
+    species:["bonefish","permit","tarpon","snook"], note:"Urban flats with bones, permit, tarpon & snook.", best:"Spring–fall; tarpon on the bridges in summer.", how:"Sight-fish the flats; live shrimp/crabs or flies. Ramps at Crandon/Black Point.", size:"~430 sq mi bay · Miami" },
+  { name:"Flamingo / Florida Bay (Everglades)", region:"Florida", type:"flats", depth:"1–6 ft", lat:25.14, lon:-80.92,
+    species:["redfish","seatrout","snook","tarpon","bonefish"], note:"Backcountry mangrove flats.", best:"Fall reds; spring–summer tarpon & snook.", how:"Skiff the basins & creeks; soft plastics, topwater, live bait. Flamingo ramp.", size:"Everglades NP · Flamingo" },
+  { name:"Mosquito Lagoon (Indian River)", region:"Florida", type:"flats", depth:"1–4 ft", lat:28.80, lon:-80.78,
+    species:["redfish","seatrout","snook"], note:"Sight-fishing capital for bull reds & gator trout.", best:"Year-round; fall red schools.", how:"Pole/wade the shallow grass; weedless soft plastics & topwater. Ramps at Oak Hill.", size:"Shallow grass flats · Titusville/New Smyrna" },
+  { name:"Boca Grande / Charlotte Harbor", region:"Florida", type:"flats", depth:"4–40 ft (passes)", lat:26.72, lon:-82.26,
+    species:["tarpon","snook","redfish","seatrout"], note:"The 'Tarpon Capital'.", best:"May–Jun pass tarpon; reds/snook spring–fall.", how:"Live crabs/pass jigs in the pass for tarpon; flats for reds & trout.", size:"~270 sq mi estuary · Boca Grande" },
+  { name:"Tampa Bay", region:"Florida", type:"flats", depth:"2–12 ft", lat:27.80, lon:-82.55,
+    species:["snook","redfish","seatrout","tarpon"], note:"Massive estuary.", best:"Snook on summer beaches; tarpon May–Jul; reds fall.", how:"Live pilchards under corks; soft plastics on the flats. Many ramps.", size:"~400 sq mi · St. Petersburg/Tampa" },
+  { name:"Ten Thousand Islands (Everglades)", region:"Florida", type:"flats", depth:"1–8 ft", lat:25.85, lon:-81.40,
+    species:["snook","redfish","tarpon","seatrout"], note:"Remote mangrove maze.", best:"Winter for snook & reds; baby tarpon year-round.", how:"Skiff/kayak the creeks; jigs, jerkbaits, live bait. Chokoloskee ramp.", size:"Mangrove backcountry · Everglades City" },
+  { name:"Crystal River / Kings Bay", region:"Florida", type:"flats", depth:"1–8 ft", lat:28.90, lon:-82.60,
+    species:["redfish","seatrout","snook"], note:"Spring-fed Nature Coast bay (manatee country).", best:"Spring–fall; winter trout in the springs.", how:"Live shrimp & soft plastics over grass; idle-speed zones. Town ramps.", size:"Spring-fed bay · Crystal River" },
+  { name:"Cedar Key", region:"Florida", type:"flats", depth:"1–8 ft", lat:29.13, lon:-83.03,
+    species:["redfish","seatrout","flounder"], note:"Old-Florida Nature Coast flats town.", best:"Spring & fall.", how:"Wade or skiff the oyster bars; jigs & live shrimp. Public ramp.", size:"Gulf flats · Cedar Key" },
+  { name:"Apalachicola Bay", region:"Florida", type:"flats", depth:"2–12 ft", lat:29.70, lon:-84.98,
+    species:["redfish","seatrout","flounder"], note:"Panhandle estuary fed by the Apalachicola River.", best:"Spring–fall.", how:"Drift the grass & bars with shrimp/soft plastics. Ramps at Apalachicola.", size:"~210 sq mi bay · Apalachicola" },
+  { name:"Indian River Lagoon (Sebastian)", region:"Florida", type:"flats", depth:"2–10 ft", lat:27.86, lon:-80.50,
+    species:["redfish","seatrout","snook","tarpon"], note:"Diverse central-coast lagoon.", best:"Year-round; snook warm months.", how:"Live bait & soft plastics on grass/docks; the inlet for snook. Ramps at Sebastian.", size:"156-mi lagoon system · Sebastian" },
+  // ---- Nearshore / inlets ----
+  { name:"Mayport / St. Johns Inlet (Jacksonville)", region:"Florida", type:"nearshore", depth:"5–40 ft", lat:30.39, lon:-81.40,
+    species:["flounder","redfish","seatrout","bluefish"], note:"NE Florida inlet.", best:"Fall flounder run; bull reds fall.", how:"Bounce jigs/live mud minnows on the jetties; cut bait for reds.", size:"River-mouth inlet · Jacksonville" },
+  { name:"Sebastian Inlet", region:"Florida", type:"nearshore", depth:"5–35 ft", lat:27.86, lon:-80.45,
+    species:["snook","redfish","bluefish","flounder"], note:"Famous land-based inlet fishery.", best:"Snook night bite Apr–Oct; winter blues.", how:"Bucktails & live bait off the jetty; flair-hawk jigs at night.", size:"Atlantic inlet · Sebastian" },
+  { name:"Jupiter / Juno Beach", region:"Florida", type:"nearshore", depth:"surf–60 ft", lat:26.94, lon:-80.07,
+    species:["snook","tarpon","bluefish"], note:"Beach & inlet run where the Gulf Stream nears shore.", best:"Spring–summer snook & tarpon; winter blues.", how:"Live bait off the beach & inlet; the reef just offshore. Ramps at Jupiter.", size:"Beach/inlet · Jupiter" },
+  // ---- Offshore / bluewater ----
+  { name:"Islamorada offshore (Gulf Stream)", region:"Florida", type:"offshore", depth:"120–1,000+ ft · 4–20 mi out", lat:24.85, lon:-80.40,
+    species:["sailfish","mahi","yellowfin"], note:"The 'Sailfish Capital'.", best:"Winter sails (cold fronts); summer mahi.", how:"Kite-fish live baits for sails; run weedlines for mahi. Charter out of Bud n' Mary's.", size:"Gulf Stream · Islamorada" },
+  { name:"Key West offshore", region:"Florida", type:"offshore", depth:"120–1,200 ft · 8–25 mi out", lat:24.45, lon:-81.80,
+    species:["sailfish","mahi","yellowfin"], note:"Where the Gulf, Atlantic & Stream meet.", best:"Winter sails; spring–summer mahi & tuna.", how:"Troll/kite the color change & humps; live bait. Charter from Key West.", size:"Bluewater · Key West" },
+  { name:"Marathon / Florida Keys offshore", region:"Florida", type:"offshore", depth:"100–800 ft · 5–20 mi out", lat:24.70, lon:-81.00,
+    species:["mahi","sailfish"], note:"Middle Keys bluewater off the reef.", best:"Apr–Aug mahi; winter sails.", how:"Run weedlines & frigate birds for mahi; troll ballyhoo. Charters at Marathon.", size:"Bluewater · Marathon" },
+  { name:"Stuart / Sailfish Point", region:"Florida", type:"offshore", depth:"100–600 ft · 5–25 mi out", lat:27.18, lon:-80.10,
+    species:["sailfish","mahi"], note:"'Sailfish Capital of the World'.", best:"Nov–Feb sailfish on cold fronts.", how:"Kite-fish live goggle-eyes; dredges & teasers. Charter from St. Lucie Inlet.", size:"Bluewater · Stuart" },
+  { name:"Miami / Gulf Stream edge", region:"Florida", type:"offshore", depth:"120–1,200 ft · 1–15 mi out", lat:25.72, lon:-79.95,
+    species:["sailfish","mahi","yellowfin"], note:"The Gulf Stream runs close to shore.", best:"Winter sails; summer mahi & tuna.", how:"Kites, dredges & live bait just off the reef. Charters from Haulover/Miami Beach.", size:"Bluewater · Miami" },
+  { name:"Destin / Panhandle canyons", region:"Florida", type:"offshore", depth:"200–2,000 ft · 20–60 mi out", lat:29.90, lon:-86.90,
+    species:["yellowfin","mahi","redsnapper","sailfish"], note:"Gulf 'Spur & Squiggles' canyons.", best:"Summer tuna & mahi; red snapper in-season.", how:"Run the canyons & rips, chunk/troll for tuna; bottom snapper on the way out.", size:"Bluewater · Destin" },
+  { name:"Pensacola offshore", region:"Florida", type:"offshore", depth:"150–1,500 ft · 15–50 mi out", lat:30.00, lon:-87.20,
+    species:["yellowfin","mahi","redsnapper","sailfish"], note:"Western-panhandle bluewater & rigs.", best:"Summer pelagics; spring/summer snapper.", how:"Troll/chunk the rigs & canyons; bottom-fish reefs. Charters from Pensacola Pass.", size:"Bluewater & rigs · Pensacola" }
+  ,
+  /* ===================== NORTH CAROLINA ===================== */
+  // ---- Western mountains: trout streams ----
+  { name:"Davidson River (Pisgah NF)", region:"North Carolina", type:"troutstream", lat:35.28, lon:-82.78,
+    species:["rainbow","brown","brook"], note:"Famous Pisgah catch-and-release water near Brevard.", best:"Year-round; hatches Apr–Jun.", how:"Tiny nymphs & fine tippet on picky fish; C&R. Roadside wade access.", size:"Pisgah NF · Brevard" },
+  { name:"Nantahala River (Delayed Harvest)", region:"North Carolina", type:"tailwater", lat:35.33, lon:-83.65,
+    species:["rainbow","brown"], note:"Cold tailwater & delayed-harvest water.", best:"DH Oct–Jun; check dam generation.", how:"Nymphs, eggs & streamers; wade between releases. Roadside access.", size:"Tailwater/DH · Topton" },
+  { name:"Tuckasegee River", region:"North Carolina", type:"troutstream", lat:35.37, lon:-83.25,
+    species:["rainbow","brown"], note:"Wide, wadeable delayed-harvest river near Dillsboro.", best:"DH Oct–Jun.", how:"High numbers — swing streamers, dead-drift nymphs. Easy wade.", size:"DH section · Dillsboro" },
+  { name:"Watauga River (High Country)", region:"North Carolina", type:"troutstream", lat:36.27, lon:-81.78,
+    species:["brown","rainbow"], note:"Boone-area freestone & tailwater stretches.", best:"Spring & fall.", how:"Nymphs & hopper-dropper; wild browns up high. Wade access.", size:"High Country · Boone/Valle Crucis" },
+  { name:"Wilson Creek (Wild Trout)", region:"North Carolina", type:"troutstream", lat:35.95, lon:-81.77,
+    species:["rainbow","brown","brook"], note:"Wild & Scenic gorge stream in Pisgah.", best:"Spring–early summer.", how:"Pocket-water nymphing; brookies in the headwaters. Hike-in/roadside.", size:"Wild & Scenic gorge · Mortimer" },
+  { name:"Raven Fork (Cherokee Trophy Waters)", region:"North Carolina", type:"troutstream", lat:35.47, lon:-83.31,
+    species:["rainbow","brown","brook"], note:"C&R trophy section on the Qualla Boundary.", best:"Year-round (tribal permit).", how:"Big nymphs & streamers for giant stocked fish; barbless C&R. Tribal permit required.", size:"Trophy water · Cherokee" },
+  { name:"Hazel Creek (Smokies backcountry)", region:"North Carolina", type:"troutstream", lat:35.49, lon:-83.65,
+    species:["brook","rainbow","brown"], note:"Remote GSMNP stream reached by boat across Fontana.", best:"Apr–Oct.", how:"Dry-dropper for wild fish; backpack/boat-in. Wade.", size:"GSMNP backcountry · Fontana" },
+  { name:"South Toe River", region:"North Carolina", type:"troutstream", lat:35.84, lon:-82.20,
+    species:["rainbow","brook"], note:"Clear Mt. Mitchell-area freestone.", best:"Spring–summer.", how:"Small dries & nymphs; native brookies up high. Roadside/walk-in.", size:"Mt. Mitchell area · Burnsville" },
+  { name:"Linville River (Gorge)", region:"North Carolina", type:"troutstream", lat:35.90, lon:-81.90,
+    species:["rainbow","brown","brook"], note:"Rugged wilderness-gorge trout water.", best:"Spring & fall.", how:"Strenuous hike-in; pocket-water nymphing, wild fish. Gorge access.", size:"Linville Gorge · Morganton" },
+  { name:"Mitchell River (Delayed Harvest)", region:"North Carolina", type:"troutstream", lat:36.30, lon:-80.85,
+    species:["rainbow","brown"], note:"Foothills delayed-harvest river near Elkin.", best:"DH Oct–Jun.", how:"Nymphs & streamers; easy wade access. C&R in season.", size:"DH section · Elkin" },
+  { name:"Cataloochee Creek (Smokies)", region:"North Carolina", type:"troutstream", lat:35.63, lon:-83.10,
+    species:["rainbow","brook","brown"], note:"Scenic GSMNP valley stream with elk nearby.", best:"Apr–Oct.", how:"Dry flies for eager wild trout; brookies up high. Wade, gravel-road access.", size:"GSMNP · Cataloochee Valley" },
+  { name:"North Mills River", region:"North Carolina", type:"troutstream", lat:35.40, lon:-82.64,
+    species:["rainbow","brown","brook"], note:"Pisgah stream with stocked & wild water.", best:"Spring & fall (DH section).", how:"Nymphs & small streamers; family-friendly access. Wade.", size:"Pisgah NF · Mills River" },
+  { name:"Snowbird Creek", region:"North Carolina", type:"troutstream", lat:35.30, lon:-83.88,
+    species:["brook","rainbow"], note:"Remote wild-brook-trout headwaters.", best:"Late spring–summer.", how:"Hike-in; tiny dries for native specks. C&R ethic.", size:"Nantahala NF · Robbinsville" },
+  // ---- Piedmont / foothills ----
+  { name:"New River (Ashe/Alleghany)", region:"North Carolina", type:"smbriver", lat:36.50, lon:-81.33,
+    species:["smallmouth","muskie","rockbass"], note:"Ancient, gentle float river.", best:"Summer smb; muskie fall–winter.", how:"Float; tubes & topwater for smb, big baits for muskie. Canoe access.", size:"Float river · Jefferson" },
+  { name:"French Broad River", region:"North Carolina", type:"smbriver", lat:35.60, lon:-82.80,
+    species:["smallmouth","muskie","channelcat"], note:"Asheville-area smallmouth & muskie river.", best:"Spring–fall smb; muskie cool months.", how:"Drift jigs/jerkbaits; guided muskie floats. Greenway & ramp access.", size:"Through Asheville · Marshall" },
+  { name:"Lake James", region:"North Carolina", type:"reservoir", lat:35.73, lon:-81.88,
+    species:["smallmouth","largemouth","spotted","walleye","whitebass"], note:"Clear foothills lake below the Linville.", best:"Spring & fall; summer deep.", how:"Drop-shot & jerkbaits for smb on points; troll for walleye.", size:"~6,800 ac · Nebo/Morganton" },
+  { name:"Lake Norman", region:"North Carolina", type:"reservoir", lat:35.50, lon:-80.95,
+    species:["largemouth","spotted","striper","whitebass","blackcrappie","channelcat","bluecat"], note:"Charlotte's big reservoir.", best:"Spring & fall; summer schooling.", how:"Spotted bass on points; live bait & topwater for schooling stripers.", size:"~32,500 ac · Mooresville" },
+  { name:"High Rock Lake", region:"North Carolina", type:"reservoir", lat:35.60, lon:-80.27,
+    species:["largemouth","blackcrappie","bluecat","channelcat"], note:"Stained Yadkin-chain tournament lake.", best:"Spring spawn; summer cats.", how:"Spinnerbaits & jigs in stained water; cut bait for blues. Many ramps.", size:"~15,000 ac · Lexington" },
+  { name:"Kerr Lake (Buggs Island)", region:"North Carolina", type:"reservoir", lat:36.55, lon:-78.30,
+    species:["striper","largemouth","blackcrappie","channelcat"], note:"Landlocked striped-bass stronghold on the NC/VA line.", best:"Spring striper run; summer open-water.", how:"Live bait & bucktails for schooling stripers; crappie on brush.", size:"~50,000 ac · Henderson" },
+  { name:"Lake Gaston", region:"North Carolina", type:"reservoir", lat:36.50, lon:-77.92,
+    species:["striper","largemouth","blackcrappie"], note:"Roanoke-chain reservoir.", best:"Spring–fall stripers; spring bass.", how:"Down-line live bait for stripers; docks for bass & crappie.", size:"~20,000 ac · Littleton" },
+  { name:"Roanoke River (Weldon)", region:"North Carolina", type:"bigriver", lat:36.43, lon:-77.60,
+    species:["striper","channelcat","bluecat"], note:"The 'Rockfish Capital'.", best:"Apr–May striper spawning run.", how:"Soft plastics & bucktails in the current below Weldon; C&R during the run.", size:"Roanoke R. · Weldon" },
+  { name:"Yadkin–Pee Dee River", region:"North Carolina", type:"bigriver", lat:35.10, lon:-79.95,
+    species:["bluecat","flathead","channelcat","striper"], note:"Lowland river chain — giant catfish.", best:"Summer & fall cats.", how:"Anchor holes with cut bait; heavy gear for blues & flatheads.", size:"Pee Dee R. · Rockingham" },
+  { name:"Jordan Lake", region:"North Carolina", type:"reservoir", lat:35.73, lon:-79.05,
+    species:["largemouth","blackcrappie","striper","channelcat","bluecat"], note:"Triangle-area reservoir.", best:"Spring spawn & crappie; summer stripers/hybrids.", how:"Crankbaits & jigs for bass; live bait for hybrids; brush for crappie.", size:"~13,900 ac · Apex/Pittsboro" },
+  { name:"Falls Lake", region:"North Carolina", type:"reservoir", lat:36.02, lon:-78.70,
+    species:["largemouth","blackcrappie","channelcat","striper"], note:"Raleigh water-supply lake.", best:"Spring bass & crappie.", how:"Plastics & spinnerbaits on points; crappie on brush. Several ramps.", size:"~12,400 ac · Raleigh/Durham" },
+  { name:"Shearon Harris Lake", region:"North Carolina", type:"reservoir", lat:35.63, lon:-78.95,
+    species:["largemouth","blackcrappie","channelcat"], note:"Warm-water cooling lake famed for trophy bass.", best:"Winter–spring giant bass.", how:"Swimbaits & big worms in grass; year-round warm water. Limited ramps.", size:"~4,100 ac · New Hill" },
+  { name:"Lake Hickory", region:"North Carolina", type:"reservoir", lat:35.78, lon:-81.27,
+    species:["striper","largemouth","blackcrappie","channelcat"], note:"Catawba-chain foothills lake.", best:"Spring–fall stripers; spring crappie.", how:"Live bait for stripers; docks for crappie & bass.", size:"~4,200 ac · Hickory" },
+  { name:"Lake Tillery", region:"North Carolina", type:"reservoir", lat:35.30, lon:-80.08,
+    species:["largemouth","blackcrappie","bluecat","striper"], note:"Clear Pee Dee-chain lake by the Uwharries.", best:"Spring spawn; summer catfish.", how:"Jigs & crankbaits; cut bait for blues. Ramps at Mt. Gilead.", size:"~5,000 ac · Mount Gilead" },
+  { name:"Catawba River", region:"North Carolina", type:"smbriver", lat:35.75, lon:-81.55,
+    species:["smallmouth","largemouth","channelcat"], note:"Foothills river linking the Catawba lakes.", best:"Spring–fall.", how:"Wade/kayak; tubes & crankbaits in the shoals.", size:"Foothills river · Morganton" },
+  { name:"Dan River", region:"North Carolina", type:"smbriver", lat:36.45, lon:-80.05,
+    species:["smallmouth","channelcat"], note:"Northern-Piedmont smallmouth float.", best:"Late spring–summer.", how:"Float; soft plastics & topwater on the ledges.", size:"Float river · Danbury" },
+  // ---- Eastern sounds, marshes & inlets ----
+  { name:"Pamlico Sound (Outer Banks)", region:"North Carolina", type:"flats", depth:"1–8 ft", lat:35.30, lon:-75.90,
+    species:["redfish","seatrout","flounder"], note:"Vast shallow sound behind the OBX.", best:"Fall bull reds; trout spring & fall.", how:"Pole/drift the grass; soft plastics, popping corks, topwater. Many ramps.", size:"~80-mi sound · Hatteras/Ocracoke" },
+  { name:"Cape Lookout / Core Sound", region:"North Carolina", type:"flats", depth:"1–10 ft", lat:34.60, lon:-76.53,
+    species:["redfish","seatrout","flounder"], note:"Clear-water marsh and shoals.", best:"Spring–fall; fall flounder at the inlets.", how:"Sight-fish reds; jigs in the sloughs. Skiff or ferry from Harkers Island.", size:"Cape Lookout NS · Harkers Island" },
+  { name:"Neuse & Pamlico Rivers (brackish)", region:"North Carolina", type:"flats", depth:"2–15 ft", lat:35.05, lon:-76.60,
+    species:["redfish","seatrout","striper","flounder"], note:"Brackish lower rivers.", best:"Reds/trout fall; Neuse stripers winter–spring.", how:"Soft plastics on points & docks; live bait for stripers. Ramps at New Bern/Oriental.", size:"Lower rivers · New Bern" },
+  { name:"Cape Fear River (Wilmington)", region:"North Carolina", type:"flats", depth:"2–20 ft", lat:34.10, lon:-77.95,
+    species:["redfish","flounder","striper","seatrout"], note:"Tidal river & marsh near Wilmington.", best:"Spring–fall inshore; striper/cats upriver.", how:"Work creek mouths & docks; cut bait for cats up top. City ramps.", size:"Tidal river · Wilmington" },
+  { name:"Albemarle Sound", region:"North Carolina", type:"flats", depth:"3–18 ft", lat:36.05, lon:-76.20,
+    species:["striper","largemouth","bluecat","blackcrappie"], note:"Huge freshwater-to-brackish sound — historic striper water.", best:"Fall–spring stripers; spring bass & crappie.", how:"Troll & cast for stripers; bass in the cypress; big blue cats. Ramps at Edenton.", size:"~50-mi sound · Edenton" },
+  { name:"Currituck Sound", region:"North Carolina", type:"flats", depth:"2–8 ft", lat:36.35, lon:-75.92,
+    species:["largemouth","redfish","blackcrappie"], note:"Fresh/brackish grass sound behind the northern OBX.", best:"Spring–fall.", how:"Frogs & spinnerbaits in the grass for bass; reds on the edges. Ramps at Poplar Branch.", size:"Grass sound · Corolla/Knotts Island" },
+  { name:"Bogue Sound (Emerald Isle)", region:"North Carolina", type:"flats", depth:"2–12 ft", lat:34.69, lon:-77.05,
+    species:["redfish","seatrout","flounder"], note:"Crystal Coast marsh & grass flats.", best:"Spring–fall.", how:"Live shrimp & soft plastics on the grass; the inlet for flounder. Ramps at Cape Carteret.", size:"Crystal Coast · Emerald Isle" },
+  { name:"Cape Hatteras surf (OBX)", region:"North Carolina", type:"nearshore", depth:"surf–30 ft", lat:35.25, lon:-75.53,
+    species:["bluefish","redfish","seatrout","flounder"], note:"Legendary surf where the currents collide.", best:"Fall drum & bluefish blitzes.", how:"Heaver rods & cut bait/metal from the beach at the Point. 4WD beach access.", size:"OBX surf · Buxton/Cape Point" },
+  { name:"Wrightsville Beach surf", region:"North Carolina", type:"nearshore", depth:"surf–25 ft", lat:34.21, lon:-77.79,
+    species:["bluefish","redfish","seatrout","flounder"], note:"SE-coast surf & pier fishery.", best:"Spring & fall runs.", how:"Surf rigs with cut bait/shrimp; the piers for blues & spots. Public beach access.", size:"Atlantic surf · Wrightsville Beach" },
+  { name:"Nearshore reefs off Morehead City", region:"North Carolina", type:"nearshore", depth:"40–120 ft · 5–25 mi out", lat:34.50, lon:-76.50,
+    species:["redsnapper","flounder"], note:"Artificial reefs & ledges off Beaufort Inlet.", best:"Summer; snapper in-season.", how:"Drop cut bait & jigs to structure; short run from the inlet. Charters at Morehead.", size:"Nearshore reefs · Morehead City" },
+  // ---- OBX Gulf Stream: bluewater ----
+  { name:"Oregon Inlet / Gulf Stream (OBX)", region:"North Carolina", type:"offshore", depth:"Gulf Stream · 100–2,000 ft · 25–45 mi out", lat:35.62, lon:-75.05,
+    species:["yellowfin","mahi","sailfish"], note:"The OBX bluewater scene.", best:"Tuna spring & fall; mahi & billfish summer.", how:"Troll ballyhoo spreads & dredges; charter fleet at Oregon Inlet.", size:"Gulf Stream · Nags Head/Wanchese" },
+  { name:"Hatteras / The Point", region:"North Carolina", type:"offshore", depth:"Gulf Stream · 120–1,500 ft · 15–35 mi out", lat:35.10, lon:-74.90,
+    species:["yellowfin","mahi","sailfish"], note:"Where the Gulf Stream runs closest to shore on the East Coast.", best:"Year-round tuna; summer billfish & mahi.", how:"Short bluewater run from Hatteras Inlet; troll & chunk. Charters at Hatteras.", size:"Gulf Stream · Hatteras" },
+  { name:"Big Rock / Cape Lookout (Morehead City)", region:"North Carolina", type:"offshore", depth:"Gulf Stream · 150–2,000 ft · 30–50 mi out", lat:34.20, lon:-76.00,
+    species:["yellowfin","mahi","sailfish"], note:"Home of the Big Rock blue marlin tournament.", best:"Jun–Aug billfish; tuna spring.", how:"Troll the break & rock for billfish, tuna, dolphin. Charters at Morehead.", size:"Gulf Stream · Morehead City" },
+  { name:"Frying Pan / Cape Fear offshore", region:"North Carolina", type:"offshore", depth:"100–1,200 ft · 30–50 mi out", lat:33.50, lon:-77.60,
+    species:["yellowfin","mahi","sailfish"], note:"Bluewater off the Frying Pan shoals & tower.", best:"Late spring–summer.", how:"Troll the break & ledges; bottom/bluewater combos. Charters from Southport.", size:"Gulf Stream · Southport/Bald Head" },
+  { name:"Masonboro / Wrightsville offshore", region:"North Carolina", type:"offshore", depth:"100–1,000 ft · 35–55 mi out", lat:34.00, lon:-77.30,
+    species:["mahi","sailfish","yellowfin"], note:"SE-NC bluewater run off Masonboro Inlet.", best:"May–Sep mahi & billfish.", how:"Run to the break; troll ballyhoo & sea witches. Charters at Wrightsville.", size:"Gulf Stream · Wrightsville Beach" }
+  ,
+  /* ===================== ARKANSAS ===================== */
+  // ---- Trophy trout tailwaters & streams ----
+  { name:"White River (below Bull Shoals Dam)", region:"Arkansas", type:"tailwater", lat:36.37, lon:-92.56,
+    species:["brown","rainbow"], note:"World-class trophy-brown tailwater — also stocked with cutthroat & brook (all four trout).", best:"Browns peak Oct–Feb; year-round rainbows.", how:"Drift sowbugs/eggs & strip streamers; wade low water, drift-boat high water. Watch generation horns.", size:"~100 mi tailwater · Cotter/Mountain Home" },
+  { name:"Norfork Tailwater", region:"Arkansas", type:"tailwater", lat:36.25, lon:-92.24,
+    species:["rainbow","brown"], note:"Short, fertile tailwater that once gave up a world-record brown.", best:"Fall–winter browns; sulphur/midge hatches.", how:"Technical low-water nymphing — midges, scuds, sowbugs. Wade on minimal generation.", size:"~5 mi tailwater · Norfork/Salesville" },
+  { name:"Little Red River (below Greers Ferry)", region:"Arkansas", type:"tailwater", lat:35.52, lon:-91.97,
+    species:["brown","rainbow"], note:"Produced a former world-record brown (40 lb 4 oz).", best:"Fall–winter browns.", how:"Sowbugs & scuds dead-drifted; wade low water near Heber Springs. Check generation.", size:"Tailwater · Heber Springs" },
+  { name:"Spring River (Mammoth Spring)", region:"Arkansas", type:"tailwater", lat:36.40, lon:-91.50,
+    species:["rainbow","brown"], note:"Cold, spring-fed river flowing year-round.", best:"Year-round; summer floatable.", how:"Float-and-wade; spinners, flies, and smallmouth lower down. Outfitter floats.", size:"Spring-fed river · Mammoth Spring" },
+  { name:"Beaver Tailwater", region:"Arkansas", type:"tailwater", lat:36.42, lon:-93.85,
+    species:["rainbow","brown"], note:"Cold tailwater below Beaver Dam near Eureka Springs.", best:"Year-round; browns in fall.", how:"Nymphs & streamers; wade on low generation, drift on high.", size:"Tailwater · Eureka Springs" },
+  { name:"Little Missouri River (below Greeson)", region:"Arkansas", type:"tailwater", lat:34.15, lon:-93.72,
+    species:["rainbow","brown"], note:"Scenic Ouachita Mountains trout tailwater below Narrows Dam.", best:"Cool months; generation-dependent.", how:"Nymphs & small streamers; wade on low water. Albert Pike area.", size:"Tailwater · Murfreesboro" },
+  { name:"Sylamore Creek", region:"Arkansas", type:"troutstream", lat:35.92, lon:-92.16,
+    species:["rainbow"], note:"Ozark creek with stocked & holdover rainbows near the White.", best:"Cooler months.", how:"Small spinners & flies; wade/walk-in. Blanchard Springs area.", size:"Ozark creek · Mountain View" },
+  // ---- Ozark smallmouth streams ----
+  { name:"Crooked Creek", region:"Arkansas", type:"smbriver", lat:36.23, lon:-92.55,
+    species:["smallmouth","rockbass"], note:"Arkansas's blue-ribbon smallmouth stream.", best:"Apr–Jun & fall.", how:"Wade or float; tubes, jerkbaits, crawfish colors on gravel. Access points near Yellville.", size:"Ozark stream · Yellville" },
+  { name:"Buffalo National River", region:"Arkansas", type:"smbriver", lat:36.03, lon:-92.75,
+    species:["smallmouth","rockbass"], note:"America's first National River.", best:"Spring–early summer floats.", how:"Float; soft plastics & topwater; goggle-eye on the side. Outfitter shuttles.", size:"~135 mi · Jasper/Buffalo City" },
+  { name:"Kings River", region:"Arkansas", type:"smbriver", lat:36.30, lon:-93.72,
+    species:["smallmouth","rockbass"], note:"Remote NW Arkansas float feeding Table Rock.", best:"Late spring–summer.", how:"Float; tubes & grubs in the pools.", size:"Float river · Berryville" },
+  { name:"Mulberry River", region:"Arkansas", type:"smbriver", lat:35.55, lon:-93.85,
+    species:["smallmouth","rockbass"], note:"Whitewater float in the Ozark NF.", best:"Spring (also whitewater season).", how:"Wade pockets; small jerkbaits & tubes.", size:"Ozark NF float · Oark/Turner Bend" },
+  { name:"War Eagle Creek", region:"Arkansas", type:"smbriver", lat:36.25, lon:-93.78,
+    species:["smallmouth","rockbass"], note:"Beaver Lake tributary with clear smallmouth water.", best:"Spring–summer.", how:"Wade/float; grubs & topwater early.", size:"Beaver feeder · Huntsville" },
+  { name:"Strawberry River", region:"Arkansas", type:"smbriver", lat:36.10, lon:-91.50,
+    species:["smallmouth","rockbass"], note:"Quiet northeastern-Ozark smallmouth float.", best:"Late spring–summer.", how:"Float; soft plastics on the gravel runs.", size:"Ozark border river · Evening Shade" },
+  { name:"Saline River", region:"Arkansas", type:"smbriver", lat:34.55, lon:-92.60,
+    species:["smallmouth","spotted","largemouth"], note:"Ouachita-foothills river south of Little Rock.", best:"Spring & fall.", how:"Float/wade; plastics & spinnerbaits around wood.", size:"Foothills river · Benton" },
+  { name:"Cossatot River", region:"Arkansas", type:"smbriver", lat:34.40, lon:-94.20,
+    species:["smallmouth","spotted"], note:"Rugged 'skull crusher' whitewater river in the Ouachitas.", best:"Spring.", how:"Wade pockets between rapids; tubes & small jerkbaits.", size:"Ouachita NF · Wickes" },
+  { name:"Eleven Point River (AR)", region:"Arkansas", type:"smbriver", lat:36.30, lon:-91.10,
+    species:["smallmouth","rockbass","channelcat"], note:"Lower, warmwater Eleven Point in Arkansas.", best:"Spring–summer.", how:"Float; plastics for smb, cut bait for cats.", size:"Float river · Pocahontas" },
+  { name:"Illinois River (NW Arkansas)", region:"Arkansas", type:"smbriver", lat:36.05, lon:-94.45,
+    species:["smallmouth","largemouth","channelcat"], note:"NW-Arkansas float through farm country.", best:"Spring–summer.", how:"Kayak/canoe; spinnerbaits & plastics.", size:"NW float · Siloam Springs" },
+  // ---- Reservoirs ----
+  { name:"Bull Shoals Lake", region:"Arkansas", type:"reservoir", lat:36.45, lon:-92.85,
+    species:["largemouth","smallmouth","spotted","whitebass","walleye","striper","channelcat"], note:"Deep, clear White-River impoundment.", best:"Spring & fall bass; summer deep.", how:"Jerkbaits, jigs, drop-shot on bluffs; troll for walleye & stripers.", size:"~45,000 ac · Bull Shoals/Lakeview" },
+  { name:"Beaver Lake", region:"Arkansas", type:"reservoir", lat:36.42, lon:-93.82,
+    species:["striper","largemouth","smallmouth","whitebass","walleye","blackcrappie","channelcat"], note:"NW Arkansas trophy-striper lake.", best:"Stripers spring & summer; spring bass/crappie.", how:"Live shad for stripers; finesse for bass; brush for crappie.", size:"~28,000 ac · Rogers/Eureka Springs" },
+  { name:"Norfork Lake", region:"Arkansas", type:"reservoir", lat:36.42, lon:-92.20,
+    species:["striper","largemouth","smallmouth","blackcrappie","channelcat"], note:"Clear highland reservoir famed for big stripers.", best:"Stripers year-round; spring crappie.", how:"Down-line live bait for stripers; brush for crappie & bass.", size:"~22,000 ac · Mountain Home" },
+  { name:"Lake Ouachita", region:"Arkansas", type:"reservoir", lat:34.57, lon:-93.40,
+    species:["striper","largemouth","spotted","blackcrappie","channelcat","bluecat"], note:"Arkansas's largest lake — exceptionally clear.", best:"Spring & fall; summer stripers deep.", how:"Live bait for stripers; finesse for bass; big cats in the timber.", size:"~40,000 ac · Hot Springs/Mount Ida" },
+  { name:"Greers Ferry Lake", region:"Arkansas", type:"reservoir", lat:35.57, lon:-92.00,
+    species:["walleye","whitebass","largemouth","smallmouth","blackcrappie"], note:"Top Arkansas walleye lake.", best:"Spring walleye run up the Little Red; summer hybrids.", how:"Crawler harnesses & jigs for walleye; spoons for white/hybrid bass.", size:"~31,500 ac · Heber Springs/Fairfield Bay" },
+  { name:"Lake Hamilton (Hot Springs)", region:"Arkansas", type:"reservoir", lat:34.45, lon:-93.10,
+    species:["striper","largemouth","blackcrappie","channelcat"], note:"Hot Springs resort lake stocked with stripers.", best:"Year-round warm-water bite.", how:"Live bait for stripers; docks for crappie & bass.", size:"~7,200 ac · Hot Springs" },
+  { name:"Lake Dardanelle (Arkansas River)", region:"Arkansas", type:"reservoir", lat:35.32, lon:-93.18,
+    species:["largemouth","blackcrappie","whitecrappie","bluecat","channelcat","whitebass"], note:"Sprawling river-reservoir & bass-tournament staple.", best:"Spring spawn & crappie; summer cats.", how:"Flip backwaters for bass; jig brush for crappie; cut bait for blues.", size:"~34,000 ac · Russellville" },
+  { name:"DeGray Lake", region:"Arkansas", type:"reservoir", lat:34.25, lon:-93.15,
+    species:["striper","spotted","largemouth","blackcrappie","walleye"], note:"Clear Ouachita-foothills lake with stripers & spotted bass.", best:"Spring & fall; summer stripers.", how:"Live bait for stripers; jigs & drop-shot for spots. State-park ramps.", size:"~13,400 ac · Bismarck" },
+  { name:"Lake Greeson", region:"Arkansas", type:"reservoir", lat:34.18, lon:-93.72,
+    species:["largemouth","spotted","blackcrappie","walleye","channelcat"], note:"Clear Little Missouri impoundment in the Ouachitas.", best:"Spring spawn; trout in the tailwater below.", how:"Finesse for bass; jigs for crappie; troll for walleye.", size:"~7,000 ac · Murfreesboro" },
+  { name:"Lake Maumelle", region:"Arkansas", type:"reservoir", lat:34.85, lon:-92.55,
+    species:["largemouth","blackcrappie","channelcat","bluegill"], note:"Little Rock water-supply lake (no-gas limits).", best:"Spring spawn & crappie.", how:"Plastics on points; jig the brush; electric/idle areas. Public ramps.", size:"~8,900 ac · Little Rock" },
+  { name:"Lake Catherine", region:"Arkansas", type:"reservoir", lat:34.42, lon:-92.95,
+    species:["largemouth","blackcrappie","channelcat","whitebass"], note:"Narrow Ouachita-River lake below Lake Hamilton.", best:"Spring & summer.", how:"Docks & bluff points for bass; cut bait for cats. State-park ramp.", size:"~1,900 ac · Hot Springs" },
+  { name:"Nimrod Lake", region:"Arkansas", type:"reservoir", lat:34.95, lon:-93.17,
+    species:["blackcrappie","whitecrappie","largemouth","channelcat"], note:"Shallow Fourche LaFave crappie & catfish lake.", best:"Spring crappie; summer cats.", how:"Jig the brush & stake beds; cut bait on the flats.", size:"~3,500 ac · Plainview" },
+  { name:"Lake Conway", region:"Arkansas", type:"reservoir", lat:35.05, lon:-92.35,
+    species:["blackcrappie","largemouth","bluegill","channelcat"], note:"Country's largest state-built lake — a crappie & bream factory.", best:"Spring crappie & bream.", how:"Jig the cypress & stumps; crickets for bream. Many ramps.", size:"~6,700 ac · Mayflower" },
+  { name:"Millwood Lake", region:"Arkansas", type:"reservoir", lat:33.68, lon:-93.96,
+    species:["largemouth","blackcrappie","whitecrappie","channelcat","alligatorgar"], note:"Shallow, fertile SW lake — trophy bass & gar.", best:"Spring bass & crappie; summer gar.", how:"Flip cypress/grass for bass; big cut bait for alligator gar.", size:"~29,000 ac · Ashdown" },
+  { name:"Lake Chicot", region:"Arkansas", type:"reservoir", lat:33.35, lon:-91.20,
+    species:["largemouth","blackcrappie","bluegill","channelcat","bowfin"], note:"Largest natural oxbow lake in the U.S.", best:"Spring crappie & bass.", how:"Cypress & docks for bass/crappie; cut bait for cats. State-park ramps.", size:"~5,300 ac · Lake Village" },
+  // ---- Big rivers & Delta ----
+  { name:"Arkansas River (Little Rock pools)", region:"Arkansas", type:"bigriver", lat:34.75, lon:-92.30,
+    species:["bluecat","flathead","channelcat","whitebass","sauger","freshdrum"], note:"Navigation-pool tailwaters below the dams.", best:"Summer cats; winter sauger; spring white bass.", how:"Anchor below the dams with cut bait; jig for sauger. Ramps in the pools.", size:"Arkansas R. pools · Little Rock" },
+  { name:"Mississippi River (Helena)", region:"Arkansas", type:"bigriver", lat:34.53, lon:-90.59,
+    species:["bluecat","flathead","channelcat","alligatorgar","freshdrum"], note:"Big-river trophy blue cats & flatheads.", best:"Fall–winter for big blues.", how:"Anchor scour holes with fresh cut shad/skipjack; heavy gear.", size:"Lower Mississippi · Helena" },
+  { name:"Delta oxbows (lower White / Arkansas)", region:"Arkansas", type:"bigriver", lat:34.30, lon:-91.30,
+    species:["alligatorgar","bowfin","bluecat","blackcrappie"], note:"Backwater oxbows & sloughs of the Delta.", best:"Summer gar; spring crappie.", how:"Big cut bait & wire for gar; jigs in the timber for crappie.", size:"Delta oxbows · Clarendon/St. Charles" },
+  { name:"White River (lower, warmwater)", region:"Arkansas", type:"bigriver", lat:34.70, lon:-91.30,
+    species:["bluecat","flathead","channelcat","blackcrappie","largemouth"], note:"Lower White below the trout zone — catfish & crappie.", best:"Summer cats; spring crappie.", how:"Cut/live bait in the holes; jig the woody backwaters.", size:"Lower White R. · Augusta/Clarendon" },
+  { name:"Ouachita River", region:"Arkansas", type:"bigriver", lat:33.60, lon:-92.82,
+    species:["bluecat","flathead","channelcat","largemouth","spotted"], note:"South-Arkansas lowland river.", best:"Summer & fall.", how:"Cut bait in the bends for cats; plastics on the banks for bass.", size:"South AR river · Camden" },
+  { name:"Red River (SW Arkansas)", region:"Arkansas", type:"bigriver", lat:33.60, lon:-93.80,
+    species:["bluecat","alligatorgar","flathead","channelcat","largemouth"], note:"Muddy SW-Arkansas river with big cats & gar.", best:"Summer.", how:"Heavy cut bait on the bottom; backwaters for bass & gar.", size:"Red R. · Fulton/Garland City" }
+  ,
+  /* ===================== ILLINOIS ===================== */
+  // ---- Lake Michigan ----
+  { name:"Lake Michigan (Chicago–Waukegan)", region:"Illinois", type:"greatlake", depth:"trolling 20–150 ft", lat:42.05, lon:-87.68,
+    species:["chinook","coho","laketrout","brown","rainbow","yellowperch","smallmouth"], note:"Open-lake salmon & trout trolling; perch and smallmouth in the harbors.", best:"Salmon Jun–Sep; perch summer; brown trout spring near shore.", how:"Downriggers/dipsy with spoons & flashers offshore; perch on minnows in the harbors. Launches at Waukegan/Chicago.", size:"Great Lake · Chicago/Waukegan" },
+  { name:"Chicago lakefront harbors", region:"Illinois", type:"greatlake", depth:"shore–25 ft", lat:41.88, lon:-87.60,
+    species:["yellowperch","smallmouth","coho","brown"], note:"Land-based lakefront fishing along the harbors & breakwalls.", best:"Spring coho/brown; summer perch & smallmouth.", how:"Cast spoons for coho, tubes for smallmouth, minnows for perch from the walls. Walk-on access.", size:"Lakefront harbors · Chicago" },
+  // ---- Northern Illinois ----
+  { name:"Fox Chain O'Lakes", region:"Illinois", type:"reservoir", lat:42.46, lon:-88.15,
+    species:["largemouth","muskie","pike","walleye","blackcrappie","bluegill"], note:"Interconnected natural lakes NW of Chicago.", best:"Spring crappie & walleye; muskie/pike fall.", how:"Cranks & jigs for walleye; big baits for muskie/pike; brush for crappie. Many ramps.", size:"~7,100 ac chain · Fox Lake/Antioch" },
+  { name:"Kankakee River", region:"Illinois", type:"smbriver", lat:41.20, lon:-88.00,
+    species:["smallmouth","pike","channelcat","walleye"], note:"Clean, gravel-bottomed smallmouth & pike river.", best:"Spring–fall smb; pike cool months.", how:"Wade/float; tubes & jerkbaits on the gravel runs. State-park access.", size:"Gravel river · Kankakee/Wilmington" },
+  { name:"Fox River", region:"Illinois", type:"smbriver", lat:41.80, lon:-88.32,
+    species:["smallmouth","walleye","channelcat"], note:"Dam-and-pool river through the suburbs.", best:"Spring walleye below dams; summer smb.", how:"Jig the tailwaters for walleye; tubes for smb on the rocks.", size:"Suburban river · Aurora/Elgin" },
+  { name:"Rock River", region:"Illinois", type:"smbriver", lat:41.90, lon:-89.10,
+    species:["smallmouth","walleye","whitebass","channelcat","flathead"], note:"NW Illinois river — smallmouth, walleye & flatheads.", best:"Spring walleye/white bass; summer smb & cats.", how:"Jigs in the tailwaters; cut/live bait for flatheads.", size:"NW IL river · Oregon/Dixon" },
+  { name:"Vermilion River (Middle Fork)", region:"Illinois", type:"smbriver", lat:40.20, lon:-87.73,
+    species:["smallmouth","channelcat"], note:"Scenic east-central smallmouth float (state Wild & Scenic).", best:"Late spring–summer.", how:"Kayak/wade; small tubes & topwater on the riffles.", size:"Wild & Scenic · Danville" },
+  { name:"Des Plaines River", region:"Illinois", type:"smbriver", lat:41.65, lon:-87.95,
+    species:["smallmouth","channelcat","largemouth"], note:"Urban-corridor river & forest-preserve fishing.", best:"Spring–fall.", how:"Wade/kayak; plastics & spinners; many forest-preserve access points.", size:"Metro river · Chicago suburbs" },
+  // ---- Central Illinois ----
+  { name:"Lake Shelbyville", region:"Illinois", type:"reservoir", lat:39.45, lon:-88.78,
+    species:["blackcrappie","largemouth","walleye","whitebass","muskie","channelcat"], note:"Big central-Illinois reservoir.", best:"Apr–May crappie; walleye & white bass spring; muskie fall.", how:"Jigs/minnows on brush; troll for walleye; bucktails for muskie. Several ramps.", size:"~11,000 ac · Shelbyville/Sullivan" },
+  { name:"Clinton Lake", region:"Illinois", type:"reservoir", lat:40.16, lon:-88.77,
+    species:["largemouth","striper","blackcrappie","channelcat"], note:"Warm-water cooling lake, open all winter.", best:"Year-round; winter hybrids in the discharge.", how:"Fish the warm arms in winter; spoons/swimbaits for hybrids. Ramps at the rec area.", size:"~4,900 ac · Clinton" },
+  { name:"Lake Decatur", region:"Illinois", type:"reservoir", lat:39.82, lon:-88.93,
+    species:["largemouth","blackcrappie","channelcat","whitebass"], note:"Sangamon-River city lake.", best:"Spring crappie & white bass; summer cats.", how:"Jig the brush & bridges; cut bait on the flats.", size:"~2,800 ac · Decatur" },
+  { name:"Lake Sangchris", region:"Illinois", type:"reservoir", lat:39.62, lon:-89.47,
+    species:["largemouth","channelcat","blackcrappie"], note:"Power-plant cooling lake — winter bass.", best:"Cold months for active largemouth.", how:"Crankbaits & plastics in the warm-water arms. State-park ramps.", size:"~2,165 ac · Kincaid" },
+  { name:"Spring Lake (Manito)", region:"Illinois", type:"reservoir", lat:40.43, lon:-89.93,
+    species:["largemouth","blackcrappie","channelcat","bluegill"], note:"Backwater lake along the Illinois River.", best:"Spring spawn & crappie.", how:"Plastics & jigs around the timber; bream on worms. Ramp access.", size:"Illinois backwater · Manito" },
+  { name:"Coffeen Lake", region:"Illinois", type:"reservoir", lat:39.08, lon:-89.40,
+    species:["largemouth","channelcat"], note:"Cooling lake known for fat, fast-growing bass.", best:"Cold-season bass in the warm water.", how:"Swimbaits & crankbaits near the discharge. State F&W ramp.", size:"~1,100 ac · Coffeen" },
+  { name:"Newton Lake", region:"Illinois", type:"reservoir", lat:38.92, lon:-88.27,
+    species:["largemouth","channelcat","blackcrappie"], note:"SE-Illinois cooling lake with year-round bass.", best:"Winter & early spring.", how:"Crankbaits & jigs in the heated water. State F&W ramp.", size:"~1,700 ac · Newton" },
+  { name:"Carlyle Lake", region:"Illinois", type:"reservoir", lat:38.62, lon:-89.35,
+    species:["whitebass","blackcrappie","walleye","sauger","largemouth","channelcat","bluecat"], note:"Illinois's largest inland lake.", best:"Spring white bass & walleye; summer cats.", how:"Spoons for white bass; troll for walleye; cut bait on flats. Many ramps.", size:"~26,000 ac · Carlyle" },
+  { name:"Braidwood Lake", region:"Illinois", type:"reservoir", lat:41.25, lon:-88.27,
+    species:["largemouth","striper","channelcat"], note:"Power-plant cooling lake — trophy largemouth.", best:"Winter & early spring open-water bass.", how:"Crankbaits & plastics; seasonal access at the state site.", size:"~2,640 ac · Braidwood" },
+  { name:"Heidecke Lake", region:"Illinois", type:"reservoir", lat:41.32, lon:-88.27,
+    species:["largemouth","striper","walleye","channelcat"], note:"Cooling lake stocked with hybrid stripers & walleye.", best:"Spring & fall; winter open water.", how:"Spoons & swimbaits for hybrids; jigs for walleye. State-site ramps.", size:"~1,955 ac · Morris" },
+  // ---- Southern Illinois ----
+  { name:"Rend Lake", region:"Illinois", type:"reservoir", lat:38.04, lon:-88.96,
+    species:["blackcrappie","whitecrappie","largemouth","whitebass","channelcat","bluegill"], note:"Shallow, fertile crappie powerhouse.", best:"Apr–May crappie spawn; summer cats.", how:"Jig the brush & riprap; cut bait on flats. Many ramps.", size:"~18,900 ac · Benton/Whittington" },
+  { name:"Kinkaid Lake", region:"Illinois", type:"reservoir", lat:37.77, lon:-89.42,
+    species:["muskie","largemouth","blackcrappie","channelcat"], note:"Clear, deep lake in the Shawnee hills.", best:"Muskie fall; spring bass & crappie.", how:"Bucktails/gliders for muskie; finesse for clear-water bass.", size:"~2,750 ac · Murphysboro" },
+  { name:"Lake of Egypt", region:"Illinois", type:"reservoir", lat:37.62, lon:-88.97,
+    species:["largemouth","redear","blackcrappie","bluegill"], note:"Warm, clear lake with slab shellcrackers.", best:"Spring spawn for bass & redear.", how:"Plastics around docks; worms for redear/bluegill. Ramps & resorts.", size:"~2,300 ac · Marion" },
+  { name:"Crab Orchard Lake", region:"Illinois", type:"reservoir", lat:37.72, lon:-89.08,
+    species:["largemouth","blackcrappie","channelcat","bluegill"], note:"Refuge lake near Carbondale.", best:"Spring bass & crappie.", how:"Spinnerbaits & jigs in the timber; cut bait for cats. Refuge ramps.", size:"~6,965 ac · Carbondale" },
+  { name:"Cedar Lake", region:"Illinois", type:"reservoir", lat:37.62, lon:-89.27,
+    species:["largemouth","blackcrappie","channelcat","bluegill"], note:"Clear Shawnee-area water-supply lake.", best:"Spring spawn.", how:"Finesse plastics on clear water; jig the brush. Electric-only areas.", size:"~1,750 ac · Carbondale" },
+  { name:"Devil's Kitchen Lake", region:"Illinois", type:"reservoir", lat:37.66, lon:-89.10,
+    species:["largemouth","smallmouth","rainbow","bluegill"], note:"Deep, ultra-clear Shawnee lake — bass plus stocked trout.", best:"Spring bass; cool-season stocked trout.", how:"Finesse for clear-water bass; spinners/PowerBait for trout. Electric-only.", size:"~810 ac · Carbondale" },
+  { name:"Lake Murphysboro", region:"Illinois", type:"reservoir", lat:37.77, lon:-89.37,
+    species:["largemouth","blackcrappie","channelcat","bluegill"], note:"Small southern-Illinois state-park lake.", best:"Spring spawn & crappie.", how:"Plastics & jigs around cover; family-friendly bank access.", size:"~145 ac · Murphysboro" },
+  // ---- Big rivers ----
+  { name:"Mississippi River (Alton / Pool 26)", region:"Illinois", type:"bigriver", lat:38.97, lon:-90.19,
+    species:["bluecat","flathead","channelcat","sauger","whitebass","largemouth"], note:"Trophy blue catfish below Mel Price Lock & Dam.", best:"Winter sauger; summer/fall big blues.", how:"Anchor the tailwater with fresh cut shad; jig sauger in cold water.", size:"Pool 26 · Alton" },
+  { name:"Mississippi River (Quad Cities, Pool 14–15)", region:"Illinois", type:"bigriver", lat:41.52, lon:-90.42,
+    species:["walleye","sauger","smallmouth","channelcat","flathead","whitebass"], note:"Famous walleye/sauger tailwaters at Lock & Dam 14–15.", best:"Mar–Apr & Nov walleye; summer cats.", how:"Vertical-jig or three-way blade baits in the current; cranks on wing dams.", size:"Pools 14–15 · Quad Cities" },
+  { name:"Illinois River (Starved Rock)", region:"Illinois", type:"bigriver", lat:41.32, lon:-88.99,
+    species:["sauger","flathead","channelcat","bluecat","whitebass","largemouth"], note:"Classic sauger tailwater below the dam.", best:"Late fall–winter sauger; summer cats.", how:"Vertical-jig hair jigs/minnows in the tailrace; cut bait for flatheads.", size:"Starved Rock pool · Ottawa/Utica" },
+  { name:"Ohio River (Golconda)", region:"Illinois", type:"bigriver", lat:37.36, lon:-88.55,
+    species:["bluecat","flathead","channelcat","sauger","striper"], note:"Far-southern border river.", best:"Summer/fall blues; winter sauger.", how:"Anchor below the dams & holes with cut bait; jig sauger.", size:"Ohio R. · Golconda" },
+  { name:"Wabash River (eastern border)", region:"Illinois", type:"bigriver", lat:38.40, lon:-87.75,
+    species:["smallmouth","channelcat","flathead","sauger"], note:"IL/IN boundary river — smallmouth & trophy flatheads.", best:"Spring smb; summer flatheads.", how:"Tubes on the gravel up top; live bait in the deep holes for flatheads.", size:"IL/IN border · Mt. Carmel" },
+  { name:"Kaskaskia River", region:"Illinois", type:"bigriver", lat:38.65, lon:-89.92,
+    species:["largemouth","blackcrappie","channelcat","flathead","bluecat"], note:"Navigable central/southern river & side lakes.", best:"Spring crappie & bass; summer cats.", how:"Backwaters & oxbows for bass/crappie; cut bait in the channel.", size:"Navigable river · New Athens" },
+  { name:"Sangamon River", region:"Illinois", type:"smbriver", lat:39.95, lon:-89.40,
+    species:["smallmouth","channelcat","flathead"], note:"Prairie river with smallmouth and trophy flatheads.", best:"Spring smb; summer flatheads.", how:"Wade/kayak; soft plastics up top; live bait in the deep holes.", size:"Prairie river · Petersburg/Decatur" }
+  /* APPEND-HERE */
+];
+
+</script>
+<script>
+/* ============================================================
+   FishDex app logic v2
+   ============================================================ */
+
+// Runtime polygon sources (browser fetch; falls back in order).
+const GEO_SOURCES = [
+  { key:"us", urls:[
+      "https://cdn.jsdelivr.net/gh/PublicaMundi/MappingAPI@master/data/geojson/us-states.json",
+      "https://raw.githubusercontent.com/python-visualization/folium/main/examples/data/us-states.json",
+      "https://cdn.jsdelivr.net/gh/codeforgermany/click_that_hood@main/public/data/united-states.geojson"
+  ]},
+  { key:"ca", urls:[
+      "https://cdn.jsdelivr.net/gh/codeforgermany/click_that_hood@main/public/data/canada.geojson",
+      "https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/canada.geojson"
+  ]},
+  { key:"mx", urls:[
+      "https://cdn.jsdelivr.net/gh/codeforgermany/click_that_hood@main/public/data/mexico.geojson",
+      "https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/mexico.geojson"
+  ]}
+];
+
+const state = {
+  angling:false, month:"", tod:new Set(), water:new Set(),
+  selectedFish:null, selectedSub:null, selectedState:null, selectedEco:null, query:""
+};
+
+let map, stateLayers={}, normIndex={};  // normIndex: normalized name -> display name
+
+// Contiguous-US states: when a fish has ecoregion data, these are shown via
+// ecoregion polygons instead of whole-state fills (AK/HI/Canada/Mexico stay state-level).
+const LOWER48 = new Set(["Alabama","Arizona","Arkansas","California","Colorado","Connecticut","Delaware",
+  "Florida","Georgia","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine",
+  "Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada",
+  "New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma",
+  "Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah",
+  "Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"].map(s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()));
+
+/* ---------- name normalization (accent/case-insensitive) ---------- */
+function norm(s){ return (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()
+  .replace(/[^a-z0-9 ]/g,"").replace(/\s+/g," ").trim(); }
+
+function fishById(id){ return FISH.find(f=>f.id===id); }
+function fishStates(f, subIdx){
+  if(subIdx!=null && f.subs && f.subs[subIdx]) return f.subs[subIdx].states;
+  return f.states;
+}
+function fishStatesNorm(f, subIdx){ return new Set(fishStates(f,subIdx).map(norm)); }
+
+/* ---------- ecoregion range helpers (US freshwater sharpening) ---------- */
+// usesEco requires ecoData to be loaded; until then a fish falls back to whole-state display.
+function usesEco(f, subIdx){ return subIdx==null && !!ecoData && typeof ECO_RANGE!=="undefined" && !!ECO_RANGE[f.id]; }
+function fishEco(f, subIdx){ return usesEco(f,subIdx) ? ECO_RANGE[f.id] : []; }
+function fishEcoNorm(f, subIdx){ return new Set(fishEco(f,subIdx).map(norm)); }
+// states to highlight for a fish: if it has eco, drop lower-48 (shown as ecoregions) but keep AK/HI/Canada/Mexico
+function fishHighlightStates(f, subIdx){
+  const sts=fishStates(f,subIdx);
+  return usesEco(f,subIdx) ? sts.filter(s=>!LOWER48.has(norm(s))) : sts;
+}
+
+/* ---------- bite score (blend month + time of day) ---------- */
+function monthScore(f){
+  if(state.month==="") return null;
+  const m=+state.month;
+  let best=99;
+  for(const bm of f.bestMonths){ let d=Math.abs(bm-m); d=Math.min(d,12-d); best=Math.min(best,d); }
+  if(best===0) return 1; if(best===1) return 0.6; if(best===2) return 0.3; return 0.1;
+}
+function todScore(f){
+  if(state.tod.size===0) return null;
+  return f.tod.some(t=>state.tod.has(t)) ? 1 : 0.2;
+}
+function evalFish(f){
+  if(state.water.size && !f.water.some(w=>state.water.has(w))) return {visible:false};
+  if(!state.angling) return {visible:true, rating:null, pct:null};
+  const parts=[monthScore(f),todScore(f)].filter(x=>x!==null);
+  if(parts.length===0) return {visible:true, rating:"good", pct:65};
+  const avg=parts.reduce((a,b)=>a+b,0)/parts.length;
+  const pct=Math.round(avg*100);
+  const rating = avg>=0.75?"peak":avg>=0.42?"good":"slow";
+  return {visible:true, rating, pct};
+}
+
+/* ---------- fish silhouettes (inline SVG) ---------- */
+function fishSVG(shape, color, w){
+  w=w||44; const h=Math.round(w*0.6);
+  const c=color||"#5bbf9b", dk="rgba(0,0,0,.35)";
+  let body;
+  switch(shape){
+    case "pike": case "gar":
+      body=`<path d="M2 30 C20 16,55 16,78 27 L96 19 L90 30 L96 41 L78 33 C55 44,20 44,2 30 Z" fill="${c}"/>
+            <circle cx="20" cy="28" r="2.4" fill="${dk}"/>`; break;
+    case "flounder":
+      body=`<ellipse cx="46" cy="30" rx="42" ry="20" fill="${c}"/>
+            <path d="M88 30 l8 -6 v12 z" fill="${c}"/><circle cx="30" cy="24" r="2.6" fill="${dk}"/>`; break;
+    case "marlin":
+      body=`<path d="M30 30 C45 16,78 16,92 28 L98 22 L94 30 L98 38 L92 32 C78 44,45 44,30 30 Z" fill="${c}"/>
+            <path d="M30 30 L0 22 L26 30 L0 38 Z" fill="${c}"/>
+            <path d="M52 17 C56 9,64 8,70 12" stroke="${c}" stroke-width="3" fill="none"/>
+            <circle cx="78" cy="27" r="2.4" fill="${dk}"/>`; break;
+    case "tuna":
+      body=`<path d="M6 30 C22 14,64 14,82 27 L98 16 L92 30 L98 44 L82 33 C64 46,22 46,6 30 Z" fill="${c}"/>
+            <path d="M40 16 l5 -7 l3 8 z" fill="${c}"/><circle cx="22" cy="27" r="2.6" fill="${dk}"/>`; break;
+    case "catfish":
+      body=`<path d="M4 30 C22 18,58 18,80 28 L96 20 L90 30 L96 40 L80 32 C58 42,22 42,4 30 Z" fill="${c}"/>
+            <circle cx="22" cy="27" r="2.4" fill="${dk}"/>
+            <path d="M14 30 q-8 4 -14 2 M14 31 q-8 7 -15 8" stroke="${c}" stroke-width="1.6" fill="none"/>`; break;
+    case "sturgeon":
+      body=`<path d="M0 31 C24 22,60 22,86 28 L98 24 L94 31 L98 38 L86 34 C60 40,24 40,0 31 Z" fill="${c}"/>
+            <path d="M10 24 L86 27" stroke="${dk}" stroke-width="1" opacity=".5"/>
+            <circle cx="20" cy="29" r="2" fill="${dk}"/>`; break;
+    default: // generic rounded gamefish
+      body=`<path d="M4 30 C20 14,60 14,80 26 L98 16 L92 30 L98 44 L80 34 C60 46,20 46,4 30 Z" fill="${c}"/>
+            <path d="M80 26 L98 16 L92 30 Z" fill="${c}"/>
+            <circle cx="22" cy="27" r="2.6" fill="${dk}"/>
+            <path d="M44 18 C50 24,50 36,44 42" stroke="${dk}" stroke-width="1" fill="none" opacity=".35"/>`;
+  }
+  return `<svg viewBox="0 0 100 60" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+}
+function stars(n){ return "★★★★★".slice(0,n)+"☆☆☆☆☆".slice(0,5-n); }
+
+/* ---------- rolodex render ---------- */
+function renderList(){
+  const list=document.getElementById("list"); const q=norm(state.query);
+  const selStateNorm = state.selectedState?norm(state.selectedState):null;
+  const selEcoNorm = state.selectedEco?norm(state.selectedEco):null;
+
+  let items=FISH.filter(f=>{
+    if(selEcoNorm && !fishEcoNorm(f).has(selEcoNorm)) return false;
+    if(selStateNorm && !fishStatesNorm(f).has(selStateNorm)) return false;
+    if(q){
+      const hay=norm(f.name+" "+f.sci+" "+f.family+" "+f.baits.join(" ")+" "+(f.diet||"")+" "+
+        (f.subs?f.subs.map(s=>s.n).join(" "):""));
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const groups={}; items.forEach(f=>{ (groups[f.family]=groups[f.family]||[]).push(f); });
+  list.innerHTML=""; let shown=0;
+
+  Object.keys(groups).forEach(fam=>{
+    // pre-eval to know if group has any visible
+    const vis=groups[fam].map(f=>({f,ev:evalFish(f)})).filter(x=>x.ev.visible);
+    if(!vis.length) return;
+    const g=document.createElement("div"); g.className="grp";
+    g.innerHTML=`<span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${FAMILY_COLOR[fam]||'#5bbf9b'};margin-right:6px"></span>${fam} <span style="opacity:.6">(${vis.length})</span>`;
+    list.appendChild(g);
+
+    // sort by bite pct when angling
+    if(state.angling) vis.sort((a,b)=>(b.ev.pct||0)-(a.ev.pct||0));
+
+    vis.forEach(({f,ev})=>{
+      shown++;
+      const card=document.createElement("div");
+      card.className="card"+(state.selectedFish===f.id?" sel":"")+(ev.rating==="slow"?" dim":"")+
+        (state.selectedFish===f.id && f.subs?" open":"");
+      card.dataset.id=f.id;
+
+      let bite="";
+      if(state.angling && ev.rating){
+        const lbl=ev.rating==="peak"?`● Biting ${ev.pct}%`:ev.rating==="good"?`◐ Active ${ev.pct}%`:`○ Slow ${ev.pct}%`;
+        bite=`<span class="bite ${ev.rating}">${lbl}</span>`;
+      }
+      const waterPills=f.water.slice(0,3).map(w=>`<span class="pill">${WATER_LABEL[w]||w}</span>`).join("");
+      let subsHtml="";
+      if(f.subs){ subsHtml=`<div class="subs">`+f.subs.map((s,i)=>
+        `<div class="sub ${state.selectedFish===f.id&&state.selectedSub===i?'sel':''}" data-sub="${i}">
+           <span class="sn">${s.n}</span><span class="ss">${s.s}</span></div>`).join("")+`</div>`; }
+
+      card.innerHTML=`
+        <div class="row1">
+          <span class="thumb">${fishSVG(f.shape, FAMILY_COLOR[f.family])}</span>
+          <div style="min-width:0;flex:1">
+            <div class="nm">${f.name}</div>
+            <div class="sci">${f.sci}</div>
+          </div>
+          ${bite}
+        </div>
+        <div class="meta">${waterPills}<span class="pill fight">${stars(f.fight)}</span>${f.subs?`<span class="pill">${f.subs.length} subsp.</span>`:""}</div>
+        ${subsHtml}`;
+      list.appendChild(card);
+    });
+  });
+
+  if(shown===0){
+    const where=state.selectedEco||state.selectedState;
+    list.innerHTML=`<div style="padding:30px 16px;color:var(--muted);text-align:center">
+      No fish match these filters.${where?`<br>Try clearing the <b>${where}</b> location.`:""}</div>`;
+  }
+  document.getElementById("count").textContent=shown+" / "+FISH.length+" species";
+}
+
+/* ---------- context bar ---------- */
+function renderCtx(){
+  const ctx=document.getElementById("ctx");
+  if(state.selectedEco){
+    ctx.innerHTML=`<span>Fish in the <b>${state.selectedEco}</b> ecoregion</span><button id="clearEco">Clear</button>`;
+    document.getElementById("clearEco").onclick=()=>setSelectedEco(null);
+  } else if(state.selectedState){
+    ctx.innerHTML=`<span>Fish found in <b>${state.selectedState}</b></span><button id="clearState">Clear location</button>`;
+    document.getElementById("clearState").onclick=()=>setSelectedState(null);
+  } else if(state.selectedFish){
+    const f=fishById(state.selectedFish);
+    const sub=state.selectedSub!=null&&f.subs?" — "+f.subs[state.selectedSub].n:"";
+    ctx.innerHTML=`<span>Range shown for <b>${f.name}${sub}</b></span><button id="clearFish">Show all</button>`;
+    document.getElementById("clearFish").onclick=()=>selectFish(null);
+  } else {
+    ctx.innerHTML=`<span>Showing all North American game fish</span>`;
+  }
+}
+
+/* ---------- map ---------- */
+const HILITE={weight:1.2, color:"#0c2a22", fillColor:"#37b6a0", fillOpacity:.82};
+const DIM={weight:.5, color:"#21404c", fillColor:"#11242c", fillOpacity:.32};
+function styleState(name){
+  const nn=norm(name);
+  const base={weight:.8, color:"#2b4d59", fillColor:"#16323c", fillOpacity:.5};
+  if(state.selectedFish){
+    const f=fishById(state.selectedFish);
+    const sts=new Set(fishHighlightStates(f, state.selectedSub).map(norm));
+    return sts.has(nn) ? HILITE : DIM;
+  }
+  if(state.selectedEco) return DIM; // dim states so the ecoregion reads clearly
+  if(state.selectedState && norm(state.selectedState)===nn)
+    return {weight:2, color:"#5ad1bb", fillColor:"#26566b", fillOpacity:.85};
+  return base;
+}
+function restyle(){
+  for(const k in stateLayers) stateLayers[k].setStyle(styleState(stateLayers[k]._fdName));
+  if(ecoLayer) ecoLayer.setStyle(styleEcoFeature);
+}
+
+function onEachState(feature, layer){
+  const name=feature.properties.name || feature.properties.NAME || "—";
+  layer._fdName=name;
+  stateLayers[norm(name)]=layer; normIndex[norm(name)]=name;
+  layer.bindTooltip(name,{className:"stt",sticky:true});
+  layer.on({
+    mouseover:e=>{ const s=styleState(name); e.target.setStyle({weight:2.2,color:"#5ad1bb",fillOpacity:Math.min(.95,s.fillOpacity+.15)}); e.target.bringToFront(); },
+    mouseout:e=>e.target.setStyle(styleState(name)),
+    click:()=>setSelectedState(name)
+  });
+}
+
+function initMap(){
+  map=L.map("map",{minZoom:2,maxZoom:8,zoomControl:true,worldCopyJump:true}).setView([44,-96],3);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{
+    attribution:'&copy; OpenStreetMap, &copy; CARTO • boundaries: click_that_hood', subdomains:"abcd", maxZoom:8
+  }).addTo(map);
+  let loaded=0;
+  GEO_SOURCES.forEach(src=>loadGeo(src.urls,0,()=>{ loaded++; if(loaded>=GEO_SOURCES.length){ document.getElementById("loading").style.display="none"; restyle(); }}));
+}
+function loadGeo(urls, i, done){
+  if(i>=urls.length){ console.warn("FishDex: all sources failed for",urls[0]); done(); return; }
+  fetch(urls[i]).then(r=>{ if(!r.ok) throw 0; return r.json(); })
+    .then(geo=>{ L.geoJSON(geo,{style:f=>styleState(f.properties.name||f.properties.NAME),onEachFeature:onEachState}).addTo(map); done(); })
+    .catch(()=>loadGeo(urls,i+1,done));
+}
+
+/* ---------- ecoregion layer (EPA Level III) ----------
+   ecoData : parsed FeatureCollection (loaded once)
+   ecoMode : toggle — interactive ecoregion filtering + colored overview
+   The layer is shown when: ecoMode, or an ecoregion is selected, or a
+   selected fish has ecoregion data. Interactive only in ecoMode, so
+   state click-to-filter still works underneath otherwise. */
+let ecoData=null, ecoLayer=null, ecoMode=false, ecoLoading=false;
+const ECO_PALETTE=["#caa24a","#6fae54","#5aa9d6","#cf8f6f","#9b7fd1","#5ec2a0","#d6a05a","#88909e","#c77f9e","#7bb25e","#bf6f6f","#5a86d6"];
+const ECO_L1_COLOR={};
+function ecoColor(name){ name=name||"—"; if(!(name in ECO_L1_COLOR)) ECO_L1_COLOR[name]=ECO_PALETTE[Object.keys(ECO_L1_COLOR).length%ECO_PALETTE.length]; return ECO_L1_COLOR[name]; }
+function ecoBandStyle(f){ const c=ecoColor(f&&f.properties&&f.properties.NA_L1NAME); return {color:c,weight:.5,fillColor:c,fillOpacity:.18}; }
+const ECO_HIDE={color:"#000",weight:0,fillColor:"#000",fillOpacity:0};
+function styleEcoFeature(f){
+  const nn=norm(f&&f.properties&&f.properties.US_L3NAME);
+  if(state.selectedFish){
+    const fish=fishById(state.selectedFish);
+    if(usesEco(fish,state.selectedSub)){
+      return fishEcoNorm(fish,state.selectedSub).has(nn)
+        ? {color:"#0c2a22",weight:.8,fillColor:"#37b6a0",fillOpacity:.8}
+        : (ecoMode?ecoBandStyle(f):ECO_HIDE);
+    }
+    return ecoMode?ecoBandStyle(f):ECO_HIDE;
+  }
+  if(state.selectedEco){
+    return norm(state.selectedEco)===nn
+      ? {color:"#5ad1bb",weight:1.6,fillColor:"#37b6a0",fillOpacity:.72}
+      : (ecoMode?ecoBandStyle(f):ECO_HIDE);
+  }
+  return ecoMode?ecoBandStyle(f):ECO_HIDE;
+}
+function onEachEco(feature, layer){
+  const nm=feature.properties&&feature.properties.US_L3NAME;
+  layer.bindTooltip(nm||"Ecoregion",{className:"eco",sticky:true});
+  layer.on("click",()=>setSelectedEco(nm));
+}
+function buildEcoLayer(){
+  if(!ecoData) return;
+  ecoLayer=L.geoJSON(ecoData,{interactive:ecoMode, style:styleEcoFeature, onEachFeature: ecoMode?onEachEco:undefined});
+}
+// decide presence + (re)build the eco layer to match current selection/mode
+function refreshEco(){
+  const show = ecoMode || state.selectedEco || (state.selectedFish && usesEco(fishById(state.selectedFish), state.selectedSub));
+  if(ecoLayer){ map.removeLayer(ecoLayer); ecoLayer=null; }
+  if(show && ecoData){ buildEcoLayer(); ecoLayer.addTo(map); ecoLayer.bringToFront(); }
+}
+function loadEcoData(urls,i,cb){
+  if(i>=urls.length){ cb(false); return; }
+  fetch(urls[i]).then(r=>r.ok?r.json():Promise.reject()).then(geo=>{ ecoData=geo; cb(true); }).catch(()=>loadEcoData(urls,i+1,cb));
+}
+function preloadEco(){ if(!ecoData && !ecoLoading){ ecoLoading=true; loadEcoData(ECOREGION_SOURCES,0,(ok)=>{ ecoLoading=false; if(ok){ refreshEco(); restyle(); } }); } }
+function toggleEcoMode(){
+  const btn=document.getElementById("ecoBtn");
+  const setBtn=(on,txt)=>{ btn.classList.toggle("on",on); btn.textContent="🗺️ "+(txt||("Ecoregions: "+(on?"on":"off"))); };
+  const hint=document.getElementById("hint");
+  if(!ecoData){
+    setBtn(false,"Ecoregions: loading…");
+    loadEcoData(ECOREGION_SOURCES,0,(ok)=>{ if(ok){ ecoMode=true; setBtn(true); hint.textContent="Ecoregion mode: click an ecoregion to see its fish."; refreshEco(); restyle(); }
+      else { setBtn(false,"Ecoregions: unavailable"); setTimeout(()=>setBtn(false),2600); } });
+    return;
+  }
+  ecoMode=!ecoMode; setBtn(ecoMode);
+  hint.textContent = ecoMode ? "Ecoregion mode: click an ecoregion to see its fish."
+                             : "Tip: click any state, province, or Mexican state to see what swims there.";
+  refreshEco(); restyle();
+}
+
+/* ---------- notable waters (named-waterbody pins) ---------- */
+let waterLayer=L.layerGroup(), waterMarkers={};
+function watersToShow(){
+  if(state.selectedFish) return (typeof WATERS!=="undefined"?WATERS:[]).filter(w=>w.species.includes(state.selectedFish));
+  if(state.selectedState) return (typeof WATERS!=="undefined"?WATERS:[]).filter(w=>w.region===state.selectedState);
+  return [];
+}
+function makeWaterPopup(w){
+  const t=WATER_TYPE[w.type]||{label:w.type,color:"#888"};
+  const el=document.createElement("div"); el.className="wpop";
+  el.innerHTML=`<div class="wph"><span class="wdot" style="background:${t.color}"></span><b>${w.name}</b></div>
+    <div class="wtype">${t.label} · ${w.region}${w.depth?` · <span style="color:#9fd8d2">${w.depth}</span>`:""}</div>
+    <div class="wnote">${w.note}</div>
+    ${w.best?`<div class="wmeta"><b>Best</b> ${w.best}</div>`:""}
+    ${w.how?`<div class="wmeta"><b>How</b> ${w.how}</div>`:""}
+    ${w.size?`<div class="wmeta"><b>Where</b> ${w.size}</div>`:""}
+    <div class="wsp">${w.species.map(id=>{const f=fishById(id);return f?`<span class="wchip" data-fid="${id}">${f.name}</span>`:"";}).join("")}</div>`;
+  el.querySelectorAll(".wchip").forEach(c=>c.addEventListener("click",()=>selectFish(c.dataset.fid)));
+  return el;
+}
+function refreshWaters(){
+  waterLayer.clearLayers(); waterMarkers={};
+  watersToShow().forEach(w=>{
+    const t=WATER_TYPE[w.type]||{color:"#888"};
+    // HTML divIcon marker -> lives in markerPane, above all polygons (so state/eco
+    // hover bringToFront can't paint over it).
+    const icon=L.divIcon({className:"wpin", html:`<span style="background:${t.color}"></span>`, iconSize:[18,18], iconAnchor:[9,9], popupAnchor:[0,-8]});
+    const m=L.marker([w.lat,w.lon],{icon, riseOnHover:true, title:w.name});
+    m.bindPopup(()=>makeWaterPopup(w),{maxWidth:260,className:"wpopwrap"});
+    m.bindTooltip(w.name,{direction:"top",offset:[0,-9]});
+    m.addTo(waterLayer); waterMarkers[w.name]=m;
+  });
+  if(map && !map.hasLayer(waterLayer)) waterLayer.addTo(map);
+}
+
+/* ---------- info card ---------- */
+const photoCache={};
+function loadPhoto(f, imgEl, creditEl){
+  const title=(typeof WIKI!=="undefined")?WIKI[f.id]:null; if(!title||!imgEl) return;
+  const apply=(o)=>{ if(!o||!o.src) return; imgEl.onload=()=>{imgEl.style.display="block";}; imgEl.src=o.src; if(creditEl&&o.credit) creditEl.textContent=o.credit; };
+  if(photoCache[f.id]!==undefined){ apply(photoCache[f.id]); return; }
+  fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title))
+    .then(r=>r.ok?r.json():Promise.reject())
+    .then(d=>{
+      let src=(d.thumbnail&&d.thumbnail.source)||(d.originalimage&&d.originalimage.source)||null;
+      if(src) src=src.replace(/\/\d+px-/,"/500px-");
+      const o = src?{src,credit:"Photo: Wikipedia / "+(d.title||title)}:null;
+      photoCache[f.id]=o; apply(o);
+    }).catch(()=>{ photoCache[f.id]=null; });
+}
+function renderInfo(){
+  const box=document.getElementById("info");
+  if(state.selectedFish){ renderFishInfo(box); box.classList.add("show"); return; }
+  if(state.selectedEco){ renderEcoInfo(box); box.classList.add("show"); return; }
+  if(state.selectedState){ renderStateInfo(box); box.classList.add("show"); return; }
+  box.classList.remove("show");
+}
+function renderEcoInfo(box){
+  const name=state.selectedEco;
+  const here=FISH.filter(f=>fishEcoNorm(f).has(norm(name)));
+  let l1="";
+  if(ecoData){ const ft=ecoData.features.find(f=>norm(f.properties.US_L3NAME)===norm(name)); if(ft) l1=(ft.properties.NA_L1NAME||"").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()); }
+  const pills=here.map(f=>`<span class="pill" data-fid="${f.id}">${f.name}</span>`).join("")
+    ||'<span style="color:var(--muted);font-size:12px">No freshwater species tagged here yet.</span>';
+  box.innerHTML=`<div class="pad">
+    <div class="ihead"><span style="font-size:22px">🗺️</span><div><h3>${name}</h3>
+      <div class="sci">EPA Level III ecoregion${l1?" · "+l1:""}</div></div></div>
+    <div class="kv">${here.length} freshwater species tagged to this ecoregion.</div>
+    <div class="kv" style="margin-top:8px"><b>Species here</b> <span style="color:var(--muted)">(tap to view range)</span></div>
+    <div class="speclist">${pills}</div>
+    <div class="disclaimer">Ecoregion ranges are curated approximations for freshwater fish. Marine species and Alaska/Hawaii/Canada/Mexico stay state-level.</div>
+  </div>`;
+  box.querySelectorAll(".speclist .pill[data-fid]").forEach(p=>p.onclick=()=>selectFish(p.dataset.fid));
+}
+function renderFishInfo(box){
+  const f=fishById(state.selectedFish);
+  const sub=state.selectedSub!=null&&f.subs?f.subs[state.selectedSub]:null;
+  const months=f.bestMonths.map(m=>MONTHS[m-1].slice(0,3)).join(", ");
+  const tod=f.tod.map(t=>TOD_LABEL[t]).join(", ");
+  box.innerHTML=`
+    <img class="hero" alt="${f.name}">
+    <div class="pad">
+      <div class="ihead">
+        <span class="iart">${fishSVG(f.shape,FAMILY_COLOR[f.family],60)}</span>
+        <div><h3>${f.name}${sub?` <span class="subname">(${sub.n})</span>`:""}</h3>
+        <div class="sci">${sub?sub.s:f.sci}</div></div>
+      </div>
+      <div class="kv"><b>Family:</b> ${f.family} &nbsp;·&nbsp; <b>Fight:</b> <span class="stars">${stars(f.fight)}</span></div>
+      <div class="kv"><b>Habitat:</b> ${f.habitat}</div>
+      <div class="kv"><b>Diet:</b> ${f.diet}</div>
+      <div class="kv"><b>Best months:</b> ${months} &nbsp;·&nbsp; <b>Time:</b> ${tod}</div>
+      <div class="kv"><b>Water temp:</b> ${f.tempF} &nbsp;·&nbsp; <b>World record:</b> ${f.record} lb</div>
+      ${f.tide?`<div class="kv"><b>Tide / solunar:</b> ${f.tide}</div>`:""}
+      <div class="kv"><b>Regs:</b> <span style="color:var(--warn)">${f.regs}</span> <span style="color:var(--muted)">— click a state for official limits.</span></div>
+      <div class="kv"><b>Tip:</b> ${f.tip}</div>
+      <div class="kv" style="margin-top:6px"><b>What they're biting:</b></div>
+      <div class="baits">${f.baits.map(b=>`<span class="pill">${b}</span>`).join("")}</div>
+      ${waterChipsHtml(f)}
+      <div class="credit"></div>
+    </div>`;
+  loadPhoto(f, box.querySelector(".hero"), box.querySelector(".credit"));
+  box.querySelectorAll(".waterchip").forEach(c=>c.onclick=()=>{
+    const m=waterMarkers[c.dataset.w]; if(m){ map.setView(m.getLatLng(),9,{animate:true}); m.openPopup(); }
+  });
+}
+function waterChipsHtml(f){
+  const ws=(typeof WATERS!=="undefined"?WATERS:[]).filter(w=>w.species.includes(f.id));
+  if(!ws.length) return "";
+  const regions=[...new Set(ws.map(w=>w.region))].join(" & ");
+  return `<div class="kv" style="margin-top:8px"><b>Notable waters</b> <span style="color:var(--muted)">(${regions} — tap to zoom)</span></div>
+    <div class="waters">${ws.map(w=>`<span class="waterchip" data-w="${w.name}">📍 ${w.name}</span>`).join("")}</div>`;
+}
+function renderStateInfo(box){
+  const name=state.selectedState;
+  const here=FISH.filter(f=>fishStatesNorm(f).has(norm(name)));
+  const reg = STATE_REGS[name] || (typeof MX_STATES!=="undefined"&&MX_STATES.has(name)?MX_REGS:null);
+  const pills=here.slice(0,48).map(f=>`<span class="pill" data-fid="${f.id}">${f.name}</span>`).join("")
+    ||'<span style="color:var(--muted);font-size:12px">No species in this guide yet for here.</span>';
+  box.innerHTML=`<div class="pad">
+    <div class="ihead"><span style="font-size:22px">📍</span><div><h3>${name}</h3>
+      <div class="sci">${here.length} game species in this guide</div></div></div>
+    ${reg?`<div class="kv"><b>Official source:</b> ${reg.agency}</div>
+      <a class="reglink" href="${reg.url}" target="_blank" rel="noopener noreferrer">📋 Regulations & licenses ↗</a>
+      <div class="disclaimer">Bag, size & season limits change yearly and vary by waterbody — always confirm current rules on the official site before you fish.</div>`
+     :`<div class="kv" style="color:var(--muted)">No official-source link on file for this region yet.</div>`}
+    <div class="kv" style="margin-top:10px"><b>Species found here</b> <span style="color:var(--muted)">(tap to view range)</span></div>
+    <div class="speclist">${pills}</div>
+  </div>`;
+  box.querySelectorAll(".speclist .pill[data-fid]").forEach(p=>p.onclick=()=>selectFish(p.dataset.fid));
+}
+
+/* ---------- selection ---------- */
+function selectFish(id, subIdx=null){
+  if(state.selectedFish===id && state.selectedSub===subIdx && id!==null){ state.selectedFish=null; state.selectedSub=null; }
+  else { state.selectedFish=id; state.selectedSub=subIdx; if(id){ state.selectedState=null; state.selectedEco=null; } }
+  refreshEco(); refreshWaters(); restyle(); renderInfo(); renderList(); renderCtx();
+  if(id){
+    const f=fishById(id); const b=L.latLngBounds([]);
+    fishHighlightStates(f,subIdx).map(norm).forEach(n=>{ const ly=stateLayers[n]; if(ly){ try{ b.extend(ly.getBounds()); }catch(e){} } });
+    if(usesEco(f,subIdx) && ecoLayer){ const set=fishEcoNorm(f,subIdx); ecoLayer.eachLayer(l=>{ if(l.feature && set.has(norm(l.feature.properties.US_L3NAME))){ try{ b.extend(l.getBounds()); }catch(e){} } }); }
+    if(b.isValid()){ try{ map.fitBounds(b.pad(0.12),{maxZoom:6,animate:true}); }catch(e){} }
+  }
+}
+function setSelectedState(name){
+  state.selectedState=(state.selectedState===name)?null:name;
+  if(state.selectedState){ state.selectedFish=null; state.selectedSub=null; state.selectedEco=null; }
+  refreshEco(); refreshWaters(); renderInfo(); restyle(); renderList(); renderCtx();
+}
+function setSelectedEco(name){
+  state.selectedEco=(state.selectedEco===name)?null:name;
+  if(state.selectedEco){ state.selectedFish=null; state.selectedSub=null; state.selectedState=null; }
+  refreshEco(); refreshWaters(); renderInfo(); restyle(); renderList(); renderCtx();
+  if(state.selectedEco && ecoLayer){
+    let lyr=null; ecoLayer.eachLayer(l=>{ if(l.feature && norm(l.feature.properties.US_L3NAME)===norm(state.selectedEco)) lyr=l; });
+    if(lyr){ try{ map.fitBounds(lyr.getBounds().pad(0.25),{maxZoom:6,animate:true}); }catch(e){} }
+  }
+}
+
+/* ---------- filters UI ---------- */
+function buildFilterUI(){
+  const monthSel=document.getElementById("month");
+  MONTHS.forEach((m,i)=>{ const o=document.createElement("option"); o.value=i+1; o.textContent=m; monthSel.appendChild(o); });
+  monthSel.onchange=()=>{ state.month=monthSel.value; renderList(); };
+
+  document.getElementById("nowBtn").onclick=()=>{
+    const m=new Date().getMonth()+1; state.month=String(m); monthSel.value=m;
+    const hr=new Date().getHours();
+    const t = hr<7?"dawn":hr<11?"morning":hr<14?"midday":hr<17?"afternoon":hr<20?"dusk":"night";
+    state.tod=new Set([t]);
+    document.querySelectorAll('#tod button').forEach(b=>b.classList.toggle("on",b.dataset.k===t));
+    if(!state.angling) document.getElementById("angleToggle").click();
+    renderList();
+  };
+
+  const todBox=document.getElementById("tod");
+  TOD_ORDER.forEach(t=>{ const b=document.createElement("button"); b.textContent=TOD_LABEL[t]; b.dataset.k=t;
+    b.onclick=()=>{ b.classList.toggle("on"); state.tod.has(t)?state.tod.delete(t):state.tod.add(t); renderList(); }; todBox.appendChild(b); });
+
+  const waterBox=document.getElementById("water");
+  Object.keys(WATER_LABEL).forEach(w=>{ const b=document.createElement("button"); b.textContent=WATER_LABEL[w]; b.dataset.k=w;
+    b.onclick=()=>{ b.classList.toggle("on"); state.water.has(w)?state.water.delete(w):state.water.add(w); renderList(); }; waterBox.appendChild(b); });
+
+  document.getElementById("ecoBtn").onclick=toggleEcoMode;
+
+  const tgl=document.getElementById("angleToggle");
+  tgl.onclick=()=>{ state.angling=!state.angling; tgl.classList.toggle("on",state.angling);
+    document.getElementById("angleFilters").classList.toggle("hide",!state.angling);
+    document.getElementById("hint").textContent=state.angling?"Set month & time to rank what's biting now.":"Tip: click any state, province, or Mexican state to see what swims there.";
+    renderList(); };
+}
+function renderLegend(){
+  document.getElementById("legend").innerHTML=`
+    <div><i style="background:#37b6a0"></i>Selected range (state or ecoregion)</div>
+    <div><i style="background:#26566b"></i>Clicked location</div>
+    <div><i style="background:#16323c"></i>Other states / provinces</div>
+    <div><i style="background:#7cc0e0;border-radius:50%"></i>📍 Notable water (tap pin)</div>
+    <div style="margin-top:3px;font-size:10px;opacity:.7">US freshwater fish show ecoregion ranges</div>`;
+}
+
+/* ---------- events ---------- */
+function wireList(){
+  document.getElementById("list").addEventListener("click",e=>{
+    const subEl=e.target.closest(".sub"); const card=e.target.closest(".card");
+    if(subEl&&card){ selectFish(card.dataset.id,+subEl.dataset.sub); return; }
+    if(card) selectFish(card.dataset.id);
+  });
+  const q=document.getElementById("q"); q.addEventListener("input",()=>{ state.query=q.value; renderList(); });
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+  buildFilterUI(); wireList(); renderLegend(); renderList(); renderCtx(); initMap();
+  setTimeout(preloadEco, 1200); // warm the ecoregion data so fish ranges render instantly
+});
+
+</script>
+</body>
+</html>
