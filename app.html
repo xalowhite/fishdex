@@ -26,6 +26,14 @@
     border-radius:7px;padding:5px 10px;margin-right:10px}
   .hdrlink:hover{border-color:var(--accent);background:#16323c}
   .main{display:flex;flex:1;min-height:0}
+  .introbar{display:flex;align-items:center;gap:12px;padding:9px 16px;background:#143b40;
+    border-bottom:1px solid var(--line);font-size:13px;color:#d7ecea;flex:0 0 auto}
+  .introbar.hide{display:none}
+  .introbar a{color:var(--accent2);font-weight:600}
+  .introbar b{color:var(--ink)}
+  .introbar button{margin-left:auto;background:var(--accent);border:none;color:#06231d;font-weight:700;
+    border-radius:7px;padding:6px 12px;font-size:12.5px;cursor:pointer;white-space:nowrap}
+  @media(max-width:600px){.introbar{font-size:12px;padding:8px 12px}}
 
   /* ---------- Rolodex (left) ---------- */
   .rolodex{width:38%;max-width:480px;min-width:300px;display:flex;flex-direction:column;
@@ -188,6 +196,10 @@
     <a href="learn.html" class="hdrlink">📚 Learn</a>
     <span class="tag" id="count"></span>
   </header>
+  <div class="introbar hide" id="intro">
+    <span>👋 <b>New here?</b> Click a <b>state</b> on the map to see what swims there, or pick a <b>fish</b> for its range, best waters &amp; how to catch it. Toggle <b>Angling mode</b> for "what's biting now." New to fishing? <a href="learn.html">📚 Start with Learn</a>.</span>
+    <button id="introX">Got it</button>
+  </div>
   <div class="main">
     <aside class="rolodex">
       <div class="search">
@@ -329,7 +341,7 @@ const FISH = [
   /* ===================== TEMPERATE BASS ===================== */
   { id:"striper", name:"Striped Bass", sci:"Morone saxatilis", family:"Temperate Bass", emoji:"🐠", shape:"striper",
     water:["saltwater","brackish","river","reservoir"], habitat:"Coastal migrations + landlocked reservoirs.",
-    states:union("ATLANTIC",["California","Tennessee","Texas","Oklahoma","Arkansas","Alabama","Georgia"],"CAN_ATL",["Quebec"]),
+    states:union("ATLANTIC",["California","Tennessee","Texas","Oklahoma","Arkansas","Alabama","Georgia","Illinois","Kentucky","Missouri"],"CAN_ATL",["Quebec"]),
     bestMonths:[4,5,6,10,11], tod:["dawn","dusk","night"], tempF:"55–68°F",
     baits:["Bunker/menhaden","Bucktail jigs","Topwater plugs","Live shad","Swimbaits"],
     diet:"Menhaden, herring, shad", fight:5, record:81.88, regs:"Strict slot & seasons on the coast — verify.", tide:"Tide-driven; fish moving water around dawn/dusk.",
@@ -337,7 +349,7 @@ const FISH = [
 
   { id:"whitebass", name:"White Bass", sci:"Morone chrysops", family:"Temperate Bass", emoji:"🐠", shape:"striper",
     water:["reservoir","river","lake"], habitat:"Open-water schools in big reservoirs & tributaries.",
-    states:union("MIDWEST","SOUTHCENT","PLAINS",["Tennessee","Kentucky","Ohio","Pennsylvania"]),
+    states:union("MIDWEST","SOUTHCENT","PLAINS",["Tennessee","Kentucky","Ohio","Pennsylvania","North Carolina","Virginia"]),
     bestMonths:[4,5,6], tod:["morning","midday","dusk"], tempF:"58–68°F",
     baits:["Inline spinners","Small jigs","Spoons","Live minnows"],
     diet:"Shad, insects", fight:3, record:6.81, regs:"Generous limits in most states.", tide:"",
@@ -475,7 +487,7 @@ const FISH = [
 
   { id:"muskie", name:"Muskellunge", sci:"Esox masquinongy", family:"Pike", emoji:"🐊", shape:"pike",
     water:["lake","river","reservoir"], habitat:"Large lakes & rivers of the Upper Midwest, Northeast & Ontario.",
-    states:union(["Minnesota","Wisconsin","Michigan","Illinois","Indiana","Ohio","Pennsylvania","New York","Kentucky","Tennessee","West Virginia","Iowa","North Carolina","Virginia"],["Ontario","Quebec","Manitoba"]),
+    states:union(["Minnesota","Wisconsin","Michigan","Illinois","Indiana","Ohio","Pennsylvania","New York","Kentucky","Tennessee","West Virginia","Iowa","North Carolina","Virginia","Missouri"],["Ontario","Quebec","Manitoba"]),
     bestMonths:[6,7,9,10,11], tod:["midday","afternoon","dusk"], tempF:"60–70°F",
     baits:["Bucktails","Large glide baits","Topwater","Rubber baits"],
     diet:"Suckers, ciscoes, panfish", fight:5, record:67.5, regs:"High minimum lengths (often 40–54\").", tide:"",
@@ -525,7 +537,7 @@ const FISH = [
 
   { id:"redear", name:"Redear Sunfish (Shellcracker)", sci:"Lepomis microlophus", family:"Sunfish", emoji:"🐟", shape:"panfish",
     water:["lake","pond","reservoir"], habitat:"Warm lakes & ponds; bottom-oriented snail crusher.",
-    states:union("SOUTHEAST","SOUTHCENT","CALIF",["Arizona","Nevada","Maryland","Virginia"]),
+    states:union("SOUTHEAST","SOUTHCENT","CALIF",["Arizona","Nevada","Maryland","Virginia","Illinois","Indiana","Ohio"]),
     bestMonths:[4,5,6], tod:["morning","afternoon"], tempF:"68–80°F",
     baits:["Red worms","Crickets","Small jigs near bottom"],
     diet:"Snails, clams, larvae", fight:2, record:6.3, regs:"Often combined panfish limits.", tide:"",
@@ -1689,6 +1701,88 @@ const TACTICS = {
     bait:"Large fresh cut carp/mullet on a heavy circle hook (no wire needed with circles); heavy 80–130 lb gear, patience for the run. Mostly C&R.",
     gear:"A 6-foot apex predator — big baits, heavy tackle; rope lures (no hook) are used by some.",
     season:"Summer in big sluggish Southern rivers, bayous & oxbows."
+  },
+  /* ---- additional trout/char/salmon ---- */
+  goldentrout:{
+    fly:"Tiny attractor dries — Royal Wulff, Humpy, parachute ants & small Adams (#14–18) in high alpine creeks & lakes. 7.5–8.5' 2–4wt.",
+    gear:"Micro inline spinners & tiny spoons in backcountry lakes; light line.",
+    bait:"Generally remote, low-limit waters — go light and release.",
+    season:"Mid–late summer (Jul–Sep) once the high country thaws; a hike-in reward."
+  },
+  bulltrout:{
+    fly:"Big streamers (sculpin & trout patterns) on a 6–8wt sink-tip — they eat other fish. Often protected; know the rules first.",
+    gear:"Large swimbaits, spoons & jerkbaits worked slow & deep in cold rivers/lakes.",
+    bait:"Where legal only; many populations are catch-and-release/closed.",
+    season:"Late summer–fall pre-spawn; a predatory native char."
+  },
+  arcticchar:{
+    fly:"Bright streamers, egg & flesh patterns and leeches on a 7–8wt; sea-run fish stage at river mouths.",
+    gear:"Spoons & spinners in silver/pink/orange; cast to staging schools.",
+    bait:"Cured roe where legal; remote fly-in fisheries.",
+    season:"Late summer (Jul–Sep) runs; spawning-color males glow red-orange."
+  },
+  grayling:{
+    fly:"Greedy dry-fly takers — small Adams, Elk Caddis, attractors & tiny nymphs (#14–18) on a 3–5wt. They sip on the surface readily.",
+    gear:"Tiny spinners & small spoons in clear northern rivers.",
+    bait:"Usually C&R in the Lower 48; light tackle.",
+    season:"Summer (Jun–Aug) on clear, cold northern rivers — sail-finned and willing."
+  },
+  sockeye:{
+    fly:"They rarely 'eat' on the run — short-line sparse flies (Coho/sockeye flies, comets) to sight-fished schools; 7–8wt.",
+    gear:"Small spoons & flossing tactics in the run; check fair-hooking rules.",
+    bait:"Mostly fly/flossing fisheries; few bite bait.",
+    season:"Summer runs (Jun–Aug); dense schools flood the rivers."
+  },
+  pinksalmon:{
+    fly:"Anything pink & small — pink Clousers, comets & marabou on a 6–7wt, stripped slow.",
+    gear:"Small pink jigs, spoons & spinners; pink is the magic color.",
+    bait:"Cured roe where legal.",
+    season:"Big odd-year runs in late summer (Aug–Sep); fast action for kids."
+  },
+  atlanticsalmon:{
+    fly:"Classic wet flies & streamers swung down-and-across; landlocked fish chase smelt streamers. 7–9wt.",
+    gear:"Smelt-imitating spoons & stickbaits, trolled just after ice-out for landlocked fish.",
+    bait:"Fly-only & C&R on many rivers — check regulations.",
+    season:"Spring (ice-out) & fall; cold Northeast rivers and lakes."
+  },
+  /* ---- sturgeon ---- */
+  whitesturgeon:{
+    bait:"Cured salmon roe, lamprey, squid or smelt on a heavy slip-sinker rig & stout circle hook; barbless, heavy 80–130 lb gear. North America's largest freshwater fish — almost all C&R.",
+    gear:"Heavy bottom gear; this is a bait fishery, not a lure one.",
+    season:"Spring & fall in big West-coast rivers; lower rivers fish best on tide changes."
+  },
+  lakesturgeon:{
+    bait:"Gobs of nightcrawlers or cut bait on the bottom of big rivers & the Great Lakes; circle hooks, heavy line. Highly protected — short C&R seasons (e.g., Rainy River).",
+    gear:"Heavy bottom rig; a living fossil, mostly catch-and-release.",
+    season:"Early summer; tightly regulated seasons."
+  },
+  /* ---- Pacific nearshore / offshore ---- */
+  lingcod:{
+    gear:"Drop swimbaits, big leadhead-and-grub combos or jigs to rocky reefs & pinnacles; they'll eat a hooked rockfish on the way up. Heavy conventional, slack-tide windows.",
+    bait:"Live greenling/rockfish or large cut bait on the structure.",
+    season:"Spring (Mar–Jun); aggressive ambusher with a huge mouth."
+  },
+  pacifichalibut:{
+    bait:"Herring, salmon bellies or large cut bait on a spreader/sliding-sinker rig, heavy conventional gear; anchor or drift sand/gravel flats.",
+    gear:"Big leadhead jigs & swimbaits bounced on bottom; barn-door flatfish to 300+ lb.",
+    season:"Summer (May–Aug); strict charter limits & size rules off AK/BC/PNW."
+  },
+  roosterfish:{
+    bait:"Live mullet or ladyfish slow-trolled or surf-cast off Baja beaches & points — the highest-percentage method.",
+    gear:"Big poppers & stickbaits/large swimbaits for blistering surf chases; heavy spinning. Almost always released.",
+    fly:"Bait-and-switch teasing, then a big baitfish fly on a 10–12wt.",
+    season:"Summer (Jun–Sep) on the Mexican Pacific; that combed dorsal and a screaming run."
+  },
+  yellowtail:{
+    gear:"Surface iron (jigs), yo-yo iron dropped & ripped over structure, and live sardines; a reef-diving bulldog — lock the drag near the rocks.",
+    bait:"Live sardines & mackerel flylined or on a dropper near kelp & banks.",
+    season:"Late spring–fall (May–Sep) off SoCal & Baja kelp and offshore banks."
+  },
+  stripedmarlin:{
+    gear:"Troll lures & bait-and-switch ballyhoo; pitch a live bait to a teased-up fish on circle hooks. Release-first.",
+    bait:"Live mackerel/sardines pitched to a lit-up fish behind the teasers.",
+    fly:"Tease to the boat, then a big billfish fly on a 14–15wt.",
+    season:"Fall–early winter (Oct–Jan) off Baja (Cabo) and the SoCal bight."
   }
 };
 
@@ -2175,7 +2269,7 @@ function howToHtml(f){
 }
 function waterChipsHtml(f){
   const ws=(typeof WATERS!=="undefined"?WATERS:[]).filter(w=>w.species.includes(f.id));
-  if(!ws.length) return "";
+  if(!ws.length) return `<div class="kv" style="margin-top:8px;color:var(--muted)"><b>Notable waters</b> — none in our covered states yet (Missouri, Florida, North Carolina, Arkansas, Illinois). More states coming.</div>`;
   const regions=[...new Set(ws.map(w=>w.region))].join(" & ");
   return `<div class="kv" style="margin-top:8px"><b>Notable waters</b> <span style="color:var(--muted)">(${regions} — tap to zoom)</span></div>
     <div class="waters">${ws.map(w=>`<span class="waterchip" data-w="${w.name}">📍 ${w.name}</span>`).join("")}</div>`;
@@ -2289,8 +2383,14 @@ function wireList(){
   const q=document.getElementById("q"); q.addEventListener("input",()=>{ state.query=q.value; renderList(); });
 }
 
+function initIntro(){
+  const bar=document.getElementById("intro"), x=document.getElementById("introX"); if(!bar) return;
+  let dismissed=false; try{ dismissed=localStorage.getItem("fishdex.intro")==="1"; }catch(e){}
+  if(!dismissed) bar.classList.remove("hide");
+  if(x) x.onclick=()=>{ bar.classList.add("hide"); try{ localStorage.setItem("fishdex.intro","1"); }catch(e){} };
+}
 window.addEventListener("DOMContentLoaded",()=>{
-  loadFavs();
+  loadFavs(); initIntro();
   buildFilterUI(); wireList(); renderLegend(); updateSavedBtn(); renderList(); renderCtx(); initMap();
   setTimeout(preloadEco, 1200); // warm the ecoregion data so fish ranges render instantly
 });
