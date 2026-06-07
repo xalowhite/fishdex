@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>FishDex — Angler's Field Guide to North America</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 <style>
+  :root{ --display:"Rajdhani",-apple-system,"Segoe UI",sans-serif; --num:"Orbitron",monospace; }
   :root{
     --bg:#0d1b24; --panel:#12252f; --panel2:#173039; --line:#244553;
     --ink:#e9f3f2; --muted:#8fa9b0; --accent:#37b6a0; --accent2:#5ad1bb;
@@ -25,6 +28,32 @@
   .hdrlink{color:var(--accent2);font-size:13px;text-decoration:none;border:1px solid var(--line);
     border-radius:7px;padding:5px 10px;margin-right:10px}
   .hdrlink:hover{border-color:var(--accent);background:#16323c}
+  /* ============ DEX UI (Pokédex-style layout, not a game) ============ */
+  header h1{font-family:var(--display);letter-spacing:.5px}
+  .dexno{font-family:var(--num);font-size:11px;color:var(--accent2);letter-spacing:.5px;opacity:.85;margin-right:3px}
+  .card .nm{font-family:var(--display);font-size:17px;letter-spacing:.2px}
+  .grp{font-family:var(--display);font-size:12px;letter-spacing:1.2px}
+  .tbadge{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+    color:#08221c;background:var(--tc,#888);border-radius:5px;padding:2px 7px;margin:0;
+    box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
+  .card .meta{gap:5px}
+  .info .dexhead{display:flex;align-items:center;gap:10px;animation:scanIn .32s ease-out}
+  .info .dexnobig{font-family:var(--num);font-size:12px;font-weight:800;color:var(--accent2);
+    writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:1px;opacity:.8;flex:0 0 auto}
+  .info h3{font-family:var(--display);font-size:20px;letter-spacing:.3px;line-height:1.08}
+  .info .cat{font-family:var(--display);font-size:13.5px;color:var(--gold);font-weight:600;letter-spacing:.3px;margin-top:1px}
+  .info .tbadges{margin:9px 0 4px}
+  .info .fielddata{display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;margin:8px 0 6px;
+    padding:9px 11px;background:#0e2730;border:1px solid var(--line);border-radius:9px}
+  .info .fd{display:flex;align-items:center;gap:8px;font-size:12px}
+  .info .fdl{flex:0 0 38px;color:var(--accent2);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px}
+  .info .fdv{color:var(--ink);font-weight:600}
+  .fbar{display:inline-flex;gap:3px}
+  .fbar .seg{width:13px;height:8px;border-radius:2px;background:#21404c}
+  .fbar .seg.on{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  @keyframes scanIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+  header{box-shadow:inset 0 -1px 0 rgba(55,182,160,.6),0 2px 8px rgba(0,0,0,.3)}
+  .info{box-shadow:var(--shadow),0 0 0 1px rgba(55,182,160,.15)}
   .main{display:flex;flex:1;min-height:0}
   .introbar{display:flex;align-items:center;gap:12px;padding:9px 16px;background:#143b40;
     border-bottom:1px solid var(--line);font-size:13px;color:#d7ecea;flex:0 0 auto}
@@ -804,6 +833,32 @@ const FAMILY_COLOR = {
   "Salmon":"#e0796b","Pike":"#7fae54","Perch":"#cdb24e","Sunfish":"#5bbf9b",
   "Catfish":"#9a8c79","Sturgeon":"#7d8a99","Other Freshwater":"#8aa36f",
   "Inshore":"#5ec2c0","Nearshore":"#5aa9d6","Offshore":"#5a86d6"
+};
+
+/* ============================================================
+   Dex "category" — a short descriptor under each entry's name
+   (the FishDex analogue of a Pokédex category line).
+   ============================================================ */
+const CATEGORY = {
+  largemouth:"The Bucketmouth", smallmouth:"The Bronzeback", spotted:"The Kentucky Bass",
+  striper:"The Rockfish", whitebass:"The Sand Bass",
+  rainbow:"The Tailwater Jewel", brown:"The Wary Predator", brook:"The Native Char",
+  cutthroat:"The Crimson-Slash Trout", goldentrout:"The Alpine Jewel", bulltrout:"The Cold-Water Char",
+  laketrout:"The Deepwater Char", arcticchar:"The Far-North Char", grayling:"The Sailfin",
+  chinook:"The King Salmon", coho:"The Silver Salmon", sockeye:"The Red Salmon",
+  pinksalmon:"The Humpy", atlanticsalmon:"The Leaper",
+  pike:"The Water Wolf", muskie:"The Fish of 10,000 Casts", pickerel:"The Chain-Sided Jack",
+  walleye:"The Glass-Eyed Predator", sauger:"The River Walleye", yellowperch:"The Ringed Panfish",
+  bluegill:"The Bream", redear:"The Shellcracker", rockbass:"The Goggle-Eye",
+  blackcrappie:"The Speckled Slab", whitecrappie:"The Timber Slab",
+  channelcat:"The Whiskered Forager", flathead:"The Live-Bait Brute", bluecat:"The River Giant",
+  whitesturgeon:"The Living Fossil", lakesturgeon:"The Ancient Mariner",
+  carp:"The Golden Ghost", freshdrum:"The Grunting Drum", bowfin:"The Mudfish", alligatorgar:"The Apex Gar",
+  redfish:"The Spot-Tailed Bull", snook:"The Linesider", seatrout:"The Speck", flounder:"The Flatfish Ambusher",
+  tarpon:"The Silver King", bonefish:"The Grey Ghost", permit:"The Flats Trophy", bluefish:"The Chopper",
+  redsnapper:"The Reef Ruby", lingcod:"The Reef Bulldog", pacifichalibut:"The Barn Door",
+  mahi:"The Dorado", yellowfin:"The Ahi Bruiser", roosterfish:"The Combed Predator",
+  yellowtail:"The Forktail Bruiser", stripedmarlin:"The Striped Billfish", sailfish:"The Fastest Fish"
 };
 
 /* ============================================================
@@ -1965,6 +2020,25 @@ function fishSVG(shape, color, w){
 }
 function stars(n){ return "★★★★★".slice(0,n)+"☆☆☆☆☆".slice(0,5-n); }
 
+/* ---------- dex identity: numbering, types, category, data bars ---------- */
+const DEX_INDEX={}; FISH.forEach((f,i)=>DEX_INDEX[f.id]=i+1);
+function dexNum(f){ return "№"+String(DEX_INDEX[f.id]||0).padStart(3,"0"); }
+function categoryOf(f){ return (typeof CATEGORY!=="undefined"&&CATEGORY[f.id])||f.family; }
+const TYPE_META={Freshwater:"#5aa9d6",Saltwater:"#3f6fc4",Coldwater:"#74c7d6",Warmwater:"#e0a85a",Inshore:"#5ec2c0",Reef:"#cf8f6f",Bluewater:"#5a6fd6"};
+function fishTypes(f){
+  const t=[]; t.push(f.water.includes("saltwater")?"Saltwater":"Freshwater");
+  if(["Trout","Char","Salmon"].includes(f.family)) t.push("Coldwater");
+  else if(!["Inshore","Nearshore","Offshore"].includes(f.family)) t.push("Warmwater");
+  if(f.family==="Inshore") t.push("Inshore");
+  else if(f.family==="Nearshore") t.push("Reef");
+  else if(f.family==="Offshore") t.push("Bluewater");
+  return t.slice(0,3);
+}
+function typeBadgesHtml(f){ return fishTypes(f).map(t=>`<span class="tbadge" style="--tc:${TYPE_META[t]||"#888"}">${t}</span>`).join(""); }
+function fightBar(n){ let s=""; for(let i=1;i<=5;i++) s+=`<i class="seg${i<=n?" on":""}"></i>`; return `<span class="fbar">${s}</span>`; }
+// size class from IGFA record (rough, for a quick visual scale)
+function sizeClass(rec){ const b=[1,3,8,20,60,300]; let n=1; for(const x of b){ if(rec>=x) n++; } return Math.min(5,n); }
+
 /* ---------- rolodex render ---------- */
 function renderList(){
   const list=document.getElementById("list"); const q=norm(state.query);
@@ -2020,13 +2094,13 @@ function renderList(){
         <div class="row1">
           <span class="thumb">${fishSVG(f.shape, FAMILY_COLOR[f.family])}</span>
           <div style="min-width:0;flex:1">
-            <div class="nm">${f.name}</div>
-            <div class="sci">${f.sci}</div>
+            <div class="nm"><span class="dexno">${dexNum(f)}</span> ${f.name}</div>
+            <div class="sci">${categoryOf(f)} · <i>${f.sci}</i></div>
           </div>
           ${bite}
           <button class="favstar${favd?" on":""}" data-fav="${f.id}" title="${favd?"Saved — tap to remove":"Save this fish"}">${favd?"★":"☆"}</button>
         </div>
-        <div class="meta">${waterPills}<span class="pill fight">${stars(f.fight)}</span>${f.subs?`<span class="pill">${f.subs.length} subsp.</span>`:""}</div>
+        <div class="meta">${typeBadgesHtml(f)}<span class="pill fight">${stars(f.fight)}</span>${f.subs?`<span class="pill">${f.subs.length} subsp.</span>`:""}</div>
         ${subsHtml}`;
       list.appendChild(card);
     });
@@ -2299,17 +2373,26 @@ function renderFishInfo(box){
   box.innerHTML=`
     <img class="hero" alt="${f.name}">
     <div class="pad">
-      <div class="ihead">
-        <span class="iart">${fishSVG(f.shape,FAMILY_COLOR[f.family],60)}</span>
-        <div style="flex:1"><h3>${f.name}${sub?` <span class="subname">(${sub.n})</span>`:""}</h3>
-        <div class="sci">${sub?sub.s:f.sci}</div></div>
+      <div class="dexhead">
+        <span class="dexnobig">${dexNum(f)}</span>
+        <span class="iart">${fishSVG(f.shape,FAMILY_COLOR[f.family],56)}</span>
+        <div style="flex:1;min-width:0">
+          <h3>${f.name}${sub?` <span class="subname">(${sub.n})</span>`:""}</h3>
+          <div class="cat">${categoryOf(f)}</div>
+          <div class="sci">${sub?sub.s:f.sci} · ${f.family}</div>
+        </div>
         <button class="favstar big${state.favFish.has(f.id)?" on":""}" id="infoFav" title="Save this fish">${state.favFish.has(f.id)?"★":"☆"}</button>
       </div>
-      <div class="kv"><b>Family:</b> ${f.family} &nbsp;·&nbsp; <b>Fight:</b> <span class="stars">${stars(f.fight)}</span></div>
+      <div class="tbadges">${typeBadgesHtml(f)}</div>
+      <div class="fielddata">
+        <div class="fd"><span class="fdl">Fight</span>${fightBar(f.fight)}</div>
+        <div class="fd"><span class="fdl">Size</span>${fightBar(sizeClass(f.record))}</div>
+        <div class="fd"><span class="fdl">Max</span><span class="fdv">${f.record} lb</span></div>
+        <div class="fd"><span class="fdl">Temp</span><span class="fdv">${f.tempF}</span></div>
+      </div>
       <div class="kv"><b>Habitat:</b> ${f.habitat}</div>
       <div class="kv"><b>Diet:</b> ${f.diet}</div>
       <div class="kv"><b>Best months:</b> ${months} &nbsp;·&nbsp; <b>Time:</b> ${tod}</div>
-      <div class="kv"><b>Water temp:</b> ${f.tempF} &nbsp;·&nbsp; <b>World record:</b> ${f.record} lb</div>
       ${f.tide?`<div class="kv"><b>Tide / solunar:</b> ${f.tide}</div>`:""}
       <div class="kv"><b>Regs:</b> <span style="color:var(--warn)">${f.regs}</span> <span style="color:var(--muted)">— click a state for official limits.</span></div>
       <div class="kv"><b>Tip:</b> ${f.tip}</div>
