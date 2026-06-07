@@ -150,6 +150,21 @@
     border-radius:8px;padding:7px;font-size:12.5px;font-weight:600;cursor:pointer}
   .wsave:hover{border-color:var(--accent)}
   .wsave.on{background:#2e2a14;border-color:#5a4f1f;color:#e9c96b}
+  .wpop .wintel{margin:6px 0;font-size:11.5px;color:#d7e6e2;background:#10333a;border:1px solid var(--line);
+    border-radius:8px;padding:7px 9px;line-height:1.4}
+  .wpop .wintel b{color:var(--accent2);display:block;margin-bottom:2px}
+  .wpop .wacc{color:var(--accent2);cursor:pointer;white-space:nowrap}
+  .wpop .wacc:hover{text-decoration:underline}
+  /* How-to-catch (fish info card) */
+  .info .howto{margin-top:10px;border:1px solid var(--line);border-radius:10px;background:#10242c;overflow:hidden}
+  .info .howto>summary{cursor:pointer;padding:9px 11px;font-size:12.5px;font-weight:700;color:var(--accent2);
+    list-style:none;user-select:none}
+  .info .howto>summary::-webkit-details-marker{display:none}
+  .info .howto>summary::after{content:"▾";float:right;color:var(--muted)}
+  .info .howto[open]>summary::after{content:"▴"}
+  .info .howbody{padding:4px 11px 10px}
+  .info .howrow{display:flex;gap:8px;font-size:12px;color:#cfe0e2;margin:6px 0;line-height:1.4}
+  .info .howlbl{flex:0 0 70px;color:var(--accent2);font-weight:600}
   .leaflet-tooltip.stt{background:#0e2530;border:1px solid var(--accent);color:var(--ink);font-weight:600}
   .leaflet-tooltip.eco{background:#241f12;border:1px solid #b78b3a;color:#f1e3c4;font-weight:600}
   .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;z-index:600}
@@ -345,7 +360,7 @@ const FISH = [
 
   { id:"brook", name:"Brook Trout", sci:"Salvelinus fontinalis", family:"Trout", emoji:"🐟", shape:"trout",
     water:["stream","river","lake"], habitat:"Small, cold, pristine headwaters & northern ponds.",
-    states:union("NORTHEAST","ROCKIES",["Michigan","Wisconsin","Minnesota","North Carolina","Tennessee","Virginia","West Virginia","Georgia"],"CAN_ATL","CAN_CENT",["Manitoba"]),
+    states:union("NORTHEAST","ROCKIES",["Michigan","Wisconsin","Minnesota","North Carolina","Tennessee","Virginia","West Virginia","Georgia","Arkansas"],"CAN_ATL","CAN_CENT",["Manitoba"]),
     bestMonths:[5,6,7,9], tod:["morning","dusk"], tempF:"45–58°F",
     baits:["Dry flies","Small spinners","Worms","Nymphs"],
     diet:"Insects, small baitfish", fight:3, record:14.5, regs:"Low creel limits protect natives.", tide:"",
@@ -353,7 +368,7 @@ const FISH = [
 
   { id:"cutthroat", name:"Cutthroat Trout", sci:"Oncorhynchus clarkii", family:"Trout", emoji:"🐟", shape:"trout",
     water:["stream","river","lake"], habitat:"Cold western streams & high-mountain lakes.",
-    states:union("ROCKIES","PNW",["Nevada","California","Alaska","New Mexico"],"CAN_BC",["Alberta"]),
+    states:union("ROCKIES","PNW",["Nevada","California","Alaska","New Mexico","Arkansas"],"CAN_BC",["Alberta"]),
     bestMonths:[6,7,8,9], tod:["morning","midday","dusk"], tempF:"48–60°F",
     baits:["Attractor dry flies","Nymphs","Small spinners"],
     diet:"Insects, crustaceans", fight:3, record:41, regs:"Many waters catch-and-release for natives.", tide:"",
@@ -987,7 +1002,9 @@ const WATERS = [
   // ---- Trout: tailwater, parks & wild streams ----
   { name:"Lake Taneycomo", region:"Missouri", type:"tailwater", lat:36.643, lon:-93.225,
     species:["rainbow","brown"], note:"Cold tailwater below Table Rock Dam; stocked rainbows plus trophy browns.",
-    best:"Year-round; brown bite peaks Nov–Feb. Fish low water early.", how:"Drift scuds, jigs & micro-jigs on light line; wade the upper end on low generation, troll/drift below.", size:"~2,000 ac tailwater · Branson" },
+    best:"Year-round; brown bite peaks Nov–Feb. Fish low water early.", how:"Drift scuds, jigs & micro-jigs on light line; wade the upper end on low generation, troll/drift below.", size:"~2,000 ac tailwater · Branson",
+    intel:"Low generation is prime: #14–18 scuds, sow bugs & zebra/thread midges under a yarn indicator; 9' 5wt, 5–6X fluoro, a #6–8 split shot. Gear anglers: 1/16 oz marabou jigs & Trout Magnets on 2–4 lb line, dead-drifted. Bait (PowerBait, night crawlers) is allowed only below the trophy/artificial area — check signs.",
+    access:[{name:"Below Table Rock Dam / Lilleys'",lat:36.643,lon:-93.225},{name:"Fall Creek",lat:36.625,lon:-93.205},{name:"Cooper Creek",lat:36.612,lon:-93.185},{name:"Trophy Run (upper)",lat:36.645,lon:-93.230}] },
   { name:"Roaring River (State Park)", region:"Missouri", type:"troutpark", lat:36.581, lon:-93.832,
     species:["rainbow"], note:"Spring-fed put-and-take trout park near Cassville.", best:"C&K season Mar 1–Oct 31; opening day is a tradition.", how:"Daily stocked rainbows; flies in the fly zone, dough bait/spinners elsewhere. Bank & wade.", size:"Spring branch · Cassville" },
   { name:"Bennett Spring (State Park)", region:"Missouri", type:"troutpark", lat:37.717, lon:-92.853,
@@ -1010,7 +1027,9 @@ const WATERS = [
     species:["rainbow","smallmouth"], note:"Scenic Ozark float — trout up high (Greer Spring), smallmouth lower.", best:"Spring & fall floats; summer for smallmouth.", how:"Canoe float; flies/spinners for trout, soft plastics for smallmouth.", size:"Wild & Scenic river · Alton" },
   // ---- Smallmouth (Ozark) rivers ----
   { name:"Current River (lower)", region:"Missouri", type:"smbriver", lat:37.18, lon:-91.18,
-    species:["smallmouth","rockbass","walleye"], note:"Classic Ozark float — smallmouth, goggle-eye and river walleye.", best:"Apr–Jun & Sep–Oct; dawn/dusk.", how:"Tube jigs, topwater & crankbaits along bluff pools; canoe/kayak float.", size:"NPS Riverways · Van Buren" },
+    species:["smallmouth","rockbass","walleye"], note:"Classic Ozark float — smallmouth, goggle-eye and river walleye.", best:"Apr–Jun & Sep–Oct; dawn/dusk.", how:"Tube jigs, topwater & crankbaits along bluff pools; canoe/kayak float.", size:"NPS Riverways · Van Buren",
+    intel:"Smallmouth special-management stretches reward a release ethic. Green-pumpkin tubes & Ned rigs on 1/16 oz heads, suspending jerkbaits in cool water, and walk-the-dog/poppers at dawn over bluff pools. River walleye hold in deep runs at dusk — jig a minnow. Goggle-eye (rock bass) eat small crankbaits along the rock.",
+    access:[{name:"Akers Ferry",lat:37.378,lon:-91.553},{name:"Pulltite",lat:37.310,lon:-91.470},{name:"Round Spring",lat:37.283,lon:-91.408},{name:"Two Rivers (Jacks Fork)",lat:37.150,lon:-91.150}] },
   { name:"Jacks Fork River", region:"Missouri", type:"smbriver", lat:37.18, lon:-91.36,
     species:["smallmouth","rockbass"], note:"Clear, spring-fed tributary of the Current.", best:"Late spring–summer when floatable.", how:"Wade or float; small tubes, Ned rigs, poppers. Upper section seasonal.", size:"Spring-fed float · Eminence" },
   { name:"Big River", region:"Missouri", type:"smbriver", lat:38.05, lon:-90.62,
@@ -1142,12 +1161,16 @@ const WATERS = [
   { name:"Destin / Panhandle canyons", region:"Florida", type:"offshore", depth:"200–2,000 ft · 20–60 mi out", lat:29.90, lon:-86.90,
     species:["yellowfin","mahi","redsnapper","sailfish"], note:"Gulf 'Spur & Squiggles' canyons.", best:"Summer tuna & mahi; red snapper in-season.", how:"Run the canyons & rips, chunk/troll for tuna; bottom snapper on the way out.", size:"Bluewater · Destin" },
   { name:"Pensacola offshore", region:"Florida", type:"offshore", depth:"150–1,500 ft · 15–50 mi out", lat:30.00, lon:-87.20,
-    species:["yellowfin","mahi","redsnapper","sailfish"], note:"Western-panhandle bluewater & rigs.", best:"Summer pelagics; spring/summer snapper.", how:"Troll/chunk the rigs & canyons; bottom-fish reefs. Charters from Pensacola Pass.", size:"Bluewater & rigs · Pensacola" }
-  ,
+    species:["yellowfin","mahi","redsnapper","sailfish"], note:"Western-panhandle bluewater & rigs.", best:"Summer pelagics; spring/summer snapper.", how:"Troll/chunk the rigs & canyons; bottom-fish reefs. Charters from Pensacola Pass.", size:"Bluewater & rigs · Pensacola" },
+  { name:"Pensacola Beach surf (Gulf)", region:"Florida", type:"nearshore", depth:"surf–15 ft", lat:30.33, lon:-87.13,
+    species:["redfish","bluefish","flounder","seatrout"], note:"Sugar-sand Gulf surf — pompano, whiting & reds from the beach.", best:"Spring (Mar–May) & fall pompano runs; reds year-round.", how:"Pompano rig + sand fleas/FishBites; cast to the trough on moving tide.", size:"Panhandle surf · Pensacola Beach",
+    intel:"Classic Gulf pompano & whiting beach: hi-lo pompano rig with #1 circle hooks baited with fresh sand fleas (mole crabs) or pink/shrimp FishBites — or a small sabiki tipped with FishBites. A #1 circle holds a FishBites strip without masking the point. Pyramid sinker to hold in the wash; read the beach and drop baits in the trough and cuts. Bull reds & bluefish on cut mullet." },
   /* ===================== NORTH CAROLINA ===================== */
   // ---- Western mountains: trout streams ----
   { name:"Davidson River (Pisgah NF)", region:"North Carolina", type:"troutstream", lat:35.28, lon:-82.78,
-    species:["rainbow","brown","brook"], note:"Famous Pisgah catch-and-release water near Brevard.", best:"Year-round; hatches Apr–Jun.", how:"Tiny nymphs & fine tippet on picky fish; C&R. Roadside wade access.", size:"Pisgah NF · Brevard" },
+    species:["rainbow","brown","brook"], note:"Famous Pisgah catch-and-release water near Brevard.", best:"Year-round; hatches Apr–Jun.", how:"Tiny nymphs & fine tippet on picky fish; C&R. Roadside wade access.", size:"Pisgah NF · Brevard",
+    intel:"These fish see everything — go small and light. Dead-drift #16–20 pheasant tails, zebra midges & caddis pupa; hatches Apr–Jun (caddis, March browns) and BWO on cool days. Hopper-dropper in summer with beetles & ants. 9' 5wt, 6X. Hatchery Supported up top, Catch-&-Release single-hook artificials in the famous middle section.",
+    access:[{name:"Pisgah Fish Hatchery lot",lat:35.283,lon:-82.788},{name:"Davidson River Campground",lat:35.276,lon:-82.728},{name:"Sycamore Flats",lat:35.270,lon:-82.730}] },
   { name:"Nantahala River (Delayed Harvest)", region:"North Carolina", type:"tailwater", lat:35.33, lon:-83.65,
     species:["rainbow","brown"], note:"Cold tailwater & delayed-harvest water.", best:"DH Oct–Jun; check dam generation.", how:"Nymphs, eggs & streamers; wade between releases. Roadside access.", size:"Tailwater/DH · Topton" },
   { name:"Tuckasegee River", region:"North Carolina", type:"troutstream", lat:35.37, lon:-83.25,
@@ -1176,7 +1199,9 @@ const WATERS = [
   { name:"New River (Ashe/Alleghany)", region:"North Carolina", type:"smbriver", lat:36.50, lon:-81.33,
     species:["smallmouth","muskie","rockbass"], note:"Ancient, gentle float river.", best:"Summer smb; muskie fall–winter.", how:"Float; tubes & topwater for smb, big baits for muskie. Canoe access.", size:"Float river · Jefferson" },
   { name:"French Broad River", region:"North Carolina", type:"smbriver", lat:35.60, lon:-82.80,
-    species:["smallmouth","muskie","channelcat"], note:"Asheville-area smallmouth & muskie river.", best:"Spring–fall smb; muskie cool months.", how:"Drift jigs/jerkbaits; guided muskie floats. Greenway & ramp access.", size:"Through Asheville · Marshall" },
+    species:["smallmouth","muskie","channelcat"], note:"Asheville-area smallmouth & muskie river.", best:"Spring–fall smb; muskie cool months.", how:"Drift jigs/jerkbaits; guided muskie floats. Greenway & ramp access.", size:"Through Asheville · Marshall",
+    intel:"One of the South's best muskie rivers. Fly: 8–12\" articulated flies — Chocklett's T-Bone & Game Changer — on a 10–12wt (~400-grain line); strip hard and finish every cast with a boatside figure-8. Gear: big bucktails & glide baits on 80–100 lb braid with a fluoro/wire leader. Smallmouth on tubes & crawfish cranks through the shoals.",
+    access:[{name:"Hap Simpson Park (Marshall)",lat:35.808,lon:-82.683},{name:"Ledges Whitewater Park",lat:35.660,lon:-82.560},{name:"Bent Creek River Park",lat:35.487,lon:-82.620}] },
   { name:"Lake James", region:"North Carolina", type:"reservoir", lat:35.73, lon:-81.88,
     species:["smallmouth","largemouth","spotted","walleye","whitebass"], note:"Clear foothills lake below the Linville.", best:"Spring & fall; summer deep.", how:"Drop-shot & jerkbaits for smb on points; troll for walleye.", size:"~6,800 ac · Nebo/Morganton" },
   { name:"Lake Norman", region:"North Carolina", type:"reservoir", lat:35.50, lon:-80.95,
@@ -1223,7 +1248,8 @@ const WATERS = [
   { name:"Cape Hatteras surf (OBX)", region:"North Carolina", type:"nearshore", depth:"surf–30 ft", lat:35.25, lon:-75.53,
     species:["bluefish","redfish","seatrout","flounder"], note:"Legendary surf where the currents collide.", best:"Fall drum & bluefish blitzes.", how:"Heaver rods & cut bait/metal from the beach at the Point. 4WD beach access.", size:"OBX surf · Buxton/Cape Point" },
   { name:"Wrightsville Beach surf", region:"North Carolina", type:"nearshore", depth:"surf–25 ft", lat:34.21, lon:-77.79,
-    species:["bluefish","redfish","seatrout","flounder"], note:"SE-coast surf & pier fishery.", best:"Spring & fall runs.", how:"Surf rigs with cut bait/shrimp; the piers for blues & spots. Public beach access.", size:"Atlantic surf · Wrightsville Beach" },
+    species:["bluefish","redfish","seatrout","flounder"], note:"SE-coast surf & pier fishery.", best:"Spring & fall runs.", how:"Surf rigs with cut bait/shrimp; the piers for blues & spots. Public beach access.", size:"Atlantic surf · Wrightsville Beach",
+    intel:"For pompano, whiting (sea mullet) & black drum from the sand: a hi-lo pompano rig with #1–2 circle hooks, baited with fresh sand fleas or pink/shrimp FishBites — or a small sabiki tipped with FishBites strips. Keep the rig 24–36\" with a pyramid sinker to hold in the wash; fish the trough and sloughs on moving tide. Metal lures & a wire leader for blues." },
   { name:"Nearshore reefs off Morehead City", region:"North Carolina", type:"nearshore", depth:"40–120 ft · 5–25 mi out", lat:34.50, lon:-76.50,
     species:["redsnapper","flounder"], note:"Artificial reefs & ledges off Beaufort Inlet.", best:"Summer; snapper in-season.", how:"Drop cut bait & jigs to structure; short run from the inlet. Charters at Morehead.", size:"Nearshore reefs · Morehead City" },
   // ---- OBX Gulf Stream: bluewater ----
@@ -1241,9 +1267,13 @@ const WATERS = [
   /* ===================== ARKANSAS ===================== */
   // ---- Trophy trout tailwaters & streams ----
   { name:"White River (below Bull Shoals Dam)", region:"Arkansas", type:"tailwater", lat:36.37, lon:-92.56,
-    species:["brown","rainbow"], note:"World-class trophy-brown tailwater — also stocked with cutthroat & brook (all four trout).", best:"Browns peak Oct–Feb; year-round rainbows.", how:"Drift sowbugs/eggs & strip streamers; wade low water, drift-boat high water. Watch generation horns.", size:"~100 mi tailwater · Cotter/Mountain Home" },
+    species:["brown","rainbow","cutthroat","brook"], note:"World-class trophy-brown tailwater — and one of the rare waters with all four trout.", best:"Browns peak Oct–Feb; year-round rainbows.", how:"Drift sowbugs/eggs & strip streamers; wade low water, drift-boat high water. Watch generation horns.", size:"~100 mi tailwater · Cotter/Mountain Home",
+    intel:"All four trout swim here — rainbows everywhere, trophy browns (40 lb-class), plus stocked cutthroat & brook. Low generation: #14–18 scuds, sowbugs & zebra midges under a yarn indicator, 6X fluoro & a micro split shot. High water: drift sowbug/egg rigs or strip sculpin streamers from a boat. ALWAYS check the dam generation schedule before wading.",
+    access:[{name:"Bull Shoals Dam / White Hole",lat:36.367,lon:-92.576},{name:"Cotter Access",lat:36.281,lon:-92.527},{name:"Wildcat Shoals",lat:36.330,lon:-92.486},{name:"Rim Shoals",lat:36.300,lon:-92.410}] },
   { name:"Norfork Tailwater", region:"Arkansas", type:"tailwater", lat:36.25, lon:-92.24,
-    species:["rainbow","brown"], note:"Short, fertile tailwater that once gave up a world-record brown.", best:"Fall–winter browns; sulphur/midge hatches.", how:"Technical low-water nymphing — midges, scuds, sowbugs. Wade on minimal generation.", size:"~5 mi tailwater · Norfork/Salesville" },
+    species:["rainbow","brown","cutthroat","brook"], note:"Short, super-fertile tailwater that once gave up a world-record brown.", best:"Fall–winter browns; sulphur/midge hatches.", how:"Technical low-water nymphing — midges, scuds, sowbugs. Wade on minimal generation.", size:"~5 mi tailwater · Norfork/Salesville",
+    intel:"Tiny, fertile, technical. Low water: midges (#20–24), scuds & sowbugs on 6–7X; sight-fish the flats above the White confluence. Cutthroat & brook are stocked bonuses alongside the rainbows and big browns. Generation comes up fast — know the schedule.",
+    access:[{name:"Norfork Dam Access",lat:36.252,lon:-92.236},{name:"Ackerman Access",lat:36.232,lon:-92.232},{name:"White River confluence",lat:36.210,lon:-92.160}] },
   { name:"Little Red River (below Greers Ferry)", region:"Arkansas", type:"tailwater", lat:35.52, lon:-91.97,
     species:["brown","rainbow"], note:"Produced a former world-record brown (40 lb 4 oz).", best:"Fall–winter browns.", how:"Sowbugs & scuds dead-drifted; wade low water near Heber Springs. Check generation.", size:"Tailwater · Heber Springs" },
   { name:"Spring River (Mammoth Spring)", region:"Arkansas", type:"tailwater", lat:36.40, lon:-91.50,
@@ -1256,7 +1286,9 @@ const WATERS = [
     species:["rainbow"], note:"Ozark creek with stocked & holdover rainbows near the White.", best:"Cooler months.", how:"Small spinners & flies; wade/walk-in. Blanchard Springs area.", size:"Ozark creek · Mountain View" },
   // ---- Ozark smallmouth streams ----
   { name:"Crooked Creek", region:"Arkansas", type:"smbriver", lat:36.23, lon:-92.55,
-    species:["smallmouth","rockbass"], note:"Arkansas's blue-ribbon smallmouth stream.", best:"Apr–Jun & fall.", how:"Wade or float; tubes, jerkbaits, crawfish colors on gravel. Access points near Yellville.", size:"Ozark stream · Yellville" },
+    species:["smallmouth","rockbass"], note:"Arkansas's blue-ribbon smallmouth stream — among the best in the country.", best:"Apr–Jun & fall.", how:"Wade or float; tubes, jerkbaits, crawfish colors on gravel. Access points near Yellville.", size:"Ozark stream · Yellville",
+    intel:"Smallmouth turn on around 55°F (often March) and stay good into late October. Green-pumpkin-red tubes & Ned rigs on 1/32–1/16 oz heads, small swimbaits and crawfish cranks; poppers & walk-the-dog at dawn. Minnows & crayfish are the natural forage. Approach pools from downstream and cast up-current — the water's gin-clear.",
+    access:[{name:"Kelly's Slab (Yellville)",lat:36.250,lon:-92.620},{name:"Fred Berry Conservation Area",lat:36.180,lon:-92.500},{name:"George's Cove / Hwy 14",lat:36.230,lon:-92.680},{name:"Snow / lower access",lat:36.200,lon:-92.550}] },
   { name:"Buffalo National River", region:"Arkansas", type:"smbriver", lat:36.03, lon:-92.75,
     species:["smallmouth","rockbass"], note:"America's first National River.", best:"Spring–early summer floats.", how:"Float; soft plastics & topwater; goggle-eye on the side. Outfitter shuttles.", size:"~135 mi · Jasper/Buffalo City" },
   { name:"Kings River", region:"Arkansas", type:"smbriver", lat:36.30, lon:-93.72,
@@ -1279,7 +1311,8 @@ const WATERS = [
   { name:"Bull Shoals Lake", region:"Arkansas", type:"reservoir", lat:36.45, lon:-92.85,
     species:["largemouth","smallmouth","spotted","whitebass","walleye","striper","channelcat"], note:"Deep, clear White-River impoundment.", best:"Spring & fall bass; summer deep.", how:"Jerkbaits, jigs, drop-shot on bluffs; troll for walleye & stripers.", size:"~45,000 ac · Bull Shoals/Lakeview" },
   { name:"Beaver Lake", region:"Arkansas", type:"reservoir", lat:36.42, lon:-93.82,
-    species:["striper","largemouth","smallmouth","whitebass","walleye","blackcrappie","channelcat"], note:"NW Arkansas trophy-striper lake.", best:"Stripers spring & summer; spring bass/crappie.", how:"Live shad for stripers; finesse for bass; brush for crappie.", size:"~28,000 ac · Rogers/Eureka Springs" },
+    species:["striper","largemouth","smallmouth","whitebass","walleye","blackcrappie","channelcat"], note:"NW Arkansas trophy-striper lake.", best:"Stripers spring & summer; spring bass/crappie.", how:"Live shad for stripers; finesse for bass; brush for crappie.", size:"~28,000 ac · Rogers/Eureka Springs",
+    intel:"Trophy stripers run on live shad: 8–10\" gizzard shad on down-lines 40–80 ft over winter schools — find the shad, find the fish (Jan–Feb is slowest but biggest). Summer: downriggers & umbrella rigs to reach deep, thermocline fish. Bass on drop-shot & jerkbaits along the gin-clear bluffs." },
   { name:"Norfork Lake", region:"Arkansas", type:"reservoir", lat:36.42, lon:-92.20,
     species:["striper","largemouth","smallmouth","blackcrappie","channelcat"], note:"Clear highland reservoir famed for big stripers.", best:"Stripers year-round; spring crappie.", how:"Down-line live bait for stripers; brush for crappie & bass.", size:"~22,000 ac · Mountain Home" },
   { name:"Lake Ouachita", region:"Arkansas", type:"reservoir", lat:34.57, lon:-93.40,
@@ -1392,6 +1425,268 @@ const WATERS = [
     species:["smallmouth","channelcat","flathead"], note:"Prairie river with smallmouth and trophy flatheads.", best:"Spring smb; summer flatheads.", how:"Wade/kayak; soft plastics up top; live bait in the deep holes.", size:"Prairie river · Petersburg/Decatur" }
   /* APPEND-HERE */
 ];
+
+</script>
+<script>
+/* ============================================================
+   TACTICS — how to catch each species, by style.
+   Species-level guidance (general but accurate); water-specific
+   specifics live on each water's `intel` field. Fields are
+   optional — UI shows only what's present, and falls back to a
+   fish's baits/tip when there's no tactics entry.
+     { bait, gear, fly, season }
+   Researched from agency guides, fly shops & angler sources.
+   ============================================================ */
+const TACTICS = {
+  /* ---------------- TROUT / CHAR ---------------- */
+  rainbow:{
+    fly:"Tailwaters: dead-drift scuds & sowbugs (#14–18 olive/gray/tan) and zebra/thread midges (#18–22) under an indicator; egg patterns behind spawners. Freestone streams in summer: terrestrials (beetles, ants, hoppers) and attractor dries. 9' 4–5wt, 9–12' leader to 5X–6X.",
+    gear:"1/16–1/8 oz marabou or Trout Magnet jigs under a float; inline spinners (#0–2); small spoons. 2–4 lb line; drift naturally, slow on cold/low water.",
+    bait:"Where bait is legal: PowerBait/dough or salmon eggs on a #12–16 hook, or a nightcrawler chunk with a light split shot, 2–4 lb line. Many wild/trophy stretches are artificial-only — check the area's rules.",
+    season:"Winter: midges & micro-jigs, slow. Spring: eggs & worms. Summer: terrestrials, low-light & cold tailwater. Fall: streamers near pre-spawn browns."
+  },
+  brown:{
+    fly:"Big browns eat meat — strip streamers (sculpin/baitfish patterns) at dusk & after dark, especially fall pre-spawn. Numbers fish on nymphs (scuds, midges, pheasant tails) and on hatches: BWO (spring/fall), sulphurs, caddis. 9' 5–6wt, 3–4X for streamers.",
+    gear:"Jerkbaits & small swimbaits at low light; brown/olive jigs; inline spinners. Twitch-pause along undercut banks and wood.",
+    bait:"Nightcrawlers drifted through deep pools; minnows where legal. 4–6 lb line.",
+    season:"Fall pre-spawn = trophy window, streamers at dusk/night. Winter midges. Spring/early-summer hatches."
+  },
+  brook:{
+    fly:"Eager surface feeders — small attractor dries (Adams, Elk Caddis, Stimulator, #12–16) and bead-head nymphs in tight headwater pockets. Short, accurate casts; 7.5–8' 2–4wt, 4–5X.",
+    gear:"Tiny inline spinners (#0–1) and micro spoons in small creeks; stay low and out of sight.",
+    bait:"A worm under a tiny split shot in plunge pools (where legal). Light line, stealth.",
+    season:"Late spring–summer in the high country; fall spawn colors (handle gently, mostly C&R)."
+  },
+  cutthroat:{
+    fly:"Suckers for attractor dries — Royal Wulff, Humpy, Stimulator, hopper-dropper (#10–16). High-country lakes & cold streams once snowmelt clears. 9' 4–5wt.",
+    gear:"Small spinners & spoons in lakes and rivers; light line.",
+    bait:"Worms or PowerBait in stocked tailwaters where legal.",
+    season:"Summer surface feeding (Jun–Sep). In Southern tailwaters they're a stocked bonus on the same scuds/midges as rainbows."
+  },
+  laketrout:{
+    fly:"Rarely on fly except shallow at ice-out — big streamers/Clousers on sinking line, 7–8wt.",
+    gear:"Vertical-jig white/glow tube jigs & spoons over deep structure; troll spoons or flutter spoons on downriggers/lead-core in summer. Cast spoons shallow right after ice-out.",
+    bait:"Cut ciscoes/smelt or live ciscoes near bottom; also a top ice-fishing target on jigging spoons tipped with minnow heads.",
+    season:"Shallow & catchable at ice-out and through the ice; go deep (50–100'+) in summer."
+  },
+  /* ---------------- SALMON ---------------- */
+  chinook:{
+    fly:"In rivers: dead-drift egg patterns & heavy nymphs, or swing bright streamers; 8–9wt, heavy tippet.",
+    gear:"Spinners (#4–6), spoons, and plugs in rivers; troll spoons/flashers in the Great Lakes & ocean. Back-troll cured roe in current.",
+    bait:"Cured salmon roe under a float or drifted; check river-specific bait rules.",
+    season:"Fall spawning runs up tributaries are the prime shot at the biggest fish."
+  },
+  coho:{
+    fly:"Bright streamers & egg-sucking leeches stripped fast; 7–8wt.",
+    gear:"Small spinners & spoons (chartreuse/orange), twitching jigs; aggressive — strip/retrieve fast.",
+    bait:"Cured roe & shrimp where legal.",
+    season:"Fall runs; chrome fish strike hard and jump."
+  },
+  /* ---------------- BLACK BASS ---------------- */
+  largemouth:{
+    gear:"Summer: topwater frogs over pads, walking baits & poppers at dawn/dusk; Texas-rig worms & jigs in cover. Spring: jerkbaits (long pauses), spinnerbaits, chatterbaits, lipless cranks. Fall: spinnerbaits, squarebill cranks, chase shad. Winter: slow jigs, Texas-rigged worms & jigging spoons.",
+    bait:"Wild shiners are deadly for big fish (free-line or under a float); nightcrawlers & live bluegill (where legal) for numbers.",
+    fly:"Poppers & deer-hair bugs at dawn/dusk; weedless baitfish & frog streamers on an 7–8wt around cover.",
+    season:"Pre-spawn (spring) & fall feed-up are best; topwater shines all summer at low light."
+  },
+  smallmouth:{
+    gear:"Green-pumpkin tubes & Ned rigs on 1/16–1/8 oz heads, small swimbaits, and crawfish-color cranks on rocky runs. Topwater poppers & walk-the-dog at dawn in summer. Jerkbaits in cool water.",
+    bait:"Live crayfish & hellgrammites are the gold standard; minnows. 6–8 lb line.",
+    fly:"Crayfish & sculpin patterns, Clousers, and poppers/divers on a 6–7wt; swing & strip through current seams.",
+    season:"Bite turns on ~55°F+ (often March); strong spring–early summer & again in fall. Approach pools from downstream, cast up-current."
+  },
+  spotted:{
+    gear:"Finesse — drop-shot, shaky head, Ned rig & small jigs on clear reservoirs & rocky rivers; jerkbaits over points.",
+    bait:"Live shad or minnows over bluffs and points.",
+    fly:"Clousers & small baitfish patterns near structure, 6–7wt.",
+    season:"Spring & fall on points; chase suspended/schooling fish in summer."
+  },
+  /* ---------------- TEMPERATE BASS ---------------- */
+  striper:{
+    gear:"Big topwater plugs & bucktail jigs in low light; swimbaits & umbrella rigs trolled deep; downriggers in summer to reach the thermocline. Follow the bait.",
+    bait:"Live gizzard or threadfin shad on down-lines over schools is the trophy method (8–10\" baits for big fish); cut bunker/menhaden on the coast.",
+    fly:"Big Clousers, Deceivers & game changers on a 9–10wt during blitzes & river runs.",
+    season:"Spring & fall coastal/reservoir runs; winter trophy bite where shad concentrate. Find the shad, find the stripers."
+  },
+  whitebass:{
+    gear:"Small jigs, inline spinners, spoons & blade baits during the spring spawning run; cast to surface 'jumps' in summer with small swimbaits & spoons.",
+    bait:"Live minnows under a float in the run.",
+    fly:"Small white/chartreuse Clousers on a 5–6wt when they're schooling.",
+    season:"Spring runs up rivers & tributaries are fast, frenzied action; summer surface schooling."
+  },
+  /* ---------------- WALLEYE / PERCH ---------------- */
+  walleye:{
+    gear:"Jig & minnow or jig & plastic on the bottom; crawler harnesses (bottom-bouncers) & trolled crankbaits over flats; blade baits & jigging spoons in cold water.",
+    bait:"Live minnows, leeches & nightcrawlers on a jig or Lindy rig; minnows shine in cold water.",
+    fly:"Rarely on fly; sink-tip with small baitfish near bottom at dusk.",
+    season:"Dawn, dusk & after dark. Spring river runs below dams; troll summer flats; blade baits in winter tailwaters."
+  },
+  sauger:{
+    gear:"Vertical-jig hair jigs or jig-and-minnow in current; blade baits in cold tailwaters.",
+    bait:"Minnows on a jig, bounced through the current seams.",
+    season:"Stack below dams in late winter — a cold-season tailwater staple."
+  },
+  yellowperch:{
+    gear:"Small jigs & drop-shot tipped with minnows; spoons through the ice.",
+    bait:"Minnows or worm pieces near bottom; find one, find the school.",
+    season:"Cool months & ice; summer schools near bottom structure."
+  },
+  /* ---------------- SUNFISH / CRAPPIE ---------------- */
+  bluegill:{
+    gear:"Tiny jigs, beetle-spins & micro-plastics under a bobber.",
+    bait:"Crickets, red worms & waxworms under a float — the classic; tiny hooks (#6–10).",
+    fly:"Small poppers, foam spiders & sponge bugs on a 3–5wt — a blast.",
+    season:"Late-spring bed-fishing is nonstop; shallow all summer."
+  },
+  redear:{
+    gear:"Small jigs fished slow on the bottom near beds.",
+    bait:"Red worms & crickets right on bottom — they crush snails, so fish low; #6–8 hook.",
+    season:"Spring bed-fishing on the bottom is the trick; bigger than most bluegill."
+  },
+  rockbass:{
+    gear:"Small tubes, crankbaits & jigs around rocks; they hit aggressively.",
+    bait:"Crayfish, worms & minnows near cover.",
+    fly:"Small poppers & nymphs along rocky banks.",
+    season:"Late spring–summer; a fun smallmouth bycatch."
+  },
+  blackcrappie:{
+    gear:"1/16–1/32 oz marabou & soft-plastic jigs (chartreuse, black/chartreuse) around brush & docks; spider-rig multiple poles; small spoons in winter.",
+    bait:"Live minnows under a slip-float at brush-pile depth.",
+    fly:"Small Clouser/marabou minnows on a 4–5wt near cover.",
+    season:"Spring spawn pushes slabs shallow to brush & docks; suspended over cover the rest of the year."
+  },
+  whitecrappie:{
+    gear:"Jigs & minnows over standing timber & creek channels; spider-rigging covers water.",
+    bait:"Minnows under a float; tolerant of stained water.",
+    season:"Spring spawn; suspends over timber in reservoirs."
+  },
+  /* ---------------- CATFISH ---------------- */
+  channelcat:{
+    bait:"Cut shad, chicken liver, stinkbait, nightcrawlers or prepared dip baits on a slip-sinker rig; #2–4/0 circle hook, 12–20 lb line. Fish current breaks & holes after dark.",
+    gear:"Occasionally on jigs/cut bait drifted; mostly a bait fishery.",
+    season:"Summer nights are prime; very adaptable year-round."
+  },
+  flathead:{
+    bait:"LIVE bait only for the big ones — live bluegill/sunfish or shad on a 5/0–8/0 circle hook, heavy 30–50 lb line, near log jams & deep cover at night.",
+    gear:"Heavy gear; this is a live-bait ambush predator, not a lure fish.",
+    season:"Summer nights near woody cover produce trophies."
+  },
+  bluecat:{
+    bait:"Fresh cut shad, skipjack or drum on a 6/0–10/0 circle hook & slip-sinker; anchor or drift channel ledges & scour holes. 30–50 lb line.",
+    gear:"Drifting fresh cut bait across flats & ledges; heavy tackle.",
+    season:"Trophy blues bite all winter; tidal & big rivers fish best on moving water."
+  },
+  /* ---------------- PIKE / MUSKIE ---------------- */
+  muskie:{
+    gear:"Big bucktails, glide baits, rubber baits & topwater; cast & burn, and ALWAYS finish with a boatside figure-8. Heavy rod, 80–100 lb braid, fluorocarbon or wire leader.",
+    fly:"10–12\" articulated flies — Chocklett's T-Bone & Game Changer, big Buford-style bugs — on a 10–12wt (≈400-grain line); strip hard and figure-8 at the boat. A 4\" fly is small for muskie.",
+    bait:"Large live suckers (under a quick-strike rig) in fall.",
+    season:"'Fish of 10,000 casts.' Cold-front fall feeding produces the giants; midday–dusk."
+  },
+  pike:{
+    gear:"Large spoons (red/white), spinnerbaits, swimbaits & jerkbaits along weed edges; always use a wire or heavy-fluoro leader.",
+    bait:"Live suckers or large shiners under a float; dead-bait (smelt) on the bottom in cold water & through the ice.",
+    fly:"Big flashy streamers & poppers on an 8–9wt with a bite tippet.",
+    season:"Ambush predator — weed edges. Excellent through the ice and right after ice-out."
+  },
+  pickerel:{
+    gear:"Spinnerbaits, spoons & jerkbaits worked fast along vegetation; light wire leader helps.",
+    bait:"Live shiners under a float.",
+    season:"Active in cold water when bass sulk — a fun winter target."
+  },
+  /* ---------------- INSHORE SALTWATER ---------------- */
+  redfish:{
+    gear:"Gold/copper weedless spoons, paddletail soft plastics & topwater on the flats; popping cork + soft plastic over grass.",
+    bait:"Live or cut mullet, shrimp & blue crab on a #1/0–4/0 circle hook; fish oyster bars, marsh drains & the surf for bull reds.",
+    fly:"Crab & shrimp patterns and weedless baitfish (Clouser, EP) on an 8–9wt; sight-fish tailing reds.",
+    season:"Sight-fish a falling tide on the flats; fall bull-red runs hit the beaches & passes."
+  },
+  snook:{
+    gear:"Live-bait-imitating jerkbaits, paddletails & flair-hawk/bucktail jigs around lights, passes & bridges; topwater at dawn.",
+    bait:"Live pilchards, pinfish or shrimp free-lined to structure; fish moving tide.",
+    fly:"Baitfish patterns (EP, Deceiver) on a 8–9wt at dock lights after dark.",
+    season:"Ambush feeders on outgoing tide around lights & structure; cold snaps push them upriver. (Watch FL closed seasons.)"
+  },
+  seatrout:{
+    gear:"Popping cork + soft plastic or live shrimp over grass; soft-plastic paddletails & topwater plugs at dawn/dusk.",
+    bait:"Live shrimp under a cork; bigger 'gator' trout favor a large live bait at low light.",
+    fly:"Clousers & shrimp patterns on a 7–8wt over the flats.",
+    season:"Work grass flats on moving tide in low light; bigger trout favor cooler months."
+  },
+  flounder:{
+    gear:"Bounce a jig (tipped with Gulp) or a jighead-and-minnow slowly on the bottom around inlets & channels.",
+    bait:"Live mud minnows or finger mullet on a Carolina rig dragged slow; let them chew before setting.",
+    season:"Fall 'flounder run' toward the inlets is the best window."
+  },
+  tarpon:{
+    gear:"Live crabs/mullet on a circle hook in the passes; swimbaits & big plugs along the beaches. Heavy spinning/conventional, 60–80 lb leader.",
+    bait:"Live crabs (pass tarpon), threadfin & mullet free-lined; bridge fishing on strong tide.",
+    fly:"Tarpon toads, EP baitfish & Black Death on an 11–12wt with a heavy bite tippet; lead the fish & bow on the jump.",
+    season:"Spring/early-summer beach migration is the show. Catch-and-release; bow to the king."
+  },
+  bonefish:{
+    gear:"Light spinning with a small jig or live shrimp, cast ahead of cruising fish.",
+    bait:"Live shrimp on a light jighead on the flat.",
+    fly:"Crab & shrimp flies (Gotcha, Crazy Charlie, #4–8) on an 8wt; lead tailing fish on a pushing tide and strip-strike.",
+    season:"Sight-fish the flats on a rising tide; 'ghost of the flats' — blistering runs."
+  },
+  permit:{
+    gear:"A live crab on a circle hook, cast ahead of the fish.",
+    bait:"Live crabs are the highest-percentage bait, on flats & wrecks.",
+    fly:"Crab patterns (Merkin, Flexo) on a 9–10wt — the flats' toughest grand-slam leg; brutally picky.",
+    season:"Flats best on a rising tide; wrecks on slack."
+  },
+  bluefish:{
+    gear:"Metal lures, poppers & swimbaits during blitzes — use a wire or heavy-mono bite leader, they shred everything.",
+    bait:"Cut bunker on a fish-finder rig in the surf.",
+    fly:"Flashy Deceivers on a wire tippet, 8–9wt.",
+    season:"Spring & fall blitzes fire on moving tide when bait gets pinned."
+  },
+  /* ---------------- NEARSHORE / OFFSHORE ---------------- */
+  redsnapper:{
+    gear:"Drop cut bait or a vertical jig to reefs, wrecks & rigs (60–300 ft); heavy conventional, circle hooks, descending device to release.",
+    bait:"Cut bait, live pinfish & cigar minnows on a knocker/Carolina rig.",
+    season:"Very short federal seasons — plan around the open dates."
+  },
+  mahi:{
+    gear:"Troll ballyhoo & skirted lures along weedlines & debris; once you find a school, pitch cut bait or bucktails to keep them up.",
+    bait:"Cut ballyhoo & live bait pitched to a hooked fish keeps the school behind the boat.",
+    fly:"Big poppers & Deceivers on a 9–10wt to a teased-up school.",
+    season:"Run weedlines & floating debris in summer; fast, acrobatic, superb eating."
+  },
+  sailfish:{
+    gear:"Kite-fish live goggle-eyes/threadfin on circle hooks; troll dredges & ballyhoo with teasers. Drop back on the bite.",
+    bait:"Live bait under kites is the South-FL winter standard.",
+    fly:"Bait-and-switch with teasers, then a big popper/streamer on a 12wt.",
+    season:"Winter cold fronts trigger spectacular runs off South Florida & the OBX."
+  },
+  yellowfin:{
+    gear:"Troll lures & ballyhoo, then chunk or pitch live hardtails at the rips & canyons; poppers & jigs over schools.",
+    bait:"Chunked & live bait on fluorocarbon at the rigs/canyons.",
+    season:"Run to the canyons, rips & rigs; brutal stand-up fights."
+  },
+  /* ---------------- OTHER FRESHWATER ---------------- */
+  carp:{
+    bait:"Sweet corn, boilies, dough & bread on a hair rig or light hook; pre-bait (chum) a spot with corn and hold on. 8–12 lb line.",
+    fly:"Sight-fish with carp/crayfish & nymph patterns on a 6–7wt — a legit challenge.",
+    season:"Warm months; cruising & feeding in shallow flats."
+  },
+  freshdrum:{
+    bait:"Nightcrawlers, cut bait & crayfish on the bottom of big rivers & lakes.",
+    gear:"Jigs & crankbaits bounced on bottom; hard-pulling bonus on river drifts.",
+    season:"Summer; abundant and underrated on light tackle."
+  },
+  bowfin:{
+    gear:"Cut bait, spinnerbaits & soft plastics in vegetated backwaters; a prehistoric brawler that destroys tackle. Heavy line.",
+    bait:"Cut bait or live shiners on a stout hook in the swamps.",
+    season:"Warm months in weedy backwaters & swamps."
+  },
+  alligatorgar:{
+    bait:"Large fresh cut carp/mullet on a heavy circle hook (no wire needed with circles); heavy 80–130 lb gear, patience for the run. Mostly C&R.",
+    gear:"A 6-foot apex predator — big baits, heavy tackle; rope lures (no hook) are used by some.",
+    season:"Summer in big sluggish Southern rivers, bayous & oxbows."
+  }
+};
 
 </script>
 <script>
@@ -1768,9 +2063,12 @@ function makeWaterPopup(w){
     ${w.best?`<div class="wmeta"><b>Best</b> ${w.best}</div>`:""}
     ${w.how?`<div class="wmeta"><b>How</b> ${w.how}</div>`:""}
     ${w.size?`<div class="wmeta"><b>Where</b> ${w.size}</div>`:""}
+    ${w.intel?`<div class="wintel"><b>🪝 Local intel</b> ${w.intel}</div>`:""}
+    ${(w.access&&w.access.length)?`<div class="wmeta"><b>Access</b> ${w.access.map((a,i)=>`<span class="wacc" data-ai="${i}">📍 ${a.name}</span>`).join(" · ")}</div>`:""}
     <div class="wsp">${w.species.map(id=>{const f=fishById(id);return f?`<span class="wchip" data-fid="${id}">${f.name}</span>`:"";}).join("")}</div>
     <button class="wsave${state.favWater.has(w.name)?" on":""}">${state.favWater.has(w.name)?"★ Saved spot":"☆ Save spot"}</button>`;
   el.querySelectorAll(".wchip").forEach(c=>c.addEventListener("click",()=>selectFish(c.dataset.fid)));
+  el.querySelectorAll(".wacc").forEach(a=>a.addEventListener("click",()=>{ const pt=w.access&&w.access[+a.dataset.ai]; if(pt&&map) map.setView([pt.lat,pt.lon],13,{animate:true}); }));
   const sv=el.querySelector(".wsave"); if(sv) sv.addEventListener("click",()=>{ toggleFavWater(w.name); sv.classList.toggle("on",state.favWater.has(w.name)); sv.textContent=state.favWater.has(w.name)?"★ Saved spot":"☆ Save spot"; });
   return el;
 }
@@ -1853,6 +2151,7 @@ function renderFishInfo(box){
       <div class="kv"><b>Tip:</b> ${f.tip}</div>
       <div class="kv" style="margin-top:6px"><b>What they're biting:</b></div>
       <div class="baits">${f.baits.map(b=>`<span class="pill">${b}</span>`).join("")}</div>
+      ${howToHtml(f)}
       ${waterChipsHtml(f)}
       <div class="credit"></div>
     </div>`;
@@ -1861,6 +2160,14 @@ function renderFishInfo(box){
   box.querySelectorAll(".waterchip").forEach(c=>c.onclick=()=>{
     const m=waterMarkers[c.dataset.w]; if(m){ map.setView(m.getLatLng(),9,{animate:true}); m.openPopup(); }
   });
+}
+function howToHtml(f){
+  const t=(typeof TACTICS!=="undefined")?TACTICS[f.id]:null;
+  if(!t) return "";
+  const row=(label,val)=> val?`<div class="howrow"><span class="howlbl">${label}</span><span>${val}</span></div>`:"";
+  const body = row("🪱 Bait",t.bait)+row("🎣 Gear",t.gear)+row("🪶 Fly",t.fly)+row("📅 Season",t.season);
+  if(!body) return "";
+  return `<details class="howto"><summary>🪝 How to catch — bait · gear · fly</summary><div class="howbody">${body}</div></details>`;
 }
 function waterChipsHtml(f){
   const ws=(typeof WATERS!=="undefined"?WATERS:[]).filter(w=>w.species.includes(f.id));
