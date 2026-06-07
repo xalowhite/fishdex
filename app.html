@@ -139,6 +139,17 @@
   .wpin span{display:block;width:14px;height:14px;border-radius:50%;border:2px solid #eef7f6;
     box-shadow:0 1px 4px rgba(0,0,0,.6);box-sizing:border-box}
   .wpin:hover span{transform:scale(1.25);transition:transform .1s}
+  .wpin.saved span{border-color:#e9c96b;box-shadow:0 0 0 2px rgba(233,201,107,.5),0 1px 4px rgba(0,0,0,.6)}
+  /* favorite stars */
+  .favstar{flex:0 0 auto;background:none;border:none;color:#5d7681;font-size:18px;cursor:pointer;line-height:1;
+    padding:2px 4px;align-self:flex-start;transition:transform .08s}
+  .favstar:hover{transform:scale(1.2)}
+  .favstar.on{color:#e9c96b}
+  .favstar.big{font-size:24px}
+  .wsave{margin-top:8px;width:100%;background:var(--chip);border:1px solid var(--line);color:var(--accent2);
+    border-radius:8px;padding:7px;font-size:12.5px;font-weight:600;cursor:pointer}
+  .wsave:hover{border-color:var(--accent)}
+  .wsave.on{background:#2e2a14;border-color:#5a4f1f;color:#e9c96b}
   .leaflet-tooltip.stt{background:#0e2530;border:1px solid var(--accent);color:var(--ink);font-weight:600}
   .leaflet-tooltip.eco{background:#241f12;border:1px solid #b78b3a;color:#f1e3c4;font-weight:600}
   .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;z-index:600}
@@ -174,6 +185,7 @@
             <span><span class="lbl">Angling mode</span><br><span class="sub">rank by season, month & time of day</span></span>
           </label>
           <button id="nowBtn">🎣 What's biting now</button>
+          <button id="savedBtn" class="ghostbtn">☆ Saved</button>
           <button id="ecoBtn" class="ghostbtn">🗺️ Ecoregions: off</button>
           <div class="ctxbar" style="margin-left:auto" id="hint">Tip: click any state, province, or Mexican state to see what swims there.</div>
         </div>
@@ -1406,8 +1418,28 @@ const GEO_SOURCES = [
 
 const state = {
   angling:false, month:"", tod:new Set(), water:new Set(),
-  selectedFish:null, selectedSub:null, selectedState:null, selectedEco:null, query:""
+  selectedFish:null, selectedSub:null, selectedState:null, selectedEco:null, query:"",
+  favFish:new Set(), favWater:new Set(), savedView:false
 };
+
+/* ---------- favorites (persisted in the browser) ---------- */
+const FAV_KEYS={fish:"fishdex.favFish", water:"fishdex.favWater"};
+function loadFavs(){
+  try{ state.favFish=new Set(JSON.parse(localStorage.getItem(FAV_KEYS.fish)||"[]")); }catch(e){}
+  try{ state.favWater=new Set(JSON.parse(localStorage.getItem(FAV_KEYS.water)||"[]")); }catch(e){}
+}
+function saveFavs(){
+  try{ localStorage.setItem(FAV_KEYS.fish,JSON.stringify([...state.favFish]));
+       localStorage.setItem(FAV_KEYS.water,JSON.stringify([...state.favWater])); }catch(e){}
+}
+function toggleFavFish(id){ if(state.favFish.has(id)) state.favFish.delete(id); else state.favFish.add(id); saveFavs(); updateSavedBtn(); renderList(); if(state.selectedFish===id) renderInfo(); }
+function toggleFavWater(name){ if(state.favWater.has(name)) state.favWater.delete(name); else state.favWater.add(name); saveFavs(); updateSavedBtn(); refreshWaters(); }
+function updateSavedBtn(){
+  const b=document.getElementById("savedBtn"); if(!b) return;
+  const n=state.favFish.size, m=state.favWater.size;
+  b.classList.toggle("on",state.savedView);
+  b.textContent=(state.savedView?"★":"☆")+" Saved"+((n||m)?` (${n}🐟·${m}📍)`:"");
+}
 
 let map, stateLayers={}, normIndex={};  // normIndex: normalized name -> display name
 
@@ -1510,6 +1542,7 @@ function renderList(){
   const selEcoNorm = state.selectedEco?norm(state.selectedEco):null;
 
   let items=FISH.filter(f=>{
+    if(state.savedView && !state.favFish.has(f.id)) return false;
     if(selEcoNorm && !fishEcoNorm(f).has(selEcoNorm)) return false;
     if(selStateNorm && !fishStatesNorm(f).has(selStateNorm)) return false;
     if(q){
@@ -1552,6 +1585,7 @@ function renderList(){
         `<div class="sub ${state.selectedFish===f.id&&state.selectedSub===i?'sel':''}" data-sub="${i}">
            <span class="sn">${s.n}</span><span class="ss">${s.s}</span></div>`).join("")+`</div>`; }
 
+      const favd=state.favFish.has(f.id);
       card.innerHTML=`
         <div class="row1">
           <span class="thumb">${fishSVG(f.shape, FAMILY_COLOR[f.family])}</span>
@@ -1560,6 +1594,7 @@ function renderList(){
             <div class="sci">${f.sci}</div>
           </div>
           ${bite}
+          <button class="favstar${favd?" on":""}" data-fav="${f.id}" title="${favd?"Saved — tap to remove":"Save this fish"}">${favd?"★":"☆"}</button>
         </div>
         <div class="meta">${waterPills}<span class="pill fight">${stars(f.fight)}</span>${f.subs?`<span class="pill">${f.subs.length} subsp.</span>`:""}</div>
         ${subsHtml}`;
@@ -1569,8 +1604,13 @@ function renderList(){
 
   if(shown===0){
     const where=state.selectedEco||state.selectedState;
-    list.innerHTML=`<div style="padding:30px 16px;color:var(--muted);text-align:center">
-      No fish match these filters.${where?`<br>Try clearing the <b>${where}</b> location.`:""}</div>`;
+    if(state.savedView && state.favFish.size===0){
+      list.innerHTML=`<div style="padding:30px 16px;color:var(--muted);text-align:center">
+        No saved fish yet.<br>Tap the ☆ on any species to save it here.</div>`;
+    } else {
+      list.innerHTML=`<div style="padding:30px 16px;color:var(--muted);text-align:center">
+        No fish match these filters.${where?`<br>Try clearing the <b>${where}</b> location.`:""}</div>`;
+    }
   }
   document.getElementById("count").textContent=shown+" / "+FISH.length+" species";
 }
@@ -1589,6 +1629,8 @@ function renderCtx(){
     const sub=state.selectedSub!=null&&f.subs?" — "+f.subs[state.selectedSub].n:"";
     ctx.innerHTML=`<span>Range shown for <b>${f.name}${sub}</b></span><button id="clearFish">Show all</button>`;
     document.getElementById("clearFish").onclick=()=>selectFish(null);
+  } else if(state.savedView){
+    ctx.innerHTML=`<span><b>★ Saved</b> — ${state.favFish.size} fish · ${state.favWater.size} spots</span>`;
   } else {
     ctx.innerHTML=`<span>Showing all North American game fish</span>`;
   }
@@ -1711,8 +1753,10 @@ function toggleEcoMode(){
 /* ---------- notable waters (named-waterbody pins) ---------- */
 let waterLayer=L.layerGroup(), waterMarkers={};
 function watersToShow(){
-  if(state.selectedFish) return (typeof WATERS!=="undefined"?WATERS:[]).filter(w=>w.species.includes(state.selectedFish));
-  if(state.selectedState) return (typeof WATERS!=="undefined"?WATERS:[]).filter(w=>w.region===state.selectedState);
+  const all=(typeof WATERS!=="undefined"?WATERS:[]);
+  if(state.savedView) return all.filter(w=>state.favWater.has(w.name));
+  if(state.selectedFish) return all.filter(w=>w.species.includes(state.selectedFish));
+  if(state.selectedState) return all.filter(w=>w.region===state.selectedState);
   return [];
 }
 function makeWaterPopup(w){
@@ -1724,17 +1768,20 @@ function makeWaterPopup(w){
     ${w.best?`<div class="wmeta"><b>Best</b> ${w.best}</div>`:""}
     ${w.how?`<div class="wmeta"><b>How</b> ${w.how}</div>`:""}
     ${w.size?`<div class="wmeta"><b>Where</b> ${w.size}</div>`:""}
-    <div class="wsp">${w.species.map(id=>{const f=fishById(id);return f?`<span class="wchip" data-fid="${id}">${f.name}</span>`:"";}).join("")}</div>`;
+    <div class="wsp">${w.species.map(id=>{const f=fishById(id);return f?`<span class="wchip" data-fid="${id}">${f.name}</span>`:"";}).join("")}</div>
+    <button class="wsave${state.favWater.has(w.name)?" on":""}">${state.favWater.has(w.name)?"★ Saved spot":"☆ Save spot"}</button>`;
   el.querySelectorAll(".wchip").forEach(c=>c.addEventListener("click",()=>selectFish(c.dataset.fid)));
+  const sv=el.querySelector(".wsave"); if(sv) sv.addEventListener("click",()=>{ toggleFavWater(w.name); sv.classList.toggle("on",state.favWater.has(w.name)); sv.textContent=state.favWater.has(w.name)?"★ Saved spot":"☆ Save spot"; });
   return el;
 }
 function refreshWaters(){
   waterLayer.clearLayers(); waterMarkers={};
   watersToShow().forEach(w=>{
     const t=WATER_TYPE[w.type]||{color:"#888"};
+    const saved=state.favWater.has(w.name);
     // HTML divIcon marker -> lives in markerPane, above all polygons (so state/eco
-    // hover bringToFront can't paint over it).
-    const icon=L.divIcon({className:"wpin", html:`<span style="background:${t.color}"></span>`, iconSize:[18,18], iconAnchor:[9,9], popupAnchor:[0,-8]});
+    // hover bringToFront can't paint over it). Saved waters get a gold ring.
+    const icon=L.divIcon({className:"wpin"+(saved?" saved":""), html:`<span style="background:${t.color}"></span>`, iconSize:[18,18], iconAnchor:[9,9], popupAnchor:[0,-8]});
     const m=L.marker([w.lat,w.lon],{icon, riseOnHover:true, title:w.name});
     m.bindPopup(()=>makeWaterPopup(w),{maxWidth:260,className:"wpopwrap"});
     m.bindTooltip(w.name,{direction:"top",offset:[0,-9]});
@@ -1792,8 +1839,9 @@ function renderFishInfo(box){
     <div class="pad">
       <div class="ihead">
         <span class="iart">${fishSVG(f.shape,FAMILY_COLOR[f.family],60)}</span>
-        <div><h3>${f.name}${sub?` <span class="subname">(${sub.n})</span>`:""}</h3>
+        <div style="flex:1"><h3>${f.name}${sub?` <span class="subname">(${sub.n})</span>`:""}</h3>
         <div class="sci">${sub?sub.s:f.sci}</div></div>
+        <button class="favstar big${state.favFish.has(f.id)?" on":""}" id="infoFav" title="Save this fish">${state.favFish.has(f.id)?"★":"☆"}</button>
       </div>
       <div class="kv"><b>Family:</b> ${f.family} &nbsp;·&nbsp; <b>Fight:</b> <span class="stars">${stars(f.fight)}</span></div>
       <div class="kv"><b>Habitat:</b> ${f.habitat}</div>
@@ -1809,6 +1857,7 @@ function renderFishInfo(box){
       <div class="credit"></div>
     </div>`;
   loadPhoto(f, box.querySelector(".hero"), box.querySelector(".credit"));
+  const iv=box.querySelector("#infoFav"); if(iv) iv.onclick=()=>toggleFavFish(f.id);
   box.querySelectorAll(".waterchip").forEach(c=>c.onclick=()=>{
     const m=waterMarkers[c.dataset.w]; if(m){ map.setView(m.getLatLng(),9,{animate:true}); m.openPopup(); }
   });
@@ -1892,6 +1941,16 @@ function buildFilterUI(){
 
   document.getElementById("ecoBtn").onclick=toggleEcoMode;
 
+  document.getElementById("savedBtn").onclick=()=>{
+    state.savedView=!state.savedView;
+    if(state.savedView){ state.selectedFish=null; state.selectedSub=null; state.selectedState=null; state.selectedEco=null; renderInfo(); }
+    updateSavedBtn();
+    document.getElementById("hint").textContent = state.savedView
+      ? "Your saved fish & spots. Tap ☆ on anything to add or remove."
+      : "Tip: click any state, province, or Mexican state to see what swims there.";
+    refreshEco(); refreshWaters(); restyle(); renderList(); renderCtx();
+  };
+
   const tgl=document.getElementById("angleToggle");
   tgl.onclick=()=>{ state.angling=!state.angling; tgl.classList.toggle("on",state.angling);
     document.getElementById("angleFilters").classList.toggle("hide",!state.angling);
@@ -1910,6 +1969,8 @@ function renderLegend(){
 /* ---------- events ---------- */
 function wireList(){
   document.getElementById("list").addEventListener("click",e=>{
+    const fav=e.target.closest(".favstar");
+    if(fav){ e.stopPropagation(); toggleFavFish(fav.dataset.fav); return; }
     const subEl=e.target.closest(".sub"); const card=e.target.closest(".card");
     if(subEl&&card){ selectFish(card.dataset.id,+subEl.dataset.sub); return; }
     if(card) selectFish(card.dataset.id);
@@ -1918,7 +1979,8 @@ function wireList(){
 }
 
 window.addEventListener("DOMContentLoaded",()=>{
-  buildFilterUI(); wireList(); renderLegend(); renderList(); renderCtx(); initMap();
+  loadFavs();
+  buildFilterUI(); wireList(); renderLegend(); updateSavedBtn(); renderList(); renderCtx(); initMap();
   setTimeout(preloadEco, 1200); // warm the ecoregion data so fish ranges render instantly
 });
 
