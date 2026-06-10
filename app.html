@@ -240,8 +240,19 @@
   .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;z-index:600}
   @media (max-width:760px){
     .main{flex-direction:column}
-    .rolodex{width:100%;max-width:none;height:42%;border-right:none;border-bottom:1px solid var(--line)}
+    .rolodex{width:100%;max-width:none;min-width:0;height:42%;border-right:none;border-bottom:1px solid var(--line)}
     .right{height:58%}
+    /* filter bar: single scrollable row, hide the verbose bits, bigger touch targets */
+    .filters{padding:8px 10px}
+    .filters .top{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:8px;scrollbar-width:none}
+    .filters .top::-webkit-scrollbar{display:none}
+    .filters .top>*{flex:0 0 auto}
+    .filters .top #hint{display:none}
+    .toggle .sub{display:none}
+    #nowBtn,.ghostbtn,.statesel{padding:9px 12px;font-size:13px}
+    header h1{font-size:17px}
+    header .tag{display:none}
+    .leaflet-control-zoom{display:none} /* pinch-zoom instead; saves map space */
   }
 </style>
 </head>
@@ -301,6 +312,7 @@
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+/* === inlined data.js === */
 /* ============================================================
    FishDex data v2 — curated North American game fish
    Coverage: USA (incl. AK & HI), Canada (provinces/territories),
@@ -1076,6 +1088,7 @@ const ECO_RANGE = {
 
 </script>
 <script>
+/* === inlined waters.js === */
 /* ============================================================
    NOTABLE WATERS — named destination fisheries (curated, not
    exhaustive). Showcase states: MO, FL, NC, AR, IL.
@@ -1776,6 +1789,7 @@ const WATER_PROFILE = {
 
 </script>
 <script>
+/* === inlined tactics.js === */
 /* ============================================================
    TACTICS — how to catch each species, by style.
    Species-level guidance (general but accurate); water-specific
@@ -2120,6 +2134,7 @@ const TACTICS = {
 
 </script>
 <script>
+/* === inlined app.js === */
 /* ============================================================
    FishDex app logic v2
    ============================================================ */
@@ -2434,9 +2449,14 @@ function initMap(){
   const satLabels=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",{maxZoom:19});
   const satellite=L.layerGroup([sat,satLabels]);
   const topo=L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",{attribution:'&copy; OpenTopoMap (CC-BY-SA)', maxZoom:17});
-  dark.addTo(map);
-  L.control.layers({"🌑 Dark":dark, "🛰️ Satellite":satellite, "🗺️ Topographic":topo}, null, {position:"topright"}).addTo(map);
-  map.on("baselayerchange", e=>{ baseMode = e.name.indexOf("Dark")>=0 ? "dark" : "imagery"; restyle(); });
+  const bases={"🌑 Dark":dark, "🛰️ Satellite":satellite, "🗺️ Topographic":topo};
+  let savedBase=null; try{ savedBase=localStorage.getItem("fishdex.basemap"); }catch(e){}
+  const startBase=bases[savedBase]||dark;
+  startBase.addTo(map);
+  baseMode = (startBase===dark) ? "dark" : "imagery";
+  L.control.layers(bases, null, {position:"topright"}).addTo(map);
+  map.on("baselayerchange", e=>{ baseMode = e.name.indexOf("Dark")>=0 ? "dark" : "imagery"; restyle();
+    try{ localStorage.setItem("fishdex.basemap", e.name); }catch(err){} });
   let loaded=0;
   GEO_SOURCES.forEach(src=>loadGeo(src.urls,0,()=>{ loaded++; if(loaded>=GEO_SOURCES.length){ document.getElementById("loading").style.display="none"; restyle(); }}));
 }
@@ -2535,9 +2555,11 @@ function showWaterDetail(w){
   try{ acc.length>1 ? map.fitBounds(b.pad(0.4),{maxZoom:13,animate:true}) : map.setView([w.lat,w.lon],12,{animate:true}); }catch(e){}
 }
 
-/* ---------- river shape tracing (OpenStreetMap, runtime + cached) ---------- */
-// our water name -> OSM waterway name (Missouri streams). Geometry fetched live from
-// Overpass within the Missouri boundary, simplified, and drawn so you can follow the river.
+/* ---------- waterbody shape tracing (OpenStreetMap, runtime + cached) ----------
+   our water name -> OSM name. Geometry fetched live from Overpass within the water's
+   OWN state boundary (w.region), so the same engine traces MO/AR/NC/IL/FL waters.
+   Rivers: way["waterway"]; lakes: way/relation["natural"="water"] (shoreline drawn
+   with the same casing+trace style). All fetches cached per water, fail silent. */
 const RIVER_OSM = {
   "Current River (lower)":"Current River","Jacks Fork River":"Jacks Fork","Big River":"Big River",
   "Meramec River":"Meramec River","Gasconade River":"Gasconade River","Big Piney River":"Big Piney River",
@@ -2545,7 +2567,72 @@ const RIVER_OSM = {
   "Huzzah Creek":"Huzzah Creek","Courtois Creek":"Courtois Creek","Bourbeuse River":"Bourbeuse River",
   "Sac River":"Sac River","Big Sugar Creek":"Big Sugar Creek","North Fork of the White River":"North Fork River",
   "Crane Creek":"Crane Creek","Little Piney Creek":"Little Piney Creek","Roubidoux Creek":"Roubidoux Creek",
-  "Eleven Point River (MO)":"Eleven Point River","Niangua River":"Niangua River","Osage River (below Bagnell Dam)":"Osage River"
+  "Eleven Point River (MO)":"Eleven Point River","Osage River (below Bagnell Dam)":"Osage River",
+  // Arkansas (OSM names verified via Overpass counts, 2026-06-10)
+  "White River (below Bull Shoals Dam)":"White River","Beaver Tailwater":"White River","White River (lower, warmwater)":"White River",
+  "Norfork Tailwater":"North Fork River","Little Red River (below Greers Ferry)":"Little Red River",
+  "Spring River (Mammoth Spring)":"Spring River","Little Missouri River (below Greeson)":"Little Missouri River",
+  "Sylamore Creek":"North Sylamore Creek","Crooked Creek":"Crooked Creek","Buffalo National River":"Buffalo River",
+  "Kings River":"Kings River","Mulberry River":"Mulberry River","War Eagle Creek":"War Eagle Creek",
+  "Strawberry River":"Strawberry River","Saline River":"Saline River","Cossatot River":"Cossatot River",
+  "Eleven Point River (AR)":"Eleven Point River","Illinois River (NW Arkansas)":"Illinois River",
+  "Ouachita River":"Ouachita River","Arkansas River (Little Rock pools)":"Arkansas River",
+  // North Carolina
+  "Davidson River (Pisgah NF)":"Davidson River","Nantahala River (Delayed Harvest)":"Nantahala River",
+  "Tuckasegee River":"Tuckasegee River","Watauga River (High Country)":"Watauga River",
+  "Wilson Creek (Wild Trout)":"Wilson Creek","Raven Fork (Cherokee Trophy Waters)":"Raven Fork",
+  "Hazel Creek (Smokies backcountry)":"Hazel Creek","South Toe River":"South Toe River",
+  "Linville River (Gorge)":"Linville River","Mitchell River (Delayed Harvest)":"Mitchell River",
+  "Cataloochee Creek (Smokies)":"Cataloochee Creek","North Mills River":"North Fork Mills River",
+  "Snowbird Creek":"Snowbird Creek","New River (Ashe/Alleghany)":"South Fork New River",
+  "French Broad River":"French Broad River","Roanoke River (Weldon)":"Roanoke River",
+  "Yadkin–Pee Dee River":"Yadkin River","Catawba River":"Catawba River","Dan River":"Dan River",
+  // Illinois
+  "Kankakee River":"Kankakee River","Fox River":"Fox River","Rock River":"Rock River",
+  "Vermilion River (Middle Fork)":"Middle Fork Vermilion River","Des Plaines River":"Des Plaines River",
+  "Illinois River (Starved Rock)":"Illinois River","Kaskaskia River":"Kaskaskia River","Sangamon River":"Sangamon River",
+  // Florida
+  "St. Johns River":"Saint Johns River","Withlacoochee River":"Withlacoochee River"
+};
+// our water name -> OSM lake name(s) (string or array of candidates; first match wins via union query).
+// Queries are bounded to 60 km around the pin, so a same-named lake elsewhere can't be drawn.
+const LAKE_OSM = {
+  // Missouri
+  "Lake of the Ozarks":"Lake of the Ozarks","Table Rock Lake":"Table Rock Lake",
+  "Truman Lake":["Harry S. Truman Reservoir","Harry S Truman Reservoir","Truman Reservoir","Truman Lake"],
+  "Stockton Lake":"Stockton Lake","Pomme de Terre Lake":"Pomme de Terre Lake","Mark Twain Lake":"Mark Twain Lake",
+  "Smithville Lake":["Smithville Lake","Smithville Reservoir"],"Bull Shoals Lake (MO arm)":"Bull Shoals Lake",
+  "Lake Wappapello":["Lake Wappapello","Wappapello Lake"],"Clearwater Lake":"Clearwater Lake",
+  "Thomas Hill Reservoir":"Thomas Hill Reservoir","Long Branch Lake":"Long Branch Lake",
+  "Fellows Lake":"Fellows Lake","Lake Jacomo":"Lake Jacomo","Montrose Lake":["Montrose Lake","Montrose Conservation Lake"],
+  "Lake Taneycomo":"Lake Taneycomo",
+  // Florida
+  "Lake Okeechobee":"Lake Okeechobee","Rodman Reservoir":["Rodman Reservoir","Lake Ocklawaha"],
+  "Lake Tohopekaliga (Toho)":"Lake Tohopekaliga","Lake George":"Lake George","Lake Seminole":"Lake Seminole",
+  "Harris Chain of Lakes":["Lake Harris","Little Lake Harris","Lake Eustis","Lake Dora","Lake Griffin","Lake Yale"],
+  // North Carolina
+  "Lake James":"Lake James","Lake Norman":"Lake Norman","High Rock Lake":"High Rock Lake",
+  "Kerr Lake (Buggs Island)":["Kerr Lake","John H. Kerr Reservoir","Buggs Island Lake"],
+  "Lake Gaston":"Lake Gaston","Jordan Lake":["Jordan Lake","B. Everett Jordan Lake","B. Everett Jordan Reservoir"],
+  "Falls Lake":["Falls Lake","Falls of the Neuse Reservoir"],
+  "Shearon Harris Lake":["Harris Lake","Shearon Harris Reservoir"],
+  "Lake Hickory":"Lake Hickory","Lake Tillery":"Lake Tillery",
+  // Arkansas
+  "Bull Shoals Lake":"Bull Shoals Lake","Beaver Lake":"Beaver Lake","Norfork Lake":["Norfork Lake","Lake Norfork"],
+  "Lake Ouachita":"Lake Ouachita","Greers Ferry Lake":"Greers Ferry Lake",
+  "Lake Hamilton (Hot Springs)":"Lake Hamilton","Lake Dardanelle (Arkansas River)":"Lake Dardanelle",
+  "DeGray Lake":["DeGray Lake","Degray Lake","Lake DeGray"],"Lake Greeson":"Lake Greeson",
+  "Lake Maumelle":"Lake Maumelle","Lake Catherine":"Lake Catherine","Nimrod Lake":"Nimrod Lake",
+  "Lake Conway":"Lake Conway","Millwood Lake":["Millwood Lake","Millwood Reservoir"],"Lake Chicot":"Lake Chicot",
+  // Illinois
+  "Lake Shelbyville":"Lake Shelbyville","Clinton Lake":"Clinton Lake","Lake Decatur":"Lake Decatur",
+  "Lake Sangchris":["Sangchris Lake","Lake Sangchris"],"Spring Lake (Manito)":"Spring Lake",
+  "Coffeen Lake":"Coffeen Lake","Newton Lake":"Newton Lake","Carlyle Lake":"Carlyle Lake",
+  "Braidwood Lake":["Braidwood Lake","Braidwood Cooling Pond"],"Heidecke Lake":"Heidecke Lake",
+  "Rend Lake":"Rend Lake","Kinkaid Lake":"Kinkaid Lake","Lake of Egypt":"Lake of Egypt",
+  "Crab Orchard Lake":"Crab Orchard Lake","Cedar Lake":"Cedar Lake",
+  "Devil's Kitchen Lake":["Devils Kitchen Lake","Devil's Kitchen Lake"],"Lake Murphysboro":"Lake Murphysboro",
+  "Fox Chain O'Lakes":["Fox Lake","Pistakee Lake","Grass Lake","Nippersink Lake","Lake Marie","Channel Lake"]
 };
 let riverLayer=null; const riverCache={};
 function clearRiver(){ if(riverLayer&&map){ map.removeLayer(riverLayer); } riverLayer=null; }
@@ -2560,21 +2647,42 @@ function renderRiver(lines, fit){
   riverLayer.addTo(map);
   if(fit){ try{ map.fitBounds(L.featureGroup(riverLayer.getLayers()).getBounds().pad(0.12),{maxZoom:12,animate:true}); }catch(e){} }
 }
-function drawRiver(w){
-  clearRiver();
-  const osm=(typeof RIVER_OSM!=="undefined")?RIVER_OSM[w.name]:null;
-  if(!osm) return;
-  if(riverCache[w.name]){ renderRiver(riverCache[w.name], true); return; }
-  const q=`[out:json][timeout:50];area["name"="Missouri"]["admin_level"="4"]->.mo;way["waterway"]["name"="${osm}"](area.mo);out geom;`;
-  fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent(q)})
-    .then(r=>r.ok?r.json():Promise.reject()).then(j=>{
-      const lines=[];
-      (j.elements||[]).forEach(e=>{ const g=e.geometry; if(g&&g.length>1) lines.push(g.map(p=>[p.lat,p.lon])); });
-      if(!lines.length) return;
-      riverCache[w.name]=lines;
-      if(state.selectedWater===w.name) renderRiver(lines, true);   // only if still viewing it
-    }).catch(()=>{});
+function overpassJson(q){
+  return fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent(q)})
+    .then(r=>r.ok?r.json():Promise.reject());
 }
+function drawWater(w){
+  clearRiver();
+  const river=(typeof RIVER_OSM!=="undefined")?RIVER_OSM[w.name]:null;
+  const lake =(typeof LAKE_OSM !=="undefined")?LAKE_OSM[w.name]:null;
+  if(!river && !lake) return;
+  if(riverCache[w.name]){ renderRiver(riverCache[w.name], true); return; }
+  const area=`area["name"="${w.region}"]["admin_level"="4"]->.st;`;
+  let q;
+  if(river){
+    q=`[out:json][timeout:50];${area}way["waterway"]["name"="${river}"](area.st);out geom;`;
+  }else{
+    // lakes: LAKE_OSM value may be a string or an array of candidate OSM names.
+    // (around:60km of the pin) guards against same-named lakes elsewhere in the state.
+    const names=Array.isArray(lake)?lake:[lake];
+    const near=`(around:60000,${w.lat},${w.lon})`;
+    const sel=names.map(n=>`way["natural"="water"]["name"="${n}"](area.st)${near};relation["natural"="water"]["name"="${n}"](area.st)${near};`).join("");
+    q=`[out:json][timeout:50];${area}(${sel});out geom;`;
+  }
+  overpassJson(q).then(j=>{
+    const lines=[];
+    (j.elements||[]).forEach(e=>{
+      if(e.geometry && e.geometry.length>1) lines.push(e.geometry.map(p=>[p.lat,p.lon]));               // river way / lake shoreline way
+      if(e.type==="relation") (e.members||[]).forEach(m=>{                                              // multipolygon lake: outer shoreline fragments
+        if(m.role!=="inner" && m.geometry && m.geometry.length>1) lines.push(m.geometry.map(p=>[p.lat,p.lon]));
+      });
+    });
+    if(!lines.length) return;
+    riverCache[w.name]=lines;
+    if(state.selectedWater===w.name) renderRiver(lines, true);   // only if still viewing it
+  }).catch(()=>{});
+}
+function drawRiver(w){ drawWater(w); }   // back-compat alias
 function watersToShow(){
   const all=(typeof WATERS!=="undefined"?WATERS:[]);
   if(state.savedView) return all.filter(w=>state.favWater.has(w.name));
@@ -2791,7 +2899,7 @@ function selectWater(w){
   state.selectedWater=w.name; state.selectedFish=null; state.selectedSub=null; state.selectedState=null; state.selectedEco=null;
   refreshEco(); renderInfo(); restyle(); renderList(); renderCtx(); syncStateSel();
   showWaterDetail(w);   // access markers + zoom
-  drawRiver(w);         // trace the river's shape (Missouri streams)
+  drawWater(w);         // trace the river / lake shoreline (all covered states)
 }
 function setSelectedEco(name){
   state.selectedEco=(state.selectedEco===name)?null:name;
