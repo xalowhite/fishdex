@@ -122,6 +122,9 @@
   .ghostbtn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:7px;
     padding:7px 12px;font-size:12.5px;cursor:pointer}
   .ghostbtn.on{background:#23464f;border-color:var(--accent);color:var(--accent2);font-weight:700}
+  .statesel{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:7px;
+    padding:7px 10px;font-size:12.5px;cursor:pointer;max-width:170px}
+  .statesel:focus{border-color:var(--accent);outline:none}
   .anglefilters{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px}
   .anglefilters.hide{display:none}
   .fgroup{display:flex;flex-direction:column;gap:5px}
@@ -183,6 +186,8 @@
     box-shadow:0 1px 4px rgba(0,0,0,.6);box-sizing:border-box}
   .wpin:hover span{transform:scale(1.25);transition:transform .1s}
   .wpin.saved span{border-color:#e9c96b;box-shadow:0 0 0 2px rgba(233,201,107,.5),0 1px 4px rgba(0,0,0,.6)}
+  .accpin span{display:block;width:11px;height:11px;border-radius:50%;background:#e9c96b;border:2px solid #2a2410;box-shadow:0 1px 3px rgba(0,0,0,.6);box-sizing:border-box}
+  .accpin:hover span{transform:scale(1.3);transition:transform .1s}
   /* favorite stars */
   .favstar{flex:0 0 auto;background:none;border:none;color:#5d7681;font-size:18px;cursor:pointer;line-height:1;
     padding:2px 4px;align-self:flex-start;transition:transform .08s}
@@ -264,7 +269,8 @@
           <button id="nowBtn">🎣 What's biting now</button>
           <button id="savedBtn" class="ghostbtn">☆ Saved</button>
           <button id="ecoBtn" class="ghostbtn">🗺️ Ecoregions: off</button>
-          <div class="ctxbar" style="margin-left:auto" id="hint">Tip: click any state, province, or Mexican state to see what swims there.</div>
+          <select id="stateSel" class="statesel" title="Filter to a state"><option value="">📍 All states</option></select>
+          <div class="ctxbar" style="margin-left:auto" id="hint">Tip: pick a state or click the map to see what swims there.</div>
         </div>
         <div class="anglefilters hide" id="angleFilters">
           <div class="fgroup">
@@ -1135,7 +1141,12 @@ const WATERS = [
   { name:"Black River", region:"Missouri", type:"smbriver", lat:37.30, lon:-90.78,
     species:["smallmouth","rockbass","largemouth"], note:"Clear Ozark river above Clearwater Lake.", best:"Late spring–summer.", how:"Float/wade; tubes, spinnerbaits and topwater on gravel bars.", size:"Ozark float · Lesterville" },
   { name:"Huzzah Creek", region:"Missouri", type:"smbriver", lat:37.92, lon:-91.18,
-    species:["smallmouth","rockbass"], note:"Spring-fed Meramec tributary, popular summer float.", best:"May–Sep.", how:"Kayak/canoe; small soft plastics and poppers.", size:"Clear creek · Steelville" },
+    species:["smallmouth","rockbass","largemouth"], note:"Spring-influenced Meramec tributary, popular summer float near Steelville.", best:"May–Sep when floatable; dawn & dusk.", how:"Kayak/canoe float or wade; small soft plastics, tubes & poppers.", size:"Clear Ozark creek · Steelville",
+    intel:"Gin-clear, gravel-bottomed Ozark creek that feeds the Meramec — smallmouth and goggle-eye (rock bass) are the draw, with largemouth in the slower lower pools. Green-pumpkin tubes & Ned rigs on 1/16 oz heads through the gravel runs and around root wads, small crawfish-color cranks, and walk-the-dog/poppers at first light. The water is so clear the fish spook — approach pools from downstream, cast up-current, and downsize. Best as a summer float when there's enough water; the upper reaches go skinny in late summer.",
+    access:[
+      {name:"Huzzah Conservation Area (MDC)",lat:38.030,lon:-91.150,info:"WADE/FLOAT: MDC area near the Meramec confluence — gravel access, primitive camping, and walk-in wade access plus a canoe put-in to the lower creek."},
+      {name:"Hwy 8 access (Davisville)",lat:37.880,lon:-91.180,info:"WADE/FLOAT: upstream gravel access near Davisville — wade the runs or launch for the upper float."},
+      {name:"Scotia / lower access",lat:37.980,lon:-91.160,info:"FLOAT: lower-creek gravel-bar take-out; outfitter floats run this stretch in summer."}] },
   { name:"Courtois Creek", region:"Missouri", type:"smbriver", lat:37.92, lon:-91.10,
     species:["smallmouth","rockbass"], note:"Scenic Meramec-basin float stream.", best:"Late spring–summer.", how:"Wade/float; tubes & grubs in the pools.", size:"Clear creek · Steelville" },
   { name:"Bourbeuse River", region:"Missouri", type:"smbriver", lat:38.30, lon:-91.10,
@@ -2082,7 +2093,9 @@ function fishEcoNorm(f, subIdx){ return new Set(fishEco(f,subIdx).map(norm)); }
 // states to highlight for a fish: if it has eco, drop lower-48 (shown as ecoregions) but keep AK/HI/Canada/Mexico
 function fishHighlightStates(f, subIdx){
   const sts=fishStates(f,subIdx);
-  return usesEco(f,subIdx) ? sts.filter(s=>!LOWER48.has(norm(s))) : sts;
+  // Only hand the lower-48 to the ecoregion layer when ecoMode is ON; otherwise
+  // show the whole-state range (so the map doesn't draw ecoregions with the toggle off).
+  return (usesEco(f,subIdx) && ecoMode) ? sts.filter(s=>!LOWER48.has(norm(s))) : sts;
 }
 
 /* ---------- bite score (blend month + time of day) ---------- */
@@ -2267,8 +2280,8 @@ function renderCtx(){
 }
 
 /* ---------- map ---------- */
-const HILITE={weight:1.4, color:"#0c2a22", fillColor:"#37b6a0", fillOpacity:.7};
-const DIM={weight:.5, color:"#21404c", fillColor:"#11242c", fillOpacity:.15};
+const HILITE={weight:1.6, color:"#5ad1bb", fillColor:"#37b6a0", fillOpacity:.32};
+const DIM={weight:.5, color:"#21404c", fillColor:"#11242c", fillOpacity:.1};
 function styleState(name){
   const nn=norm(name);
   // lighter neutral fill so the basemap's lakes & rivers show through
@@ -2280,7 +2293,7 @@ function styleState(name){
   }
   if(state.selectedEco) return DIM; // dim states so the ecoregion reads clearly
   if(state.selectedState && norm(state.selectedState)===nn)
-    return {weight:2, color:"#5ad1bb", fillColor:"#26566b", fillOpacity:.85};
+    return {weight:2.6, color:"#5ad1bb", fillColor:"#5ad1bb", fillOpacity:.12}; // bright outline, faint fill — keep waterbodies visible
   return base;
 }
 function restyle(){
@@ -2364,7 +2377,9 @@ function buildEcoLayer(){
 }
 // decide presence + (re)build the eco layer to match current selection/mode
 function refreshEco(){
-  const show = ecoMode || state.selectedEco || (state.selectedFish && usesEco(fishById(state.selectedFish), state.selectedSub));
+  // ecoregion polygons appear ONLY when the toggle is on or an ecoregion is selected —
+  // never just because a fish is selected (that range now shows at state level).
+  const show = ecoMode || state.selectedEco;
   if(ecoLayer){ map.removeLayer(ecoLayer); ecoLayer=null; }
   if(show && ecoData){ buildEcoLayer(); ecoLayer.addTo(map); ecoLayer.bringToFront(); }
 }
@@ -2391,6 +2406,23 @@ function toggleEcoMode(){
 
 /* ---------- notable waters (named-waterbody pins) ---------- */
 let waterLayer=L.layerGroup(), waterMarkers={};
+let waterDetailLayer=L.layerGroup();   // access/POI sub-markers shown when a water is opened
+// When a water pin is opened: zoom to it (so the satellite/topo basemap shows the actual
+// water) and drop its access points as their own markers along the shoreline/banks.
+function showWaterDetail(w){
+  waterDetailLayer.clearLayers();
+  if(map && !map.hasLayer(waterDetailLayer)) waterDetailLayer.addTo(map);
+  const acc=((typeof ACCESS!=="undefined"&&ACCESS[w.name])||w.access||[]);
+  const b=L.latLngBounds([[w.lat,w.lon]]);
+  acc.forEach(a=>{
+    const ic=L.divIcon({className:"accpin",html:'<span></span>',iconSize:[13,13],iconAnchor:[6,6],popupAnchor:[0,-6]});
+    const am=L.marker([a.lat,a.lon],{icon:ic,title:a.name,zIndexOffset:-50});
+    am.bindTooltip("📍 "+a.name,{direction:"top",offset:[0,-5],className:"stt"});
+    am.bindPopup('<div class="wpop"><div class="wph"><span class="wdot" style="background:#e9c96b"></span><b>'+a.name+'</b></div>'+(a.info?'<div class="wnote">'+a.info+'</div>':'')+'</div>',{maxWidth:240,className:"wpopwrap"});
+    am.addTo(waterDetailLayer); b.extend([a.lat,a.lon]);
+  });
+  try{ acc.length>1 ? map.fitBounds(b.pad(0.4),{maxZoom:13,animate:true}) : map.setView([w.lat,w.lon],12,{animate:true}); }catch(e){}
+}
 function watersToShow(){
   const all=(typeof WATERS!=="undefined"?WATERS:[]);
   if(state.savedView) return all.filter(w=>state.favWater.has(w.name));
@@ -2450,9 +2482,12 @@ function refreshWaters(){
     const m=L.marker([w.lat,w.lon],{icon, riseOnHover:true, title:w.name});
     m.bindPopup(()=>makeWaterPopup(w),{maxWidth:260,className:"wpopwrap"});
     m.bindTooltip(w.name,{direction:"top",offset:[0,-9]});
+    m.on("popupopen",()=>showWaterDetail(w));
+    m.on("popupclose",()=>waterDetailLayer.clearLayers());
     m.addTo(waterLayer); waterMarkers[w.name]=m;
   });
   if(map && !map.hasLayer(waterLayer)) waterLayer.addTo(map);
+  waterDetailLayer.clearLayers();
 }
 
 /* ---------- info card ---------- */
@@ -2574,7 +2609,7 @@ function renderStateInfo(box){
 function selectFish(id, subIdx=null){
   if(state.selectedFish===id && state.selectedSub===subIdx && id!==null){ state.selectedFish=null; state.selectedSub=null; }
   else { state.selectedFish=id; state.selectedSub=subIdx; if(id){ state.selectedState=null; state.selectedEco=null; } }
-  refreshEco(); refreshWaters(); restyle(); renderInfo(); renderList(); renderCtx();
+  refreshEco(); refreshWaters(); restyle(); renderInfo(); renderList(); renderCtx(); syncStateSel();
   if(id){
     const f=fishById(id); const b=L.latLngBounds([]);
     fishHighlightStates(f,subIdx).map(norm).forEach(n=>{ const ly=stateLayers[n]; if(ly){ try{ b.extend(ly.getBounds()); }catch(e){} } });
@@ -2585,12 +2620,15 @@ function selectFish(id, subIdx=null){
 function setSelectedState(name){
   state.selectedState=(state.selectedState===name)?null:name;
   if(state.selectedState){ state.selectedFish=null; state.selectedSub=null; state.selectedEco=null; }
-  refreshEco(); refreshWaters(); renderInfo(); restyle(); renderList(); renderCtx();
+  refreshEco(); refreshWaters(); renderInfo(); restyle(); renderList(); renderCtx(); syncStateSel();
+  if(state.selectedState) zoomToState(state.selectedState);
 }
+function syncStateSel(){ const s=document.getElementById("stateSel"); if(s) s.value=state.selectedState||""; }
+function zoomToState(name){ const ly=stateLayers[norm(name)]; if(ly&&map){ try{ map.fitBounds(ly.getBounds().pad(0.06),{maxZoom:9,animate:true}); }catch(e){} } }
 function setSelectedEco(name){
   state.selectedEco=(state.selectedEco===name)?null:name;
   if(state.selectedEco){ state.selectedFish=null; state.selectedSub=null; state.selectedState=null; }
-  refreshEco(); refreshWaters(); renderInfo(); restyle(); renderList(); renderCtx();
+  refreshEco(); refreshWaters(); renderInfo(); restyle(); renderList(); renderCtx(); syncStateSel();
   if(state.selectedEco && ecoLayer){
     let lyr=null; ecoLayer.eachLayer(l=>{ if(l.feature && norm(l.feature.properties.US_L3NAME)===norm(state.selectedEco)) lyr=l; });
     if(lyr){ try{ map.fitBounds(lyr.getBounds().pad(0.25),{maxZoom:6,animate:true}); }catch(e){} }
@@ -2622,6 +2660,16 @@ function buildFilterUI(){
     b.onclick=()=>{ b.classList.toggle("on"); state.water.has(w)?state.water.delete(w):state.water.add(w); renderList(); }; waterBox.appendChild(b); });
 
   document.getElementById("ecoBtn").onclick=toggleEcoMode;
+
+  const stateSel=document.getElementById("stateSel");
+  if(stateSel){
+    [...new Set((typeof WATERS!=="undefined"?WATERS:[]).map(w=>w.region))].sort()
+      .forEach(r=>{ const o=document.createElement("option"); o.value=r; o.textContent="📍 "+r; stateSel.appendChild(o); });
+    stateSel.onchange=()=>{ const v=stateSel.value;
+      state.selectedState=v||null; if(v){ state.selectedFish=null; state.selectedSub=null; state.selectedEco=null; }
+      refreshEco(); refreshWaters(); renderInfo(); restyle(); renderList(); renderCtx();
+      if(v) zoomToState(v); };
+  }
 
   document.getElementById("savedBtn").onclick=()=>{
     state.savedView=!state.savedView;
