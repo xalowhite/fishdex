@@ -914,7 +914,12 @@ const WATERS = [
   { name:"Black River", region:"Missouri", type:"smbriver", lat:37.30, lon:-90.78,
     species:["smallmouth","rockbass","largemouth"], note:"Clear Ozark river above Clearwater Lake.", best:"Late spring–summer.", how:"Float/wade; tubes, spinnerbaits and topwater on gravel bars.", size:"Ozark float · Lesterville" },
   { name:"Huzzah Creek", region:"Missouri", type:"smbriver", lat:37.92, lon:-91.18,
-    species:["smallmouth","rockbass"], note:"Spring-fed Meramec tributary, popular summer float.", best:"May–Sep.", how:"Kayak/canoe; small soft plastics and poppers.", size:"Clear creek · Steelville" },
+    species:["smallmouth","rockbass","largemouth"], note:"Spring-influenced Meramec tributary, popular summer float near Steelville.", best:"May–Sep when floatable; dawn & dusk.", how:"Kayak/canoe float or wade; small soft plastics, tubes & poppers.", size:"Clear Ozark creek · Steelville",
+    intel:"Gin-clear, gravel-bottomed Ozark creek that feeds the Meramec — smallmouth and goggle-eye (rock bass) are the draw, with largemouth in the slower lower pools. Green-pumpkin tubes & Ned rigs on 1/16 oz heads through the gravel runs and around root wads, small crawfish-color cranks, and walk-the-dog/poppers at first light. The water is so clear the fish spook — approach pools from downstream, cast up-current, and downsize. Best as a summer float when there's enough water; the upper reaches go skinny in late summer.",
+    access:[
+      {name:"Huzzah Conservation Area (MDC)",lat:38.030,lon:-91.150,info:"WADE/FLOAT: MDC area near the Meramec confluence — gravel access, primitive camping, and walk-in wade access plus a canoe put-in to the lower creek."},
+      {name:"Hwy 8 access (Davisville)",lat:37.880,lon:-91.180,info:"WADE/FLOAT: upstream gravel access near Davisville — wade the runs or launch for the upper float."},
+      {name:"Scotia / lower access",lat:37.980,lon:-91.160,info:"FLOAT: lower-creek gravel-bar take-out; outfitter floats run this stretch in summer."}] },
   { name:"Courtois Creek", region:"Missouri", type:"smbriver", lat:37.92, lon:-91.10,
     species:["smallmouth","rockbass"], note:"Scenic Meramec-basin float stream.", best:"Late spring–summer.", how:"Wade/float; tubes & grubs in the pools.", size:"Clear creek · Steelville" },
   { name:"Bourbeuse River", region:"Missouri", type:"smbriver", lat:38.30, lon:-91.10,
@@ -1439,6 +1444,100 @@ const ACCESS = {
     {name:"Granada / Southport ramp",lat:28.100,lon:-81.400,info:"South-end public ramp — access to the lower-lake grass and the Southport Canal."}]
 };
 
+/* ============================================================
+   WATER_PROFILE — deeper descriptive character for marquee
+   waters. Keyed by water name (must match WATERS name exactly).
+   Values are arrays of paragraph strings rendered in the detail
+   panel under "Waterbody profile". General, well-documented
+   character (no invented stats); confirm regs/seasons locally.
+   ============================================================ */
+const WATER_PROFILE = {
+  "Lake of the Ozarks":[
+    "A sprawling 50,000+-acre Osage River impoundment with over 1,100 miles of shoreline — and that shoreline is the story: mile after mile of boat docks, brush and seawalls. It fishes like a giant cover-and-structure puzzle, with largemouth, spotted bass and a strong crappie population relating to docks, points and timber.",
+    "Spring pre-spawn and the fall shad migration into the creek arms are the prime windows; summer pushes bass deep and turns the lake into an early-morning and night fishery to dodge heavy recreational boat traffic. Dock-shooting jigs for crappie and pitching the endless docks for bass are the signature techniques."
+  ],
+  "Table Rock Lake":[
+    "A clear, deep, rocky White River highland reservoir straddling the Missouri–Arkansas line, widely regarded as one of the country's premier bass lakes. Its clarity and structure favor smallmouth and spotted bass alongside largemouth, and it's famous for finesse fishing.",
+    "Because the water is clear, light line and finesse presentations — the Ned rig, drop-shot, shaky head and jerkbaits — dominate, especially the cold-water months. Bass relate to chunk-rock banks, bluff ends, points and submerged timber; the many creek arms (James, Kings, Long Creek) each fish a little differently."
+  ],
+  "Lake Taneycomo":[
+    "Not a warmwater lake at all but a cold tailwater: the water released from the bottom of Table Rock Dam keeps Taneycomo cold year-round, creating one of the Midwest's best trout fisheries right in Branson. The upper end below the dam is prime trout water; it warms and broadens downstream.",
+    "Flow is dictated by power generation at the dam — when turbines run, the river rises and current picks up, changing everything. Anglers fish scuds, midges, eggs and small jigs; the upper trophy area carries special regulations. Check generation schedules before you go: low water wades, high water is a boat/drift game."
+  ],
+  "Truman Lake":[
+    "A large, often-stained flood-control reservoir above Lake of the Ozarks, defined by vast amounts of standing flooded timber. That timber makes Truman one of Missouri's elite crappie lakes and a strong largemouth and white bass fishery.",
+    "The flooded timber and creek arms concentrate crappie on cover you can fish vertically or pick apart with jigs and minnows. Spring brings shallow crappie and a white-bass run up the rivers; the lake's stain means reaction baits and contrast colors often outproduce finesse."
+  ],
+  "Stockton Lake":[
+    "A clear, wind-swept Sac River reservoir best known as Missouri's top walleye lake, with a strong smallmouth population that thrives on its rocky structure — plus largemouth, spotted bass and white bass.",
+    "Open main-lake points, flats and humps set up classic walleye trolling and jigging, while the rocky banks and bluffs hold smallmouth. The lake is famous (and sometimes infamous) for wind, which positions fish on windblown structure but can make boat control a challenge."
+  ],
+  "Current River (lower)":[
+    "A spring-fed Ozark float stream within the Ozark National Scenic Riverways — cold, clear and powerful, fed by some of Missouri's largest springs. The upper reaches near Montauk and the big springs stay cold enough for trout, while the river transitions to a premier smallmouth and goggle-eye (rock bass) stream downstream.",
+    "This is a wade-and-float fishery: gravel bars, bluff pools, root wads and current seams hold smallmouth that fight well above their weight. Cold spring inflows keep summer fishable. It's a destination float as much as a fishery — plan around canoe/kayak access points and water levels."
+  ],
+  "Meramec River":[
+    "A classic eastern-Ozark float stream and one of the longest free-flowing rivers in Missouri, draining to the Mississippi near St. Louis. It's a strong smallmouth river with rock bass, sunfish and catfish, popular for both wading and canoe floats within easy reach of the metro area.",
+    "Fish the current seams, bluff pools, gravel riffles and wood. Spring and fall are prime for smallmouth; summer floats are as much recreation as fishing. Like all Ozark streams it clears and drops after rains stabilize — clarity and flow drive the bite."
+  ],
+  "North Fork of the White River":[
+    "One of Missouri's finest wild-trout streams: spring-fed and cold, the North Fork supports naturally reproducing rainbow trout in its blue-ribbon water — a rarity in the state — alongside smallmouth lower down. Big springs (Rainbow Spring) feed the cold flow.",
+    "A wading and float fly-fishery built around scuds, sowbugs, midges and seasonal hatches, with special-regulation trophy water. Cold, clear and technical — light tippet and a careful approach matter. Levels swing with rain, so check flows before committing to a float."
+  ],
+  "Bull Shoals Lake":[
+    "A huge, deep, exceptionally clear White River highland reservoir on the Missouri–Arkansas border, known for quality bass fishing (largemouth, smallmouth and spotted) over rock and timber, plus walleye, white bass, crappie and stripers in the open water.",
+    "Clarity and depth make it a finesse and structure lake — points, bluffs, brush and channel swings. Spring is the shallow window; summer and winter fish set up deep. The lake's many remote creek arms reward anglers who learn to read its rocky structure."
+  ],
+  "Beaver Lake":[
+    "The uppermost White River reservoir in northwest Arkansas — clear, deep and rocky, with bluffs, timber and standing structure. It holds largemouth, smallmouth and spotted bass, plus a notable striped bass fishery and good crappie and walleye.",
+    "Clear water again means finesse: drop-shot, Ned rig, jerkbaits and shaky heads around the rock and brush. Stripers roam the open lake chasing shad and are chased with live bait and trolling. The Beaver tailwater below the dam is cold-enough trout water."
+  ],
+  "Greers Ferry Lake":[
+    "A clear, deep Little Red River highland reservoir in central Arkansas, famous for walleye and a strong smallmouth and spotted-bass fishery alongside largemouth, hybrid/white bass and crappie. Its spring walleye run is a regional tradition.",
+    "Rocky points, bluffs, brush and the open main lake set up finesse bass fishing and walleye trolling/jigging. The tailwater below the dam — the Little Red — is a celebrated trophy trout stream. Clear water rewards light line and a stealthy approach."
+  ],
+  "White River (below Bull Shoals Dam)":[
+    "The legendary Arkansas tailwater: cold, nutrient-rich water released from the bottom of Bull Shoals Dam creates a world-class trophy trout fishery for rainbow and brown trout running many miles downstream. This is one of America's premier trout rivers.",
+    "Everything revolves around dam generation. Low water is a wade-and-drift game (scuds, sowbugs, midges, small jigs, drifted bait); high generation turns it into a boat fishery where guides back-troll and drift big browns to streamers and bait. Always check the generation schedule and never get caught wading on a rising river."
+  ],
+  "Norfork Tailwater":[
+    "A short but mighty cold tailwater below Norfork Dam where the North Fork River meets the White system — small, intimate and famously rich, producing outsized brown and rainbow trout for its size. A fly-fishing favorite.",
+    "Like the White, it lives and dies by generation: a wadeable spring-creek-like fishery at low water (sowbugs, midges, scuds on light tippet) that transforms when the turbines run. The catch-and-release trophy area is renowned. Confirm generation timing before wading."
+  ],
+  "Little Red River (below Greers Ferry)":[
+    "The cold tailwater below Greers Ferry Dam in central Arkansas — a quality brown and rainbow trout river that has historically produced exceptionally large browns, including world-record-class fish, thanks to cold, fertile dam releases.",
+    "A generation-driven tailwater: low flows let anglers wade and drift small flies (sowbugs, midges, eggs) and light tackle; high water is a drift-boat game for big browns. Check the dam schedule and watch for fast-rising water."
+  ],
+  "Lake Okeechobee":[
+    "Florida's vast, shallow, grass-filled inland sea — 'the Big O' — and one of the most famous big-largemouth fisheries in the world. Native Florida-strain bass, year-round growth and endless aquatic vegetation make it a shallow-water bass factory; it's also a premier black-crappie ('speck') lake.",
+    "The game is shallow and visual: flipping and punching matted grass, throwing swimbaits, lipless cranks and frogs over and around the vegetation, and drifting wild shiners for the biggest fish. Winter and the pre-spawn (roughly December–March) are the peak trophy windows. Water levels and vegetation shift the productive zones year to year."
+  ],
+  "Lake Tohopekaliga (Toho)":[
+    "A premier central-Florida trophy-bass lake in the Kissimmee chain near Orlando, managed intensively for big Florida-strain largemouth and dotted with hydrilla, bulrush and lily pads. It also gives up huge numbers of black crappie in the cool season.",
+    "Shallow grass fishing rules — flipping, frogging, swimbaits and wild shiners on the vegetation lines and the famous shell beds. The pre-spawn and spawn (winter into early spring) draw anglers chasing double-digit bass. Periodic habitat drawdowns reshape the lake's hot zones."
+  ],
+  "Rend Lake":[
+    "A large, shallow, fertile flood-control reservoir in southern Illinois long famous as one of the Midwest's top crappie destinations, with both black and white crappie, plus strong largemouth, bluegill, channel catfish and white bass.",
+    "Stained, shad-rich water favors reaction baits and contrast colors; crappie stack on the lake's abundant brush, standing timber and rip-rap. Spring brings a shallow crappie bonanza around cover, while summer and winter fish hold on deeper structure and the man-made attractors."
+  ],
+  "Lake of Egypt":[
+    "A clear, warm power-plant cooling lake in southern Illinois that stays fishable year-round thanks to the heated discharge. It's a quality largemouth lake with good bluegill, redear, crappie and catfish, and the warm water keeps bass growing and feeding through winter.",
+    "Clear water and abundant docks, weed lines and brush call for a mix of finesse and cover fishing. The warm discharge areas concentrate baitfish and gamefish in the cold months, making winter one of the more productive times — unusual for a northern-state lake."
+  ],
+  "Jordan Lake":[
+    "A large piedmont reservoir near Raleigh, North Carolina, known as a solid largemouth fishery with good crappie, catfish and white perch, set among standing timber, creek arms and points. It's also nationally notable for its wintering bald eagles.",
+    "Often stained, it rewards reaction baits — spinnerbaits, crankbaits and ChatterBaits — around wood, points and bridge structure, with finesse plastics for pressured fish. Spring pre-spawn in the creek arms and the fall shad feed are the prime windows."
+  ],
+  "High Rock Lake":[
+    "A large, fertile, often-stained Yadkin River reservoir in central North Carolina with an enormous shoreline and abundant cover — a well-known tournament-bass lake with strong largemouth plus crappie, catfish and white perch.",
+    "The stained, shallow, cover-rich water suits power fishing: spinnerbaits, squarebills, ChatterBaits and jigs around docks, laydowns and rip-rap, with the muddy upper river arms holding fish year-round. Spring and fall are prime; the lake's many creek arms spread the fish out."
+  ],
+  "Lake James":[
+    "A clear, cool reservoir in the North Carolina mountains at the foot of the Blue Ridge, notable for both smallmouth and largemouth bass (a relatively rare smallmouth fishery for the state) plus a walleye population and good panfish.",
+    "Clear, rocky highland-style water favors finesse presentations and structure fishing — points, rock, brush and timber — much like the Ozark highland lakes. Smallmouth relate to the rock; largemouth tuck into the bushier coves. Cooler mountain temperatures stretch the spring and fall windows."
+  ]
+};
+
 </script>
 <script>
 /* ============================================================
@@ -1920,6 +2019,162 @@ const PROFILE = {
       {t:"Classic Fish Facts: Brown Trout — Orvis News", u:"https://news.orvis.com/fly-fishing/classic-fish-facts-brown-trout-salmo-trutta"},
       {t:"Brown Trout 101: Biology, Habitat & Tactics — Field & Stream", u:"https://www.fieldandstream.com/stories/fishing/freshwater-fishing/trout-fishing/brown-trout-fishing-guide"},
       {t:"Lake Taneycomo (trophy browns) — Missouri Trout Hunter", u:"https://www.missouritrouthunter.com/lake-taneycomo.html"}
+    ]
+  },
+  walleye:{
+    tagline:"The thinking angler's gamefish — a low-light predator built around a pair of glowing, light-gathering eyes, and the best-eating fish that swims in fresh water.",
+    sections:[
+      { h:"Identification",
+        body:"Sander vitreus, the largest North American perch. Olive-and-gold flanks, a spiny front dorsal, sharp canine teeth, and the two dead giveaways: large, <b>glassy, marble-like eyes</b> that shine back at a light, and a <b>clean white tip on the lower lobe of the tail</b>. The eyes carry a reflective layer (the <i>tapetum lucidum</i>) that makes them deadly in dim light — and is exactly why the fish is named 'walleye.' The close cousin, the <b>sauger</b>, is smaller, blotchy/saddle-marked, has <b>dark spots on the spiny dorsal</b>, and lacks the white tail tip; where the two overlap they hybridize into 'saugeye.'" },
+      { h:"Biology & life history",
+        body:"Walleye are early-spring <b>broadcast spawners</b> — no nest, no parental care. As water climbs through roughly <b>42–50°F</b> they run up rivers or onto windswept rock/gravel shoals at night and scatter eggs over the bottom. Females are larger and longer-lived than males; a trophy 'marble-eye' over 10 lb is typically an old female of 8–12+ years. They grow fastest in cool, fertile waters with abundant baitfish and a long enough cool season — which is why the species reaches its peak abundance across the northern tier and thins out (becoming a stocked, structure-bound reservoir fish) toward the south." },
+      { h:"Behavior & seasonal patterns",
+        body:"Everything about a walleye revolves around its eyes. Those light-gathering eyes give it a feeding edge in <b>low light and stained water</b>, so the classic windows are dawn, dusk, night, overcast skies, and a stiff 'walleye chop' that breaks up the surface. They're structure-and-bottom oriented — points, humps, rock piles, drop-offs, river channel edges. Seasonally: a <b>spring spawning run</b> stacks fish below dams and in river current; summer pushes them onto deep main-lake structure and weed edges where trolling shines; fall is a heavy feed-up that pulls big females shallow again; winter slows them to a deliberate, vertical bite (and a banner ice fishery up north)." },
+      { h:"Diet & forage",
+        body:"A pursuit predator that keys on soft-rayed baitfish — <b>yellow perch and shad above all</b>, plus shiners, ciscoes and young-of-year panfish, with crayfish, leeches and nightcrawlers rounding out the menu. Because they feed by sight in dim light, the most consistent presentations either move slowly along the bottom (jig-and-minnow, live-bait/crawler-harness rigs) or cover water at a precise depth and speed (trolling crankbaits and spinner rigs). Match the local forage size and you've won most of the battle." },
+      { h:"How to catch them",
+        body:"Three families of technique cover almost everything. <b>Jigging</b> a 1/8–3/8 oz head tipped with a minnow, plastic or crawler is the bread-and-butter river and structure tactic. <b>Live-bait rigging</b> (a Lindy/slip-sinker rig with a leech, crawler or minnow) lets a wary fish eat without feeling weight. <b>Trolling</b> crankbaits or spinner-and-crawler harnesses behind bottom bouncers or planer boards is how you find and pick apart big summer flats and basins. Fish the edges of light — early, late, after dark — and slow down in cold water." }
+    ],
+    regions:[
+      { name:"Missouri (river runs & big-reservoir trolling)",
+        body:"A solid, sometimes overlooked walleye state that the MDC stocks widely. <b>Stockton Lake</b> is the marquee water — Missouri's best-known walleye fishery, with classic main-lake point-and-flat trolling. <b>Bull Shoals</b>, <b>Pomme de Terre</b>, <b>Mark Twain</b> and <b>Longview</b> all carry good numbers, and there's a strong <b>late-winter/early-spring run</b> up feeder rivers and below dams (the Niangua, Sac and Osage arms) where jig-and-minnow fishing peaks as the spawn nears." },
+      { name:"Arkansas (highland lakes & the Little Red trophies)",
+        body:"Arkansas's cold, clear Ozark reservoirs are genuine trophy walleye water. <b>Greers Ferry Lake</b> and its tailwater the <b>Little Red River</b> produced the longstanding state-record class fish and host a famous spring spawning run; <b>Norfork, Bull Shoals, Beaver</b> and <b>Lake Ouachita</b> all hold quality walleye that run up their feeder rivers (the <b>Kings, War Eagle</b> and others) in late winter. The AGFC stocks to sustain these populations near the southern edge of the walleye's natural range." },
+      { name:"North Carolina (Appalachian walleye)",
+        body:"The mountain reservoirs of the far west hold a long-established walleye fishery — <b>Lake James, Hiwassee, Santeetlah, Glenville</b> and <b>Fontana</b> among them — supported by NCWRC stocking. Fish run up the cold feeder rivers (the upper Little Tennessee and Tuckasegee systems) on a <b>March spawning push</b>, the prime window for bank and jig anglers, before settling onto deep summer structure." },
+      { name:"Illinois (big-river walleye & sauger)",
+        body:"Illinois is genuine walleye-and-sauger country thanks to its big rivers. The <b>Mississippi</b> and <b>Illinois</b> rivers — especially the tailwater pools below the lock-and-dams — give up walleye, sauger and saugeye through the cold months, while <b>Lake Shelbyville, Lake Mendota</b>-style natural lakes up north, and reservoirs like <b>Shelbyville and Carlyle</b> support stocked open-water fisheries. The river bite peaks in the late-winter pre-spawn stack below the dams." }
+    ],
+    conservation:"Walleye are slow-growing, and the big fish are old females — release the trophies and keep a few mid-size eaters instead. They're sensitive to spawning disturbance; respect closed seasons and below-dam regulations during the run. Toward the south the species lives near its thermal limit and leans on hatchery support, so harvest limits there matter more than in the walleye-rich north.",
+    refs:[
+      {t:"Walleye — Wikipedia", u:"https://en.wikipedia.org/wiki/Walleye"},
+      {t:"Walleye fishing basics — Take Me Fishing", u:"https://www.takemefishing.org/fish/freshwater-fish/walleye/"},
+      {t:"Walleye — Missouri Department of Conservation Field Guide", u:"https://mdc.mo.gov/discover-nature/field-guide/walleye"},
+      {t:"Greers Ferry & Little Red walleye — Arkansas Game & Fish Commission", u:"https://www.agfc.com/fishing/"}
+    ]
+  },
+  blackcrappie:{
+    tagline:"The clear-water speck — a school-roaming panfish that's a springtime bonanza on the bank and one of the finest fillets in fresh water.",
+    sections:[
+      { h:"Identification",
+        body:"Pomoxis nigromaculatus. A deep, slab-sided, silvery panfish covered in an <b>irregular scatter of dark speckles</b> with no clear pattern — hence 'black' or 'speckled' crappie. The reliable separator from white crappie is the <b>dorsal-fin spine count: black crappie have 7–8 spines</b> (white crappie have 5–6), and the black crappie's dorsal sits about as far forward as the distance from it to the eye. Blacks favor <b>clearer, weedier, more stable water</b> and are the dominant crappie of natural lakes and clean reservoirs." },
+      { h:"Biology & life history",
+        body:"Crappie spawn in spring as water reaches about <b>58–68°F</b>. Males sweep shallow nests in <b>colonies</b> over a firm or gravelly bottom near cover in 1–6 ft and guard the eggs and fry. They are fast-maturing, highly <b>fecund</b> schooling fish — which makes their numbers boom and bust, so a lake can be wall-to-wall slabs one year and full of stunted dinks the next. They grow quickly to a foot or so and most live 4–7 years; a true 2-lb-plus crappie is the fish of a season." },
+      { h:"Behavior & seasonal patterns",
+        body:"Crappie are <b>roaming, suspending schoolfish</b>, and finding the school is 90% of the game. The calendar is built around the spawn: a <b>pre-spawn</b> stage in mid-depth brush, the <b>spawn</b> itself in the shallows (the famous bank bonanza when fish move to 1–4 ft of wood and grass), then a <b>post-spawn</b> pull back to deeper structure. Through summer and winter they suspend over <b>brush piles, standing timber, bridge pilings and channel edges</b> at a specific depth — find that depth and you load the boat. They feed most actively in low light and bite light, so a sensitive setup matters." },
+      { h:"Diet & forage",
+        body:"As fry they eat zooplankton; adults switch to a diet dominated by <b>small baitfish (shad and minnows)</b> plus aquatic insects and larvae. That's why the two timeless crappie baits are a <b>live minnow under a bobber</b> and a <b>small jig (1/16–1/32 oz) with a soft-plastic or marabou body</b> — both imitate the minnows crappie are hunting. Match the hatch small; crappie key on bite-size forage." },
+      { h:"How to catch them",
+        body:"In spring, work the bank: a minnow or jig under a slip-bobber pitched to shallow wood and grass is hard to beat. The rest of the year, fish go vertical over structure — <b>spider-rigging</b> multiple long rods, <b>vertical jigging</b> brush piles, or 'dock-shooting' jigs far back under docks. Modern crappie anglers lean hard on <b>electronics</b> to find suspended schools and pin down the exact depth. Set the hook with a smooth lift, not a yank — the thin, papery mouth (hence 'papermouth') tears easily." }
+    ],
+    regions:[
+      { name:"Missouri (one of the country's great crappie states)",
+        body:"Missouri is a crappie heavyweight, and the MDC actively sinks <b>brush-pile attractors</b> and publishes their GPS coordinates. <b>Truman Lake</b> is the crown jewel — vast flooded timber that grows giant crappie — with <b>Stockton, Pomme de Terre, Mark Twain, Lake of the Ozarks</b> and countless MDC community lakes all excellent. Blacks dominate the clearer arms; whites the stained, riverine upper ends. The April spawn is a statewide event." },
+      { name:"Arkansas (timber lakes & a deep crappie culture)",
+        body:"Arkansas crappie fishing runs deep. <b>Lake Conway</b> (a shallow, stumpy, fertile state-built lake) is a legendary crappie factory, with <b>Greers Ferry, Beaver, Bull Shoals, Ouachita</b> and the Delta oxbows all strong. Spring brings a shallow-cover bonanza; summer and winter fish suspend over brush and standing timber. The state's mix of clear highland lakes and stained lowland waters supports both blacks and whites." },
+      { name:"Florida (specks — a winter institution)",
+        body:"In Florida the black crappie is the <b>'speck' (speckled perch)</b>, and chasing them is a beloved cool-season tradition. <b>Lake Okeechobee</b>, the <b>Kissimmee chain</b> (Lake Toho), <b>Lake Tarpon</b> and the St. Johns lakes give up huge numbers and big, deep-bodied fish from late fall through the early-spring spawn — anglers drift live missouri-minnows and troll jigs across the open shallows. The year-round warmth means specks grow fast and fishing peaks exactly when northern lakes are frozen." },
+      { name:"North Carolina & Illinois",
+        body:"In North Carolina, piedmont reservoirs like <b>High Rock, Jordan, Falls</b> and <b>Badin</b> hold strong crappie around brush and bridge pilings, with a classic March–April shallow spawn. Illinois is famous for <b>Rend Lake</b> — one of the Midwest's premier crappie destinations — along with <b>Lake Shelbyville, Carlyle</b> and the backwaters of the Mississippi and Illinois rivers, where white crappie share the stained water with blacks." }
+    ],
+    conservation:"Because crappie populations swing between boom and bust, many lakes use a <b>minimum length (often 9–10 in) and a generous creel</b> to thin out over-abundant year-classes and let the rest grow — so keeping a limit of eaters is often good management. Crappie are excellent table fare and handle harvest well, but in stunted lakes the kindest thing for the fishery is to take some home.",
+    refs:[
+      {t:"Black crappie — Wikipedia", u:"https://en.wikipedia.org/wiki/Black_crappie"},
+      {t:"Crappie fishing basics — Take Me Fishing", u:"https://www.takemefishing.org/fish/freshwater-fish/crappie/"},
+      {t:"Crappie & brush-pile attractors — Missouri Department of Conservation", u:"https://mdc.mo.gov/fishing"},
+      {t:"Black vs. white crappie ID — In-Fisherman", u:"https://www.in-fisherman.com/editorial/black-crappies-vs-white-crappies/"}
+    ]
+  },
+  whitecrappie:{
+    tagline:"The crappie of muddy water and big rivers — more tolerant of current and turbidity than its speckled cousin, and just as good in the pan.",
+    sections:[
+      { h:"Identification",
+        body:"Pomoxis annularis. Lighter and more silvery than the black crappie, marked with <b>faint dark vertical bars</b> down the sides rather than a random scatter of speckles. The clinching feature is the <b>dorsal-fin spine count: white crappie have just 5–6 spines</b> (blacks have 7–8), and the body is a touch more elongated. Where the two species share water, whites dominate the <b>more turbid, fertile, river-influenced</b> sections while blacks hold in the clearer, weedier areas." },
+      { h:"Biology & life history",
+        body:"White crappie spawn the same way blacks do — colonial nests swept by males in 1–6 ft of water as temperatures pass roughly <b>56–66°F</b> in spring — but they're better adapted to <b>stained water, silt and current</b>, which lets them thrive in rivers, oxbows and turbid flood-control reservoirs where black crappie struggle. They're prolific and fast-growing, and like all crappie their numbers boom and bust with each year-class. They tend to run slightly more elongated and can edge out blacks for sheer size in rich, muddy impoundments." },
+      { h:"Behavior & seasonal patterns",
+        body:"Behaviorally they mirror black crappie — <b>schooling, suspending, structure-oriented</b> — with the same spring shallow-spawn bonanza and the same summer/winter retreat to deep brush, timber and channel edges. The practical difference is <b>where</b> you find them: whites push farther up the muddy, current-fed arms of a reservoir and into river backwaters, and they tolerate the off-color water that follows a rain better than blacks do, so they're often the more catchable crappie in a stained system." },
+      { h:"Diet & forage",
+        body:"White crappie lean even more heavily on <b>small baitfish (especially young shad)</b> than blacks, with insects and larvae filling in. The implication for anglers: minnow imitations and shad-colored jigs shine, and in fertile river-run reservoirs whites can grow fat and large on dense shad populations. The same minnow-under-a-bobber and small-jig presentations work — just look for them in dirtier, more current-influenced water." },
+      { h:"How to catch them",
+        body:"Identical toolkit to black crappie — spring bank fishing with minnows and jigs around shallow wood, then vertical jigging, spider-rigging and dock-shooting over deeper brush the rest of the year. Because whites favor stained water, <b>color and vibration matter more than finesse</b>: bright or shad-pattern jigs, and minnows fished tight to visible cover (laydowns, standing timber, bridge pilings) in the muddy upper ends of reservoirs and in river backwaters." }
+    ],
+    regions:[
+      { name:"Missouri & Illinois (river-run reservoirs)",
+        body:"White crappie shine in Missouri's stained, fertile flood-control lakes and the muddy upper arms of <b>Truman, Mark Twain</b> and the big-river backwaters. In Illinois they're a staple of <b>Rend Lake, Carlyle, Shelbyville</b> and the Mississippi and Illinois river backwaters — turbid, shad-rich systems tailor-made for white crappie, which often outnumber blacks there." },
+      { name:"Arkansas (the muddy-water specialist)",
+        body:"In Arkansas's stained lowland lakes and Delta oxbows the white crappie is frequently the dominant crappie — <b>Lake Conway</b>, the Arkansas River pools, and the big-river backwaters grow heavy whites on dense shad. They run up the muddier creek arms in spring while blacks hold in the clearer water, giving anglers two species to chase in the same lake." },
+      { name:"North Carolina & the South",
+        body:"Across North Carolina's piedmont and coastal-plain reservoirs and the warm reservoirs throughout the South, white crappie fill the turbid, current-influenced niches — the muddy headwaters of <b>High Rock</b> and the Yadkin chain, river backwaters and shallow, fertile impoundments — where their tolerance for off-color water makes them the more reliable crappie after a rain." }
+    ],
+    conservation:"Manage them like black crappie: minimum-length and generous creel limits help thin booming year-classes so the survivors grow to slab size. Whites are superb eating and harvest-tolerant — in over-populated stained lakes, taking a limit of eaters is good for the fishery. Where blacks and whites share water, the same regulations typically cover both.",
+    refs:[
+      {t:"White crappie — Wikipedia", u:"https://en.wikipedia.org/wiki/White_crappie"},
+      {t:"Black vs. white crappie ID — In-Fisherman", u:"https://www.in-fisherman.com/editorial/black-crappies-vs-white-crappies/"},
+      {t:"Crappie fishing basics — Take Me Fishing", u:"https://www.takemefishing.org/fish/freshwater-fish/crappie/"},
+      {t:"White crappie — Missouri Department of Conservation Field Guide", u:"https://mdc.mo.gov/discover-nature/field-guide/white-crappie"}
+    ]
+  },
+  channelcat:{
+    tagline:"America's catfish — a sleek, hard-pulling, scent-hunting omnivore that lives in nearly every river, lake and farm pond on the continent and bites day or night.",
+    sections:[
+      { h:"Identification",
+        body:"Ictalurus punctatus. A smooth, scaleless catfish with a <b>deeply forked tail</b>, a small rounded head, and (on younger fish) a scatter of <b>dark spots</b> along slate-blue-to-olive sides — fading on big adults, and breeding males turning dark and thick-headed. The forked tail separates it from the flat-tailed bullheads; the <b>rounded anal fin with 24–29 rays</b> separates it from the blue catfish (straight-edged anal fin, 30–36 rays). Eight whisker-like <b>barbels</b> ring the mouth — chemical sensors, not stingers. The pectoral and dorsal spines, however, can deliver a nasty jab, so handle with care." },
+      { h:"Biology & life history",
+        body:"Channel cats are <b>cavity nesters</b>: in early summer, as water passes about <b>70–75°F</b>, the male finds a dark, enclosed spot — an undercut bank, hollow log, muskrat hole or sunken can — and the female lays a gelatinous egg mass there, which the <b>male then guards and fans</b> until the fry disperse. They're long-lived (commonly 10–15+ years, occasionally much older) and grow large where forage and water allow; most rod-and-reel fish run 1–8 lb, but trophy 'channels' exceed 20 lb. They tolerate a huge range of temperature, current and water quality, which is why they're so nearly universal." },
+      { h:"Behavior & seasonal patterns",
+        body:"The channel cat is a <b>scent-and-taste hunter</b> — its whole body, and especially the barbels, is covered in taste buds, so it locates food by smell in dark or muddy water where sight feeders fail. They're most active in <b>warm water and low light</b>: summer nights are prime, and a rising, stained river after rain triggers a strong feed as the current carries scent. They roam, following food along channel edges, holes, current seams and the downstream side of cover. Cold winter water slows them to a deep, sluggish bite in the river's deepest holes." },
+      { h:"Diet & forage",
+        body:"A true <b>omnivore and opportunist</b> — fish (live and dead), crayfish, insects, mollusks, worms, and plenty of plant matter and decaying material. That broad, scent-driven diet is why catfish bites span the spectrum: <b>fresh cut bait and live baitfish</b> for the biggest fish, <b>nightcrawlers and chicken liver</b> for numbers, and pungent <b>'stinkbaits' / prepared dough and dip baits</b> that exploit their incredible sense of smell. The smellier and bloodier, the better in muddy water." },
+      { h:"How to catch them",
+        body:"Keep it on or near the bottom. A simple <b>slip-sinker (Carolina) rig or three-way rig</b> with cut shad, a gob of crawlers, liver or a dip bait, fished in current seams, holes and below dams, accounts for most channel cats. Fish <b>after dark in summer</b> and during rising, off-color water for the best action. They fight hard and dirty toward cover, so don't under-gun them — and watch those pectoral/dorsal spines when you unhook one." }
+    ],
+    regions:[
+      { name:"Missouri (rivers, reservoirs & a stocked-pond staple)",
+        body:"Channel cats are everywhere in Missouri — the <b>Missouri and Mississippi rivers</b> and their tributaries, every major reservoir, and thousands of MDC community lakes and farm ponds that the department <b>stocks specifically with channel catfish</b> for easy, family-friendly fishing. Summer nights below the big-river wing dams and in reservoir coves are prime; rising, muddy water after a rain turns the bite on." },
+      { name:"Arkansas (catfish country, top to bottom)",
+        body:"Arkansas is serious catfish water. The <b>Arkansas, White and Mississippi rivers</b> and the Delta's bayous and oxbows grow channel cats in huge numbers alongside trophy blues and flatheads, and the AGFC stocks channels into family and city ponds across the state. Drifting and bottom-fishing cut bait in river holes and below the navigation dams is the classic approach." },
+      { name:"North Carolina (piedmont rivers & reservoirs)",
+        body:"From the <b>Cape Fear, Neuse and Roanoke</b> rivers to piedmont reservoirs like <b>Jordan, Falls and High Rock</b>, channel catfish are abundant and widely stocked, including in NCWRC community fishing ponds. The coastal-plain rivers and their warm, fertile flows produce steady summer-night fishing on cut bait and crawlers." },
+      { name:"Illinois & the heartland",
+        body:"In Illinois the channel cat is arguably the most-caught sportfish — the <b>Mississippi, Illinois, Rock and Kaskaskia</b> rivers and their backwaters, plus reservoirs and a statewide network of stocked ponds, all teem with them. Tailwaters below the lock-and-dams concentrate fish in current, and the post-rain rising-water bite is a Midwest summer tradition." }
+    ],
+    conservation:"Channel cats are abundant, productive and stocked for harvest, so keeping a few for the table is well within good management — they're one of the best 'eat what you catch' fisheries in the country. Handle them carefully (the spines, not the barbels, are the hazard), and consider releasing the rare trophy-class fish, which are decades old. Never move live catfish between waters.",
+    refs:[
+      {t:"Channel catfish — Wikipedia", u:"https://en.wikipedia.org/wiki/Channel_catfish"},
+      {t:"Catfish fishing basics — Take Me Fishing", u:"https://www.takemefishing.org/fish/freshwater-fish/catfish/"},
+      {t:"Channel catfish — Missouri Department of Conservation Field Guide", u:"https://mdc.mo.gov/discover-nature/field-guide/channel-catfish"},
+      {t:"Channel vs. blue catfish ID — In-Fisherman", u:"https://www.in-fisherman.com/editorial/telling-channel-catfish-and-blue-catfish-apart/"}
+    ]
+  },
+  bluegill:{
+    tagline:"The fish that taught America to fish — a scrappy, beautiful, nearly universal sunfish that fits in a child's hand and a master angler's respect alike.",
+    sections:[
+      { h:"Identification",
+        body:"Lepomis macrochirus. A deep, round, hand-sized sunfish with a tiny mouth, marked by a <b>solid black ear-flap</b> (no red or pale margin, unlike the redear/shellcracker), a <b>dark blotch at the rear base of the dorsal fin</b>, and 5–9 faint vertical bars. Breeding males blaze with orange-and-blue color and a coppery breast. The small mouth is the functional key — it tells you to fish <b>small</b>. Bluegill hybridize readily with other sunfish, which can muddy the field marks, but the black ear-flap and dorsal blotch are the anchors." },
+      { h:"Biology & life history",
+        body:"Bluegill are <b>colonial bed-spawners</b>: from late spring through summer, whenever water sits around <b>67–80°F</b>, males sweep clusters of saucer-shaped nests in 1–4 ft of water — the unmistakable 'honeycomb' of beds in the shallows — and the dominant 'bull' bluegills guard them. They spawn <b>repeatedly through the warm months</b>, which makes them astonishingly prolific and prone to <b>overpopulating and stunting</b> in waters without enough predators. They're short-lived (most 4–6 years) and slow to reach real size; a true 'bull' bluegill near a pound is a genuine trophy that took years to grow." },
+      { h:"Behavior & seasonal patterns",
+        body:"Bluegill orient to <b>cover and the warm shallows</b> — weed edges, docks, brush, laydowns. The spawn is the headline event: through the warm months waves of fish bed in the shallows, and a visible bed is nonstop action. In summer's heat and in winter the bigger fish slide to <b>deeper weed lines and brush</b>, suspending off structure, while the small ones stay shallow. They feed all day but best in the warm hours, and the <b>biggest, oldest bulls are surprisingly wary</b> — they hold a little deeper and spook easily, which is why monster bluegill are a specialist's quarry, not just a kid's." },
+      { h:"Diet & forage",
+        body:"Bluegill are <b>invertebrate feeders</b> — aquatic insects and larvae, tiny crustaceans, snails, worms, and the occasional small minnow or fish egg, sipped through that small mouth. They're a cornerstone of the food web, the primary forage that grows big largemouth bass. For anglers the lesson is to <b>go small and natural</b>: a piece of worm or a cricket, a tiny jig, a small popper or wet fly. Oversize baits just get pecked." },
+      { h:"How to catch them",
+        body:"The most welcoming fishing there is, and a real craft when you chase big ones. The timeless rig is a <b>worm or cricket under a small bobber</b>; a <b>1/32–1/64 oz jig or a tiny tube/grub</b> on light line is deadlier still. Fly anglers love them — a small <b>popping bug or wet fly</b> on a bedding colony is pure fun. For the wary 'bulls,' fish the deeper outside weed edges and brush with a slow, small presentation. Everything about bluegill rewards <b>light line, small hooks, and finesse</b>." }
+    ],
+    regions:[
+      { name:"Florida (native giants & the coppernose)",
+        body:"Florida is a <b>big-bluegill paradise</b> — the warm, year-round growing season and the native <b>coppernose</b> subspecies produce huge bream. <b>Lake Okeechobee</b>, the <b>Kissimmee chain</b> and countless lakes and canals give up plate-size bluegill and redear, and Floridians chase the bedding 'bream' on light tackle and flies through a long spring and summer. The same warmth that grows giant bass grows giant panfish." },
+      { name:"Missouri & Illinois (the farm-pond heartland)",
+        body:"In the Midwest the bluegill is the backbone of <b>farm-pond and community-lake fishing</b> — the MDC and IDNR stock the bluegill-bass combination into thousands of small waters precisely because bluegill feed the bass and provide easy, abundant fishing. Well-managed ponds and lakes like Missouri's MDC community lakes and Illinois' park and strip-mine lakes grow surprisingly big bulls; the trick is enough bass predation to keep the bluegill from stunting." },
+      { name:"Arkansas & North Carolina (bream culture)",
+        body:"Across Arkansas and North Carolina, 'bream' fishing is a deep tradition — farm ponds, oxbows, the fertile lowland lakes and slow rivers all teem with bluegill and their redear cousins. The warm southern summers stretch the bedding season for months, and light-tackle and fly anglers work the shallow beds and shaded banks from spring well into fall." }
+    ],
+    conservation:"Counter-intuitively, bluegill often need <b>harvest</b>: in small lakes and ponds they over-reproduce and stunt, so keeping plenty of the small-to-medium fish is good management and good eating. The one thing to protect is the <b>big bull bluegill</b> — they're old, rare, and the prime spawners; releasing the genuine 9-inch-plus fish helps keep a panfish fishery producing quality. A healthy bass population is the best bluegill-management tool there is.",
+    refs:[
+      {t:"Bluegill — Wikipedia", u:"https://en.wikipedia.org/wiki/Bluegill"},
+      {t:"Bluegill / sunfish fishing basics — Take Me Fishing", u:"https://www.takemefishing.org/fish/freshwater-fish/bluegill/"},
+      {t:"Bluegill — Missouri Department of Conservation Field Guide", u:"https://mdc.mo.gov/discover-nature/field-guide/bluegill"},
+      {t:"Managing bluegill in ponds — pond management extension guidance", u:"https://www.takemefishing.org/how-to-fish/fishing-fish-species/bluegill/"}
     ]
   }
 };

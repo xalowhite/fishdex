@@ -205,6 +205,10 @@
   .wpop .wintel{margin:6px 0;font-size:11.5px;color:#d7e6e2;background:#10333a;border:1px solid var(--line);
     border-radius:8px;padding:7px 9px;line-height:1.4}
   .wpop .wintel b{color:var(--accent2);display:block;margin-bottom:2px}
+  .wpop .wprofile{margin:8px 0;font-size:12px;color:#dcebe7;background:#0f2832;border:1px solid var(--line);
+    border-left:3px solid var(--accent);border-radius:8px;padding:8px 11px;line-height:1.5}
+  .wpop .wprofile b{color:var(--accent2);display:block;margin-bottom:3px;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px}
+  .wpop .wprofile p{margin:0 0 7px}.wpop .wprofile p:last-child{margin-bottom:0}
   .wpop .waccs{display:flex;flex-direction:column;gap:4px;margin:2px 0 4px}
   .wpop .wacc-row{font-size:11.5px;line-height:1.35}
   .wpop .wacc{color:var(--accent2);cursor:pointer;font-weight:600}
@@ -1676,6 +1680,100 @@ const ACCESS = {
     {name:"Granada / Southport ramp",lat:28.100,lon:-81.400,info:"South-end public ramp — access to the lower-lake grass and the Southport Canal."}]
 };
 
+/* ============================================================
+   WATER_PROFILE — deeper descriptive character for marquee
+   waters. Keyed by water name (must match WATERS name exactly).
+   Values are arrays of paragraph strings rendered in the detail
+   panel under "Waterbody profile". General, well-documented
+   character (no invented stats); confirm regs/seasons locally.
+   ============================================================ */
+const WATER_PROFILE = {
+  "Lake of the Ozarks":[
+    "A sprawling 50,000+-acre Osage River impoundment with over 1,100 miles of shoreline — and that shoreline is the story: mile after mile of boat docks, brush and seawalls. It fishes like a giant cover-and-structure puzzle, with largemouth, spotted bass and a strong crappie population relating to docks, points and timber.",
+    "Spring pre-spawn and the fall shad migration into the creek arms are the prime windows; summer pushes bass deep and turns the lake into an early-morning and night fishery to dodge heavy recreational boat traffic. Dock-shooting jigs for crappie and pitching the endless docks for bass are the signature techniques."
+  ],
+  "Table Rock Lake":[
+    "A clear, deep, rocky White River highland reservoir straddling the Missouri–Arkansas line, widely regarded as one of the country's premier bass lakes. Its clarity and structure favor smallmouth and spotted bass alongside largemouth, and it's famous for finesse fishing.",
+    "Because the water is clear, light line and finesse presentations — the Ned rig, drop-shot, shaky head and jerkbaits — dominate, especially the cold-water months. Bass relate to chunk-rock banks, bluff ends, points and submerged timber; the many creek arms (James, Kings, Long Creek) each fish a little differently."
+  ],
+  "Lake Taneycomo":[
+    "Not a warmwater lake at all but a cold tailwater: the water released from the bottom of Table Rock Dam keeps Taneycomo cold year-round, creating one of the Midwest's best trout fisheries right in Branson. The upper end below the dam is prime trout water; it warms and broadens downstream.",
+    "Flow is dictated by power generation at the dam — when turbines run, the river rises and current picks up, changing everything. Anglers fish scuds, midges, eggs and small jigs; the upper trophy area carries special regulations. Check generation schedules before you go: low water wades, high water is a boat/drift game."
+  ],
+  "Truman Lake":[
+    "A large, often-stained flood-control reservoir above Lake of the Ozarks, defined by vast amounts of standing flooded timber. That timber makes Truman one of Missouri's elite crappie lakes and a strong largemouth and white bass fishery.",
+    "The flooded timber and creek arms concentrate crappie on cover you can fish vertically or pick apart with jigs and minnows. Spring brings shallow crappie and a white-bass run up the rivers; the lake's stain means reaction baits and contrast colors often outproduce finesse."
+  ],
+  "Stockton Lake":[
+    "A clear, wind-swept Sac River reservoir best known as Missouri's top walleye lake, with a strong smallmouth population that thrives on its rocky structure — plus largemouth, spotted bass and white bass.",
+    "Open main-lake points, flats and humps set up classic walleye trolling and jigging, while the rocky banks and bluffs hold smallmouth. The lake is famous (and sometimes infamous) for wind, which positions fish on windblown structure but can make boat control a challenge."
+  ],
+  "Current River (lower)":[
+    "A spring-fed Ozark float stream within the Ozark National Scenic Riverways — cold, clear and powerful, fed by some of Missouri's largest springs. The upper reaches near Montauk and the big springs stay cold enough for trout, while the river transitions to a premier smallmouth and goggle-eye (rock bass) stream downstream.",
+    "This is a wade-and-float fishery: gravel bars, bluff pools, root wads and current seams hold smallmouth that fight well above their weight. Cold spring inflows keep summer fishable. It's a destination float as much as a fishery — plan around canoe/kayak access points and water levels."
+  ],
+  "Meramec River":[
+    "A classic eastern-Ozark float stream and one of the longest free-flowing rivers in Missouri, draining to the Mississippi near St. Louis. It's a strong smallmouth river with rock bass, sunfish and catfish, popular for both wading and canoe floats within easy reach of the metro area.",
+    "Fish the current seams, bluff pools, gravel riffles and wood. Spring and fall are prime for smallmouth; summer floats are as much recreation as fishing. Like all Ozark streams it clears and drops after rains stabilize — clarity and flow drive the bite."
+  ],
+  "North Fork of the White River":[
+    "One of Missouri's finest wild-trout streams: spring-fed and cold, the North Fork supports naturally reproducing rainbow trout in its blue-ribbon water — a rarity in the state — alongside smallmouth lower down. Big springs (Rainbow Spring) feed the cold flow.",
+    "A wading and float fly-fishery built around scuds, sowbugs, midges and seasonal hatches, with special-regulation trophy water. Cold, clear and technical — light tippet and a careful approach matter. Levels swing with rain, so check flows before committing to a float."
+  ],
+  "Bull Shoals Lake":[
+    "A huge, deep, exceptionally clear White River highland reservoir on the Missouri–Arkansas border, known for quality bass fishing (largemouth, smallmouth and spotted) over rock and timber, plus walleye, white bass, crappie and stripers in the open water.",
+    "Clarity and depth make it a finesse and structure lake — points, bluffs, brush and channel swings. Spring is the shallow window; summer and winter fish set up deep. The lake's many remote creek arms reward anglers who learn to read its rocky structure."
+  ],
+  "Beaver Lake":[
+    "The uppermost White River reservoir in northwest Arkansas — clear, deep and rocky, with bluffs, timber and standing structure. It holds largemouth, smallmouth and spotted bass, plus a notable striped bass fishery and good crappie and walleye.",
+    "Clear water again means finesse: drop-shot, Ned rig, jerkbaits and shaky heads around the rock and brush. Stripers roam the open lake chasing shad and are chased with live bait and trolling. The Beaver tailwater below the dam is cold-enough trout water."
+  ],
+  "Greers Ferry Lake":[
+    "A clear, deep Little Red River highland reservoir in central Arkansas, famous for walleye and a strong smallmouth and spotted-bass fishery alongside largemouth, hybrid/white bass and crappie. Its spring walleye run is a regional tradition.",
+    "Rocky points, bluffs, brush and the open main lake set up finesse bass fishing and walleye trolling/jigging. The tailwater below the dam — the Little Red — is a celebrated trophy trout stream. Clear water rewards light line and a stealthy approach."
+  ],
+  "White River (below Bull Shoals Dam)":[
+    "The legendary Arkansas tailwater: cold, nutrient-rich water released from the bottom of Bull Shoals Dam creates a world-class trophy trout fishery for rainbow and brown trout running many miles downstream. This is one of America's premier trout rivers.",
+    "Everything revolves around dam generation. Low water is a wade-and-drift game (scuds, sowbugs, midges, small jigs, drifted bait); high generation turns it into a boat fishery where guides back-troll and drift big browns to streamers and bait. Always check the generation schedule and never get caught wading on a rising river."
+  ],
+  "Norfork Tailwater":[
+    "A short but mighty cold tailwater below Norfork Dam where the North Fork River meets the White system — small, intimate and famously rich, producing outsized brown and rainbow trout for its size. A fly-fishing favorite.",
+    "Like the White, it lives and dies by generation: a wadeable spring-creek-like fishery at low water (sowbugs, midges, scuds on light tippet) that transforms when the turbines run. The catch-and-release trophy area is renowned. Confirm generation timing before wading."
+  ],
+  "Little Red River (below Greers Ferry)":[
+    "The cold tailwater below Greers Ferry Dam in central Arkansas — a quality brown and rainbow trout river that has historically produced exceptionally large browns, including world-record-class fish, thanks to cold, fertile dam releases.",
+    "A generation-driven tailwater: low flows let anglers wade and drift small flies (sowbugs, midges, eggs) and light tackle; high water is a drift-boat game for big browns. Check the dam schedule and watch for fast-rising water."
+  ],
+  "Lake Okeechobee":[
+    "Florida's vast, shallow, grass-filled inland sea — 'the Big O' — and one of the most famous big-largemouth fisheries in the world. Native Florida-strain bass, year-round growth and endless aquatic vegetation make it a shallow-water bass factory; it's also a premier black-crappie ('speck') lake.",
+    "The game is shallow and visual: flipping and punching matted grass, throwing swimbaits, lipless cranks and frogs over and around the vegetation, and drifting wild shiners for the biggest fish. Winter and the pre-spawn (roughly December–March) are the peak trophy windows. Water levels and vegetation shift the productive zones year to year."
+  ],
+  "Lake Tohopekaliga (Toho)":[
+    "A premier central-Florida trophy-bass lake in the Kissimmee chain near Orlando, managed intensively for big Florida-strain largemouth and dotted with hydrilla, bulrush and lily pads. It also gives up huge numbers of black crappie in the cool season.",
+    "Shallow grass fishing rules — flipping, frogging, swimbaits and wild shiners on the vegetation lines and the famous shell beds. The pre-spawn and spawn (winter into early spring) draw anglers chasing double-digit bass. Periodic habitat drawdowns reshape the lake's hot zones."
+  ],
+  "Rend Lake":[
+    "A large, shallow, fertile flood-control reservoir in southern Illinois long famous as one of the Midwest's top crappie destinations, with both black and white crappie, plus strong largemouth, bluegill, channel catfish and white bass.",
+    "Stained, shad-rich water favors reaction baits and contrast colors; crappie stack on the lake's abundant brush, standing timber and rip-rap. Spring brings a shallow crappie bonanza around cover, while summer and winter fish hold on deeper structure and the man-made attractors."
+  ],
+  "Lake of Egypt":[
+    "A clear, warm power-plant cooling lake in southern Illinois that stays fishable year-round thanks to the heated discharge. It's a quality largemouth lake with good bluegill, redear, crappie and catfish, and the warm water keeps bass growing and feeding through winter.",
+    "Clear water and abundant docks, weed lines and brush call for a mix of finesse and cover fishing. The warm discharge areas concentrate baitfish and gamefish in the cold months, making winter one of the more productive times — unusual for a northern-state lake."
+  ],
+  "Jordan Lake":[
+    "A large piedmont reservoir near Raleigh, North Carolina, known as a solid largemouth fishery with good crappie, catfish and white perch, set among standing timber, creek arms and points. It's also nationally notable for its wintering bald eagles.",
+    "Often stained, it rewards reaction baits — spinnerbaits, crankbaits and ChatterBaits — around wood, points and bridge structure, with finesse plastics for pressured fish. Spring pre-spawn in the creek arms and the fall shad feed are the prime windows."
+  ],
+  "High Rock Lake":[
+    "A large, fertile, often-stained Yadkin River reservoir in central North Carolina with an enormous shoreline and abundant cover — a well-known tournament-bass lake with strong largemouth plus crappie, catfish and white perch.",
+    "The stained, shallow, cover-rich water suits power fishing: spinnerbaits, squarebills, ChatterBaits and jigs around docks, laydowns and rip-rap, with the muddy upper river arms holding fish year-round. Spring and fall are prime; the lake's many creek arms spread the fish out."
+  ],
+  "Lake James":[
+    "A clear, cool reservoir in the North Carolina mountains at the foot of the Blue Ridge, notable for both smallmouth and largemouth bass (a relatively rare smallmouth fishery for the state) plus a walleye population and good panfish.",
+    "Clear, rocky highland-style water favors finesse presentations and structure fishing — points, rock, brush and timber — much like the Ozark highland lakes. Smallmouth relate to the rock; largemouth tuck into the bushier coves. Cooler mountain temperatures stretch the spring and fall windows."
+  ]
+};
+
 </script>
 <script>
 /* ============================================================
@@ -2507,6 +2605,7 @@ function makeWaterPopup(w){
   const gage=(typeof USGS_GAGE!=="undefined")?USGS_GAGE[w.name]:null;
   const gen=(typeof GEN_URL!=="undefined")?GEN_URL[w.name]:null;
   const acc=((typeof ACCESS!=="undefined"&&ACCESS[w.name])||w.access||[]);
+  const prof=(typeof WATER_PROFILE!=="undefined")?WATER_PROFILE[w.name]:null;
   const el=document.createElement("div"); el.className="wpop";
   el.innerHTML=`<div class="wph"><span class="wdot" style="background:${t.color}"></span><b>${w.name}</b></div>
     <div class="wtype">${t.label} · ${w.region}${w.depth?` · <span style="color:#9fd8d2">${w.depth}</span>`:""}</div>
@@ -2515,6 +2614,7 @@ function makeWaterPopup(w){
     ${w.how?`<div class="wmeta"><b>How</b> ${w.how}</div>`:""}
     ${w.size?`<div class="wmeta"><b>Where</b> ${w.size}</div>`:""}
     ${w.intel?`<div class="wintel"><b>🪝 Local intel</b> ${w.intel}</div>`:""}
+    ${prof?`<div class="wprofile"><b>📋 Waterbody profile</b>${prof.map(p=>`<p>${p}</p>`).join("")}</div>`:""}
     ${acc.length?`<div class="wmeta"><b>Public access</b></div><div class="waccs">${acc.map((a,i)=>`<div class="wacc-row"><span class="wacc" data-ai="${i}">📍 ${a.name}</span>${a.info?`<div class="wacc-info">${a.info}</div>`:""}</div>`).join("")}</div>`:""}
     ${(gage||gen)?`<div class="wlive"><span class="protag">PRO</span>${gage?`<span class="liveflow">💧 Live flow: loading…</span>`:""}${gen?`<a class="genlink" href="${gen}" target="_blank" rel="noopener">⚡ Dam generation ↗</a>`:""}</div>`:""}
     <div class="wsp">${w.species.map(id=>{const f=fishById(id);return f?`<span class="wchip" data-fid="${id}">${f.name}</span>`:"";}).join("")}</div>
