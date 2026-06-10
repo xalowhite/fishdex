@@ -2453,10 +2453,12 @@ let riverLayer=null; const riverCache={};
 function clearRiver(){ if(riverLayer&&map){ map.removeLayer(riverLayer); } riverLayer=null; }
 function renderRiver(lines, fit){
   clearRiver(); riverLayer=L.layerGroup();
-  lines.forEach(ll=>{
-    L.polyline(ll,{color:"#37b6a0",weight:9,opacity:.25}).addTo(riverLayer);   // glow
-    L.polyline(ll,{color:"#5ad1bb",weight:3,opacity:.95}).addTo(riverLayer);    // bright trace
-  });
+  // full-resolution geometry; let Leaflet's smoothFactor handle display thinning so the
+  // trace follows every bend instead of cutting across them.
+  const casing={color:"#06262b",weight:6,opacity:.55,lineCap:"round",lineJoin:"round",smoothFactor:1};
+  const trace ={color:"#5ad1bb",weight:2.5,opacity:.95,lineCap:"round",lineJoin:"round",smoothFactor:1};
+  lines.forEach(ll=>L.polyline(ll,casing).addTo(riverLayer));   // dark casing under everything
+  lines.forEach(ll=>L.polyline(ll,trace ).addTo(riverLayer));   // bright trace on top
   riverLayer.addTo(map);
   if(fit){ try{ map.fitBounds(L.featureGroup(riverLayer.getLayers()).getBounds().pad(0.12),{maxZoom:12,animate:true}); }catch(e){} }
 }
@@ -2469,11 +2471,7 @@ function drawRiver(w){
   fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent(q)})
     .then(r=>r.ok?r.json():Promise.reject()).then(j=>{
       const lines=[];
-      (j.elements||[]).forEach(e=>{ const g=e.geometry; if(g&&g.length>1){
-        const step=Math.max(1,Math.floor(g.length/120)); const ll=[];
-        for(let i=0;i<g.length;i+=step) ll.push([g[i].lat,g[i].lon]);
-        const last=g[g.length-1]; ll.push([last.lat,last.lon]); lines.push(ll);
-      }});
+      (j.elements||[]).forEach(e=>{ const g=e.geometry; if(g&&g.length>1) lines.push(g.map(p=>[p.lat,p.lon])); });
       if(!lines.length) return;
       riverCache[w.name]=lines;
       if(state.selectedWater===w.name) renderRiver(lines, true);   // only if still viewing it
