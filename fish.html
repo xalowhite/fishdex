@@ -50,6 +50,21 @@
   .note{background:#1a2f1f;border:1px solid #2f5a3a;border-radius:10px;padding:12px 14px;color:#cfe0d2;font-size:14px}
   .disc{color:var(--muted);font-size:12px;line-height:1.5;border-top:1px solid var(--line);padding:24px 0;margin-top:14px}
   .cta{margin:14px 0}
+  .sbody{font-size:15px}
+  .sbody p{font-size:15px;margin:9px 0}
+  .sbody h3{margin:16px 0 5px}
+  table.pb{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+  table.pb th,table.pb td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.pb th{color:var(--accent2);font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+  table.pb tr:hover td{background:#0f2029}
+  table.pb td.s{font-weight:700;color:var(--gold);white-space:nowrap}
+  .gearbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 15px;margin:10px 0}
+  .gearbox h3{margin:0 0 4px;color:var(--accent2)}
+  .gearbox .pick{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .gearbox .pick b{color:var(--ink)}
+  .callout2{background:#0f2832;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14px}
+  .fightline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0}
+  .fightline .stars{color:var(--gold);font-size:18px;letter-spacing:1px}
 </style>
 </head>
 <body>
@@ -398,7 +413,7 @@ const FISH = [
     states:union("SOUTHEAST","SOUTHCENT","MIDWEST","PLAINS","MIDATL","NORTHEAST","SOUTHWEST","CALIF",["Manitoba","Saskatchewan","Ontario"]),
     bestMonths:[5,6,7,8,9], tod:["dusk","night","afternoon"], tempF:"70–85°F",
     baits:["Cut bait","Chicken liver","Stinkbait","Nightcrawlers"],
-    diet:"Anything — true omnivore", fight:3, record:58, regs:"Generous limits; trophy slots in spots.", tide:"",
+    diet:"Anything — true omnivore", fight:4, record:58, regs:"Generous limits; trophy slots in spots.", tide:"",
     tip:"Summer nights are prime. Fish current breaks & holes after dark." },
 
   { id:"flathead", name:"Flathead Catfish", sci:"Pylodictis olivaris", family:"Catfish", emoji:"🐡", shape:"catfish",
@@ -472,7 +487,7 @@ const FISH = [
     states:union("GULF",["Georgia","South Carolina","North Carolina","Virginia"],"MX_GULF","MX_CARIB"),
     bestMonths:[9,10,11,4,5], tod:["dawn","morning","dusk"], tempF:"60–80°F",
     baits:["Gold spoons","Soft plastics","Live shrimp","Cut mullet"],
-    diet:"Shrimp, crabs, mullet", fight:4, record:94.2, regs:"Tight slot limits (often 18–27\").", tide:"Sight-fish tailing reds on a falling tide.",
+    diet:"Shrimp, crabs, mullet", fight:5, record:94.2, regs:"Tight slot limits (often 18–27\").", tide:"Sight-fish tailing reds on a falling tide.",
     tip:"Fall bull-red runs hit the beaches & passes. A flats-fishing staple." },
 
   { id:"snook", name:"Snook", sci:"Centropomus undecimalis", family:"Inshore", emoji:"🐠", shape:"snook",
@@ -1896,6 +1911,29 @@ const TACTICS = {
    ============================================================ */
 const PROFILE = {
   largemouth:{
+    extra:[
+      { h:"Season &amp; weather playbook — what to throw, when",
+        body:`<p>Largemouth are governed by water temperature and the position it puts them in. Find the stage, then match the bait to the mood — aggressive fish want speed and reaction, neutral fish want slow and natural.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top lures &amp; baits</th></tr>
+        <tr><td class="s">Winter<br><span style="font-weight:400;color:#90a8af">&lt;50°F</span></td><td>Deep — channel edges, steep bluff banks, main-lake structure, the deepest cover</td><td>Jigging spoon, blade bait, hair/finesse jig, suspending jerkbait (long pauses), drop-shot</td></tr>
+        <tr><td class="s">Pre-spawn<br><span style="font-weight:400;color:#90a8af">48–58°F</span></td><td>Staging on secondary points &amp; creek-channel bends on the way to the spawning flats — <b>the best big-fish window of the year</b></td><td>Lipless crankbait, jerkbait, ChatterBait, 1/2 oz jig, spinnerbait, big swimbait</td></tr>
+        <tr><td class="s">Spawn<br><span style="font-weight:400;color:#90a8af">58–66°F</span></td><td>Shallow 1–4 ft on hard/protected bottom near cover; fish are visible &amp; defensive</td><td>Wacky/Texas Senko, creature bait (flipped), soft jerkbait, beaver baits — sight-fishing</td></tr>
+        <tr><td class="s">Post-spawn /<br>early summer</td><td>Recovering in shade — docks, first drop, bushes; then schooling on bait</td><td>Topwater (walker, popper), weightless plastics, shaky head, squarebill, swim jig</td></tr>
+        <tr><td class="s">Summer<br><span style="font-weight:400;color:#90a8af">75–88°F</span></td><td>Split shift: shallow grass/wood at dawn–dusk &amp; night; deep ledges, points &amp; humps midday</td><td>Frog &amp; walking topwater (low light), deep crankbait, big worm / Carolina rig, football jig; <b>black jig or spinnerbait after dark</b></td></tr>
+        <tr><td class="s">Fall</td><td>Following shad to the backs of creeks &amp; flats — chase the bait and you find the bass</td><td>Squarebill, lipless, spinnerbait, swimbait, walking topwater — <b>match the shad size</b></td></tr></table>
+        <h3>Reading the weather &amp; light</h3>
+        <p><b>Bluebird &amp; clear after a cold front:</b> the toughest day — fish bury in cover; downsize, slow down, go natural (drop-shot, shaky head, jig flipped into the thickest cover). <b>Overcast, wind or light rain:</b> the best moving-bait conditions — cover water with spinnerbaits, ChatterBaits, squarebills and topwater; wind on a point or bank is a green light. <b>Falling pressure ahead of a front:</b> often a feeding frenzy — pick up the pace. <b>Stained/muddy water:</b> dark or bright, bigger profiles, rattles &amp; thumping blades (they hunt by vibration); tight to visible cover. <b>Clear water:</b> natural colors, longer casts, finesse, fluorocarbon.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🎣 Baitcasting — the bass workhorse</h3><p style="margin:4px 0">A 7'–7'6" medium-heavy, fast-action casting rod with a 7:1-ish reel covers most of bass fishing: jigs, Texas rigs, spinnerbaits, ChatterBaits, lipless and squarebill cranks. Go heavier (heavy power, 50–65 lb braid) for frogs and flipping/punching matted grass; a separate moderate-action "cranking" rod (often glass/composite) helps deep crankbaits and treble baits.</p><div class="pick"><b>Solid picks:</b> Lew's Speed Spool / KVD, Shimano SLX &amp; Curado, Daiwa Tatula reels; Dobyns Fury/Colt or St. Croix Bass X / Mojo Bass rods.</div></div>
+        <div class="gearbox"><h3>🪶 Spinning — finesse</h3><p style="margin:4px 0">A 7' medium or medium-light spinning rod with a 2500–3000 reel for drop-shot, Ned rig, shaky head, wacky worm and small swimbaits — the clear-water and pressured-fish answer.</p><div class="pick"><b>Solid picks:</b> Shimano Stradic, Daiwa Fuego/BG; 10–15 lb braid main line with a 6–10 lb fluorocarbon leader.</div></div>
+        <div class="gearbox"><h3>🐟 Fly</h3><p style="margin:4px 0">Bass are excellent on the fly: a 7–8wt with a bass-taper floating line throws poppers, divers, Game Changers and Clousers. Add a short heavy leader (0X–2X, ~12–20 lb).</p></div>
+        <h3>Line cheat-sheet</h3>
+        <p><b>Fluorocarbon</b> (12–20 lb) for most casting — sinks, low-stretch, less visible; the bottom-contact &amp; clear-water choice. <b>Monofilament</b> (15–20 lb) floats — for topwater &amp; squarebills. <b>Braid</b> (30–65 lb) for frogs, flipping heavy grass, and as a finesse main line behind a fluoro leader.</p>
+        <div class="fightline"><span class="stars">★★★★☆</span><b>Fight: 4/5 — power, not endurance.</b></div>
+        <p>A largemouth's strike and first surge are violent, with hard head-shakes and an immediate bolt for cover — but they're sprinters, not distance runners, and tire fast. The challenge is winning the first three seconds: stop the run and turn the fish before it buries you in a dock, brush pile or grass mat. Use enough rod and line to horse them out; a big female's headshake throws hooks, so keep steady pressure and a sticky hookset.</p>` },
+      { h:"Subspecies, strains &amp; the size ceiling",
+        body:`<p>Two subspecies drive everything about largemouth size. The <b>Northern largemouth</b> (<i>M. salmoides salmoides</i>) ranges across most of the country — more aggressive, relates to structure, tolerates cold winters, but tops out smaller (a 6–8 lb fish is excellent, double-digits rare). The <b>Florida largemouth</b> (<i>M. s. floridanus</i>) is genetically built to grow far larger (10–20+ lb) but only expresses that potential in warm water with a long growing season, and tends to be warier and harder to fool. Across the transition belt (Texas to the Carolinas) the two interbreed into <b>"intergrade" or F1 bass</b> that managers stock for fast-growing trophies. The practical takeaway: the same species is a 6-lb trophy in Missouri and an average fish in Florida — and stocking Florida genes only pays off where the water stays warm. <span class="src">See the regional profiles below for how this plays out state by state.</span></p>` }
+    ],
     tagline:"North America's most popular gamefish — an ambush predator of weedy lakes, ponds and slow rivers, and the species most shaped by where it lives.",
     sections:[
       { h:"Identification",
@@ -1931,6 +1969,26 @@ const PROFILE = {
     ]
   },
   smallmouth:{
+    extra:[
+      { h:"Season &amp; weather playbook — what to throw, when",
+        body:`<p>Smallmouth are temperature- and current-driven. In rivers, think current seams, rock and depth changes; in lakes, think main-lake rock, points and humps. They feed hard in cool water and pull off the shallows as it warms.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top lures &amp; baits</th></tr>
+        <tr><td class="s">Winter<br><span style="font-weight:400;color:#90a8af">&lt;48°F</span></td><td>The deepest, slowest water — river wintering pools, lake channels &amp; deep rock; nearly dormant</td><td>Hair jig, blade bait, jigging spoon, suspending jerkbait (very long pauses), drop-shot — <b>slow</b></td></tr>
+        <tr><td class="s">Pre-spawn</td><td>Staging on transition banks &amp; flats near gravel spawning areas — a peak big-fish window</td><td>Jerkbait, tube, Ned rig, blade bait, hair jig, small swimbait</td></tr>
+        <tr><td class="s">Spawn<br><span style="font-weight:400;color:#90a8af">59–64°F</span></td><td>Clean gravel/rock in 2–8 ft; males guard nests aggressively</td><td>Tube, Ned, drop-shot, soft jerkbait — sight-fishing (release them quickly)</td></tr>
+        <tr><td class="s">Summer</td><td>Rivers: oxygen-rich riffles, runs &amp; current seams (deeper pools midday). Lakes: main-lake rock, points, humps</td><td>Tube, Ned, drop-shot, crayfish crankbait, walking topwater &amp; Whopper Plopper (low light), swimbait</td></tr>
+        <tr><td class="s">Fall</td><td>Heavy feed-up chasing baitfish &amp; crayfish into the fall — often the year's best numbers of big fish</td><td>Jerkbait, crankbait, swimbait, blade bait, topwater, hair jig</td></tr></table>
+        <h3>Weather &amp; light</h3>
+        <p>Smallmouth water is often clear, so they're sight feeders that spook easily — <b>clear &amp; calm:</b> natural colors (green-pumpkin, brown, smoke), light fluoro, long casts, finesse. <b>Wind &amp; chop, or clouds:</b> the great equalizer — they roam and crush moving baits and topwater; fish windblown rock. <b>Cold front:</b> drop-shot or Ned, deep and dead-slow. In rivers, <b>flow is everything</b>: a little extra current after a rain positions fish on seams and turns on the crayfish bite, but high muddy water shuts it down.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🪶 Spinning — the smallmouth standard</h3><p style="margin:4px 0">Finesse rules: a 7'–7'2" medium or medium-light spinning rod with a 2500–3000 reel handles tubes, the Ned rig, drop-shot, hair jigs and small swimbaits. This is the outfit you'll use most.</p><div class="pick"><b>Solid picks:</b> Shimano Stradic / Daiwa BG reels; St. Croix Mojo Bass, Dobyns Fury, or G. Loomis spinning rods. <b>Line:</b> 10–15 lb braid main + 6–8 lb fluorocarbon leader.</div></div>
+        <div class="gearbox"><h3>🎣 Baitcasting</h3><p style="margin:4px 0">A 6'10"–7' medium casting rod for jerkbaits, crankbaits, bladed baits and mid-size swimbaits; 10–12 lb fluorocarbon.</p></div>
+        <div class="gearbox"><h3>🐟 Fly — rivers shine</h3><p style="margin:4px 0">A 6–7wt with floating &amp; intermediate lines is a joy on river smallmouth: Clouser Minnows, crayfish patterns, Murdich Minnows, poppers and small Game Changers on a short 0X–3X leader.</p></div>
+        <div class="fightline"><span class="stars">★★★★★</span><b>Fight: 5/5 — the benchmark.</b></div>
+        <p>Pound for pound the hardest-fighting freshwater fish in North America, and our 5/5 reference point. A hooked smallmouth runs, bulldogs deep, and <b>jumps repeatedly</b>, using current to its advantage — a 3-pounder fights like a largemouth twice its size. Keep the rod loaded and let a good drag absorb the jumps; bow slightly to a leaping fish so it can't snap a light leader.</p>` },
+      { h:"Subspecies &amp; variants — the Ozark Neosho",
+        body:`<p>Beyond the wide-ranging <b>Northern smallmouth</b> (<i>M. dolomieu dolomieu</i>), the Ozarks hold a special native subspecies: the <b>Neosho smallmouth</b> (<i>M. d. velox</i>), found in the clear Ozark-border streams of southwest Missouri, northwest Arkansas and northeast Oklahoma (the Neosho, Elk, Illinois and upper White drainages). Neosho fish tend to run a bit more bronze-to-brownish with subtle marking and jaw differences, and they're prized by stream anglers; because their range is limited and they hybridize with introduced northern-strain fish, they're a conservation focus — several Ozark streams carry special black-bass regulations to protect them. There's also a celebrated lake variant phenomenon: fertile reservoirs (Dale Hollow, and historically the Ozark highland lakes) grow giant "football" smallmouth far larger than any stream fish. <span class="src">If you fish the SW-Missouri / NW-Arkansas streams, you're very likely catching Neosho smallmouth — handle and release them with care.</span></p>` }
+    ],
     tagline:"Pound for pound the hardest-fighting freshwater gamefish in North America — a cool-water predator of clear rivers and rocky lakes.",
     sections:[
       { h:"Identification",
@@ -1962,6 +2020,25 @@ const PROFILE = {
     ]
   },
   rainbow:{
+    extra:[
+      { h:"Season &amp; weather playbook — flies, lures &amp; bait",
+        body:`<p>Rainbows feed subsurface most of the time, so nymphs and (on tailwaters) midges &amp; scuds do the heavy lifting; dries are the prize when fish are rising. Spin anglers do well with small flash and bait, especially on stocked fish.</p>
+        <table class="pb"><tr><th>Season</th><th>What's happening</th><th>Flies → &nbsp;|&nbsp; Spin/bait</th></tr>
+        <tr><td class="s">Winter</td><td>Slow, deep; tailwaters &amp; spring creeks stay prime while freestones sleep</td><td><b>Flies:</b> zebra midge, RS2, scuds, sowbugs, eggs (tiny, deep, slow). <b>Spin:</b> small spinner crawled slow; float + PowerBait/eggs for stockers</td></tr>
+        <tr><td class="s">Spring</td><td>Spawn (rainbows are spring spawners) &amp; runoff — high, often off-color water</td><td><b>Flies:</b> eggs, San Juan worm, stonefly nymphs, BWO on cloudy days. <b>Spin:</b> inline spinner, spoon, drifted bait in the seams</td></tr>
+        <tr><td class="s">Summer</td><td>Bug season — best hatches &amp; dry-fly fishing, early &amp; late; fish riffles &amp; oxygenated water</td><td><b>Flies:</b> caddis, PMD, terrestrials (hopper-dropper), midday nymph rig. <b>Spin:</b> small Rooster Tail / Panther Martin, Kastmaster</td></tr>
+        <tr><td class="s">Fall</td><td>Pre-winter feed; big rainbows key on brown-trout eggs &amp; baitfish</td><td><b>Flies:</b> BWO, October caddis, egg patterns, streamers (Woolly Bugger, sculpins). <b>Spin:</b> spoon, spinner, streamer under a bubble</td></tr></table>
+        <div class="callout2"><b>Stocked-trout reality:</b> most put-and-take rainbows are caught on <b>PowerBait, salmon eggs or nightcrawlers</b> under a float or on a slip-sinker rig, and on small inline spinners and spoons — they key on easy, bright, scented targets, not hatch-matching.</div>
+        <h3>Weather &amp; water</h3>
+        <p><b>Cloudy, cool days</b> bring the best BWO and emerger fishing and embolden fish into the open. <b>Bright sun &amp; low clear water</b> push trout to depth and shade — go small and natural, lengthen and lighten tippet, fish nymphs deep. <b>High or rising water</b> (rain, snowmelt, dam generation) favors eggs, worms and streamers swung through the color line. On tailwaters, the <b>generation schedule</b> matters more than the sky — read the flows before you go.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🐟 Fly — the classic approach</h3><p style="margin:4px 0">A <b>9' 5-weight</b> is the do-everything trout rod (dries, nymphs, small streamers). Drop to a 3–4wt for small creeks and delicate dries; step up to a 6wt for big rivers, wind and streamers. For nymphing, a 10'–11' 2–3wt <b>Euro-nymph</b> rod is deadly. Big lake-run rainbows and steelhead need a 7–8wt with a real sealed drag.</p><div class="pick"><b>Solid picks:</b> Orvis Clearwater, Echo Base, Redington Classic Trout (rods); Orvis Hydros / Lamson Liquid (reels). <b>Line:</b> weight-forward floating; 9' leader tapered to 4X–6X.</div></div>
+        <div class="gearbox"><h3>🎣 Spin — light &amp; ultralight</h3><p style="margin:4px 0">A 6'–7' light or ultralight spinning rod with a 1000–2500 reel and <b>2–6 lb</b> mono or fluorocarbon. Throw 1/16–1/8 oz inline spinners (Mepps, Rooster Tail, Panther Martin) and small spoons (Kastmaster, Little Cleo), or fish bait under a float / on a light slip rig.</p></div>
+        <div class="fightline"><span class="stars">★★★★☆</span><b>Fight: 4/5 — acrobatic speedster.</b></div>
+        <p>Rainbows are the showmen of trout — fast runs and <b>repeated jumps</b>, often cartwheeling across the surface the instant they're hooked. Stream fish punch above their size; lake-run and steelhead-strain rainbows are in another class entirely, capable of long, reel-screaming runs. Keep the rod tip up, let a smooth drag do the work, and bow to jumps on light tippet.</p>` },
+      { h:"Subspecies, strains &amp; the steelhead connection",
+        body:`<p>Rainbow trout (<i>Oncorhynchus mykiss</i>) are wildly variable. The wide-ranging native forms are the <b>coastal rainbow</b> and the inland <b>redband</b> trout (Columbia Basin, Great Basin and McCloud River redbands), the latter often vividly colored with a brick-red stripe. The <b>sea-run form is the steelhead</b> — same species, but anadromous, growing huge and fighting ferociously after years at sea (Great Lakes "steelhead" are the lake-run equivalent). Two famous strains shape fisheries: <b>McCloud River</b> stock founded most of the world's hatchery rainbows, and the big-water <b>Kamloops</b> strain grows trophy lake rainbows. The hatchery rainbows stocked across the country are generally domesticated mixes selected for fast growth — which is why they behave so differently from a wild, hatch-keyed stream fish. <span class="src">Browns and brook trout are different species entirely — see their profiles and the Species ID guide.</span></p>` }
+    ],
     tagline:"A native Pacific trout and the most widely stocked trout on earth — caught everywhere from a knee-deep Smoky Mountain creek to a giant tailwater from a jet boat.",
     sections:[
       { h:"Identification",
@@ -1992,6 +2069,24 @@ const PROFILE = {
     ]
   },
   brown:{
+    extra:[
+      { h:"Season &amp; weather playbook — flies, lures &amp; bait",
+        body:`<p>Browns are the wariest, most predatory trout — the big ones turn nocturnal and eat other fish. Hatch-match like a rainbow for numbers, but to catch a <i>trophy</i> brown, think low light, big meals, and streamers.</p>
+        <table class="pb"><tr><th>Season</th><th>What's happening</th><th>Flies → &nbsp;|&nbsp; Spin/bait</th></tr>
+        <tr><td class="s">Winter</td><td>Slow &amp; deep; tailwaters fish best — browns hold in soft water</td><td><b>Flies:</b> midges, scuds, sowbugs, small streamers fished slow. <b>Spin:</b> slow minnow plug, drifted bait</td></tr>
+        <tr><td class="s">Spring</td><td>Pre-runoff feeding then high water; good nymphing &amp; streamer fishing</td><td><b>Flies:</b> BWO, stoneflies, San Juan worm, streamers in the color line. <b>Spin:</b> inline spinner, jerkbait, minnow plug</td></tr>
+        <tr><td class="s">Summer</td><td>Hatches plus the <b>terrestrial &amp; night game</b> — the biggest browns feed after dark</td><td><b>Flies:</b> caddis, PMD, hoppers/ants; after dark — mouse patterns, big dries, Hex. <b>Spin:</b> Rapala-style minnow, spinner, low-light topwater</td></tr>
+        <tr><td class="s">Fall</td><td><b>Spawn season</b> — browns turn aggressive &amp; territorial; big males move and attack intruders</td><td><b>Flies:</b> big articulated streamers (Sex Dungeon, Sculpzilla), eggs, October caddis. <b>Spin:</b> large jerkbaits &amp; spoons — <b>don't fish over redds</b></td></tr></table>
+        <h3>Weather &amp; light — fish the gloom</h3>
+        <p>Browns are famously <b>light-shy</b>: overcast skies, dawn, dusk and night are when they let their guard down and the big fish hunt. <b>High or stained water</b> after rain is prime time to swing or strip big streamers — reduced visibility makes trophy browns bold. <b>Bright, low, clear conditions</b> make them maddeningly selective: long fine tippet, small natural flies, downstream drag-free presentations, and a careful, hidden approach. A falling barometer ahead of a front often triggers the streamer bite.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🐟 Fly — two outfits</h3><p style="margin:4px 0">For dries &amp; nymphs, the same <b>9' 5wt</b> (or a Euro-nymph 10' 3wt) as for rainbows. For trophy hunting, build a dedicated <b>streamer stick — a 6–7wt</b> with a sink-tip or full sinking line to chuck big articulated flies and move them fast; a stout 0X–3X (8–16 lb) leader. Night-fishing mouse patterns also wants the 6wt.</p><div class="pick"><b>Solid picks:</b> Orvis Clearwater / Recon, Sage Foundation (rods); WF floating for dries, a sink-tip (e.g., 200–300 gr) for streamers.</div></div>
+        <div class="gearbox"><h3>🎣 Spin</h3><p style="margin:4px 0">A 6'6"–7' light/medium-light spinning rod, 4–8 lb line. Browns love a twitched <b>minnow plug</b> (floating/jerkbait Rapala), inline spinners and small spoons — fished on the swing and twitch-pause, especially in low light.</p></div>
+        <div class="fightline"><span class="stars">★★★★☆</span><b>Fight: 4/5 — dogged bruiser.</b></div>
+        <p>Where a rainbow jumps, a brown <b>bulldogs</b> — deep, heavy headshakes and a determined bolt for the nearest log, undercut bank or weed bed. Big browns are powerful and use cover ruthlessly, so don't give line you don't have to; turn the fish and keep it out of the wood. Hooked at night, they fight even harder and dirtier.</p>` },
+      { h:"Strains &amp; variants — von Behr, Loch Leven &amp; sea trout",
+        body:`<p>Brown trout (<i>Salmo trutta</i>) aren't split into formal subspecies in North America, but they trace to distinct European strains that still flavor our fisheries. The <b>German "von Behr"</b> strain is the classic riverine fish — golden-brown, heavily spotted with red and black, structure-loving. The Scottish <b>Loch Leven</b> strain runs more silvery and slender, adapted to lakes. The <b>sea trout</b> is the same species in its anadromous (sea-run) form, returning from salt to spawn — silver and large. Browns also famously produce the <b>"tiger trout"</b>, a striking, sterile, vermiculated hybrid with brook trout. Wherever they live, browns are the trout most likely to grow huge and predatory — which is exactly why the trophy game revolves around streamers and darkness. <span class="src">Brown spawning runs in fall make tailwaters like the White, Norfork and Little Red trophy destinations — see the regional profiles.</span></p>` }
+    ],
     tagline:"The wily European import — the wariest fish in the river, the most nocturnal, and the species behind nearly every trophy-trout headline.",
     sections:[
       { h:"Identification",
@@ -2022,6 +2117,24 @@ const PROFILE = {
     ]
   },
   walleye:{
+    extra:[
+      { h:"Season &amp; weather playbook — what to throw, when",
+        body:`<p>Walleye location follows water temperature and forage; the bite follows <b>light</b>. Three technique families cover the year: vertical jigging, live-bait rigging, and trolling.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top baits &amp; presentations</th></tr>
+        <tr><td class="s">Winter</td><td>Deep, stable basins &amp; structure; lethargic (a banner ice fishery up north)</td><td>Jigging spoon, jigging Rap, jig + minnow, dead-stick minnow — slow &amp; vertical</td></tr>
+        <tr><td class="s">Spring (pre-spawn)</td><td>Stacked in rivers &amp; below dams, and on rock/gravel shoals at night — the classic run</td><td>Jig + minnow/plastic, blade bait, hair jig, slip-float minnow; fish current seams &amp; eddies</td></tr>
+        <tr><td class="s">Summer</td><td>Deep main-lake structure — points, humps, flats, weed edges &amp; the thermocline</td><td>Trolling crankbaits &amp; spinner/crawler harnesses behind bottom bouncers; live-bait (Lindy) rigging leeches/crawlers; deep jigging</td></tr>
+        <tr><td class="s">Fall</td><td>Big females feed up &amp; pull shallow again, often onto rock at night</td><td>Cast &amp; troll crankbaits, jig + big minnow, swimbaits; shallow night-casting</td></tr></table>
+        <h3>Weather &amp; light — the walleye's edge</h3>
+        <p>Those reflective, light-gathering eyes make walleye <b>low-light hunters</b>: dawn, dusk, night and overcast skies are the prime windows, and <b>wind</b> is your friend — a "walleye chop" breaking up the surface and pushing bait onto a windblown point or flat is one of the most reliable patterns in fishing. <b>Bright, calm bluebird days</b> push them deep and tight to structure — go deeper, slower, and to live bait. In <b>stained or dirty water</b> their eyes give them such an advantage that they'll feed all day, and color/vibration (firetiger, chartreuse, gold; bladed harnesses) outproduces subtlety.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🪶 Spinning — jigging &amp; rigging</h3><p style="margin:4px 0">A sensitive 6'6"–7' medium-light/medium spinning rod with a 2500–3000 reel for jigs (1/8–3/8 oz) and live-bait rigs — feel is everything for the light walleye "tick." Braid main line (8–10 lb) with a fluorocarbon leader maximizes sensitivity.</p><div class="pick"><b>Solid picks:</b> St. Croix Eyecon / Premier, Shimano Stradic; jigs, Lindy rigs, slip-bobbers.</div></div>
+        <div class="gearbox"><h3>🎣 Trolling</h3><p style="margin:4px 0">For summer open water: 7'–8'6" medium trolling rods, line-counter reels, and <b>bottom bouncers</b> to run spinner/crawler harnesses, plus crankbaits (Shad Rap, Flicker Shad, Reef Runner). Planer boards spread lines and cover flats.</p></div>
+        <div class="fightline"><span class="stars">★★★☆☆</span><b>Fight: 3/5 — modest, but who cares.</b></div>
+        <p>Let's be honest: walleye don't fight especially hard — expect a few headshakes and a steady, dogged pull rather than runs or jumps. Big females give a heavier, throbbing resistance. Nobody chases walleye for the fight; they chase them because a walleye is widely considered the <b>best-eating fish in fresh water</b>. The sport is in finding and fooling them.</p>` },
+      { h:"Relatives &amp; the saugeye",
+        body:`<p>The walleye's close cousin the <b>sauger</b> shares many of its waters (especially big rivers) — smaller, blotchy, with spotted dorsal fins and no white tail tip. Where the two overlap, they hybridize into the <b>saugeye</b>, a fast-growing, hardy cross that many states (including parts of the Midwest and the user's region) stock heavily into reservoirs and tailwaters because it tolerates turbid, fluctuating water better than pure walleye. Saugeye fish much like walleye — jigs, blades and crankbaits in current and on structure — and often bite a touch more aggressively. The historic <b>"blue walleye"</b> of the Great Lakes, a bluish variant, is considered extinct. <span class="src">Tell walleye from sauger by the white tail-tip and clear dorsal — see the Species ID guide.</span></p>` }
+    ],
     tagline:"The thinking angler's gamefish — a low-light predator built around a pair of glowing, light-gathering eyes, and the best-eating fish that swims in fresh water.",
     sections:[
       { h:"Identification",
@@ -2054,6 +2167,25 @@ const PROFILE = {
     ]
   },
   blackcrappie:{
+    extra:[
+      { h:"Season &amp; weather playbook — finding the school",
+        body:`<p>Crappie are roaming, suspending schoolfish, so the whole game is locating the school and its depth. The calendar is built around the spawn; the rest of the year they hang on brush and timber at a precise depth.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top baits &amp; presentations</th></tr>
+        <tr><td class="s">Winter</td><td>Deep &amp; tightly schooled — standing timber, brush piles, bridge pilings, channel edges</td><td>Small jig or spoon dropped vertically, live minnow on a tight line — slow &amp; precise</td></tr>
+        <tr><td class="s">Pre-spawn</td><td>Staging in mid-depth brush, easing toward the spawning shallows</td><td>1/16 oz jig, minnow under a slip-float, slow swimming retrieves</td></tr>
+        <tr><td class="s">Spawn<br><span style="font-weight:400;color:#90a8af">58–68°F</span></td><td>Shallow 1–6 ft on wood, grass &amp; docks — the famous bank bonanza</td><td>Jig or minnow under a float pitched to cover; <b>dock-shooting</b> jigs far back under docks</td></tr>
+        <tr><td class="s">Summer</td><td>Suspended over deep brush, timber &amp; bridge pilings, often near the thermocline</td><td>Vertical jigging, <b>spider-rigging</b> (multiple long rods) &amp; trolling jigs/minnows; find the depth with electronics</td></tr>
+        <tr><td class="s">Fall</td><td>Roaming flats chasing shad, then back to brush as it cools</td><td>Cast/troll small jigs &amp; tiny crankbaits, minnows over brush</td></tr></table>
+        <h3>Weather &amp; light</h3>
+        <p>Crappie are low-light feeders — <b>overcast days and dawn/dusk</b> extend the bite and pull fish shallower and more aggressive. <b>Cold fronts</b> push them deeper, tighter and fussier: downsize the jig, slow down, and put it right on their nose. Black crappie prefer clearer water, so in clean lakes lean toward <b>natural/subtle jig colors</b>; when the water stains, switch to chartreuse, white or two-tone for visibility.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🪶 Spinning — light &amp; ultralight</h3><p style="margin:4px 0">A 6'–7' light or ultralight spinning rod with a 1000–2000 reel and <b>4–6 lb</b> line is the everyday crappie outfit for casting jigs, dock-shooting and float fishing. A sensitive tip plus a forgiving action protects the fish's papery mouth.</p><div class="pick"><b>Baits:</b> 1/16–1/32 oz jigheads with soft plastics (Bobby Garland Baby Shad, Crappie Magnet) or marabou; live minnows under a slip-float.</div></div>
+        <div class="gearbox"><h3>🎣 Spider-rigging &amp; long rods</h3><p style="margin:4px 0">For covering water and presenting multiple depths at once, long <b>10'–16' crappie rods</b> spread on rod holders (spider-rigging), trolling jigs and minnows slowly. Forward-facing sonar (LiveScope-style) has transformed crappie fishing by letting anglers see and target individual suspended fish.</p><div class="pick"><b>Solid picks:</b> B'n'M, ACC Crappie Stix, Mr. Crappie rods.</div></div>
+        <div class="fightline"><span class="stars">★★☆☆☆</span><b>Fight: 2/5 — but a blast on ultralight.</b></div>
+        <p>Crappie aren't strong fighters — a slab gives a few thumping headshakes and a broadside "kite" against the rod. The catch is their nickname, <b>"papermouth"</b>: their thin, membranous mouth tears easily, so set the hook with a smooth lift, never a hard yank, and don't horse them on the way in. On ultralight gear they're genuinely fun, and they come in numbers.</p>` },
+      { h:"Black vs. white — and hybrid variants",
+        body:`<p>Black crappie (<i>Pomoxis nigromaculatus</i>) and <b>white crappie</b> (<i>P. annularis</i>) often share the same lake, splitting it by water clarity: blacks dominate the clearer, weedier sections, whites the stained, river-influenced water. Tell them apart by the dorsal spines — <b>blacks have 7–8, whites have 5–6</b> — and by the markings (blacks are randomly speckled, whites barred). Some states stock the <b>"Magnolia" / black-stripe crappie</b>, a hybrid bred to grow fast and not over-reproduce in small lakes. <span class="src">See the white crappie profile for its muddy-water playbook, and the Species ID guide for the spine count.</span></p>` }
+    ],
     tagline:"The clear-water speck — a school-roaming panfish that's a springtime bonanza on the bank and one of the finest fillets in fresh water.",
     sections:[
       { h:"Identification",
@@ -2086,6 +2218,22 @@ const PROFILE = {
     ]
   },
   whitecrappie:{
+    extra:[
+      { h:"Season &amp; weather playbook — the muddy-water crappie",
+        body:`<p>White crappie school, suspend and spawn just like black crappie, but they thrive in the <b>stained, fertile, current-influenced water</b> — the muddy upper arms of reservoirs and river backwaters — where blacks struggle. Look for them dirtier and a little more up-current, and lean on color and vibration over finesse.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top baits &amp; presentations</th></tr>
+        <tr><td class="s">Winter</td><td>Deep timber, brush &amp; bridge pilings in the main lake &amp; lower river arms</td><td>Vertical jig/minnow on a tight line; bright/two-tone colors in stained water</td></tr>
+        <tr><td class="s">Pre-spawn</td><td>Pushing up the muddy creek &amp; river arms toward shallow wood</td><td>Jig or minnow under a float; shad-pattern &amp; chartreuse plastics</td></tr>
+        <tr><td class="s">Spawn<br><span style="font-weight:400;color:#90a8af">56–66°F</span></td><td>Shallow wood, laydowns &amp; standing timber in the off-color upper ends</td><td>Float-and-jig / minnow tight to visible cover; the classic spring bonanza</td></tr>
+        <tr><td class="s">Summer–Fall</td><td>Suspended over deep brush &amp; standing timber; roaming flats after shad in fall</td><td>Spider-rig &amp; troll jigs/minnows; cast small jigs &amp; crankbaits on the fall feed</td></tr></table>
+        <h3>Weather &amp; light</h3>
+        <p>Whites tolerate (even prefer) off-color water, so they're often the more catchable crappie after a rain. In their typical stained habitat, <b>bright and contrasting colors</b> — chartreuse, white, orange — and a little extra vibration earn more bites than natural finesse colors. Overcast and low light still extend the bite; cold fronts still push them deeper and slower. Their slightly larger average size in fertile, shad-rich impoundments makes them a favorite of crappie-meat anglers.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<p>Identical toolkit to black crappie: a 6'–7' light/ultralight spinning rod with 4–6 lb line for casting, dock-shooting and float fishing 1/16–1/32 oz jigs and minnows, or long 10'–16' rods for spider-rigging and trolling over brush. Because whites live in stained water, bias jig color toward <b>shad patterns and bright chartreuse/white</b>, and fish tight to visible wood. Forward-facing sonar helps locate the suspended schools.</p>
+        <div class="fightline"><span class="stars">★★☆☆☆</span><b>Fight: 2/5 — papermouth, set the hook gently.</b></div>
+        <p>Like all crappie, whites fight modestly — a few broadside thumps — and have the same thin, tear-prone "papermouth," so lift smoothly to set and don't horse them. Pound for pound they're a light scrap, but they school thick and grow heavy in rich water, and few fish are better on the table.</p>
+        <div class="callout2"><b>The difference that matters:</b> 5–6 dorsal spines (vs. 7–8 on a black crappie) and faint vertical bars. On many lakes the same regulations cover both, but always check — see the Species ID guide and the black crappie profile for the full comparison.</div>` }
+    ],
     tagline:"The crappie of muddy water and big rivers — more tolerant of current and turbidity than its speckled cousin, and just as good in the pan.",
     sections:[
       { h:"Identification",
@@ -2116,6 +2264,23 @@ const PROFILE = {
     ]
   },
   channelcat:{
+    extra:[
+      { h:"Season &amp; weather playbook — feeding the nose",
+        body:`<p>Channel cats hunt by scent, so the bite is driven by water temperature, current and smell more than by sight. Keep bait on or near the bottom, fish the warm months and low light hard, and chase rising, stained water.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top baits &amp; presentations</th></tr>
+        <tr><td class="s">Winter</td><td>The deepest river holes &amp; lake basins; sluggish &amp; bunched</td><td>Fresh cut bait or liver on the bottom, dead slow; small baits, patient soaks</td></tr>
+        <tr><td class="s">Spring</td><td>Pre-spawn feeding as water warms — flats, current breaks &amp; below dams</td><td>Cut bait, nightcrawlers, prepared dip baits; <b>rising muddy water turns them on</b></td></tr>
+        <tr><td class="s">Summer<br><span style="font-weight:400;color:#90a8af">spawn 70–75°F</span></td><td>Prime time — current seams, holes, flats &amp; below cover, especially after dark</td><td>Cut shad/skipjack &amp; live bait for size; stinkbait/dip bait &amp; crawlers for numbers; drift flats</td></tr>
+        <tr><td class="s">Fall</td><td>Heavy feed-up, increasingly shad-oriented</td><td>Big fresh cut-shad chunks for trophies; keep moving to find active fish</td></tr></table>
+        <h3>Weather &amp; water — chase the mud</h3>
+        <p>The single best trigger is <b>rising, stained water after a rain</b>: current washes food loose and carries scent, and catfish feed aggressively along the new current edges and inflows. <b>Summer nights</b> are prime — fish move shallow and feed under cover of darkness. On <b>bright, clear, low water</b> they pull back into the deeper holes and feed less, so fish deeper and slower or wait for dusk. The smellier and bloodier your bait in dirty water, the better.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🎣 The catfish outfit</h3><p style="margin:4px 0">A 7'–7'6" medium-heavy rod with backbone (spinning or casting) and 15–30 lb mono or 30–50 lb braid handles channel cats and lets you pull them from cover. Use <b>circle hooks</b> (they self-set in the corner of the mouth and reduce gut-hooking) on a <b>slip-sinker (Carolina) or three-way rig</b> to hold bottom in current.</p><div class="pick"><b>Solid picks:</b> Ugly Stik Catfish / Tiger, Abu Garcia 6500-class reels; sponge/dip-bait hooks for prepared baits, snelled circle hooks for cut bait.</div></div>
+        <div class="fightline"><span class="stars">★★★★☆</span><b>Fight: 4/5 — updated. Dogged power.</b></div>
+        <p>We bumped the channel cat to 4/5: they don't jump or make flashy runs, but a good one pulls <b>hard and sustained</b>, using current and diving for cover and the bottom with surprising strength for its size — a 5–10 lb channel in river current is a genuine handful. (Their giant cousins, the blue and flathead catfish, are the 5/5 brutes.) Mind the stiff <b>pectoral and dorsal spines</b> when you land one — those, not the harmless barbels, are the hazard.</p>` },
+      { h:"Relatives &amp; stocking",
+        body:`<p>The channel cat has no recognized subspecies, but it heads a trio of catfish anglers should keep straight. Its bigger cousins, the <b>blue catfish</b> (straight-edged anal fin, slate-blue, grows to 100+ lb) and the <b>flathead catfish</b> (flattened head, protruding lower jaw, eats live fish, also 100+ lb), share many of its rivers and now have their own FishDex profiles. The channel is by far the most widely <b>stocked</b> of the three — state agencies put them into thousands of community lakes, city ponds and farm ponds because they're hardy, fast-growing, and the perfect "anyone can catch one" fish. <span class="src">See the Species ID guide for the anal-fin and head shape tells.</span></p>` }
+    ],
     tagline:"America's catfish — a sleek, hard-pulling, scent-hunting omnivore that lives in nearly every river, lake and farm pond on the continent and bites day or night.",
     sections:[
       { h:"Identification",
@@ -2148,6 +2313,24 @@ const PROFILE = {
     ]
   },
   bluegill:{
+    extra:[
+      { h:"Season &amp; weather playbook — small &amp; natural",
+        body:`<p>Bluegill orient to cover and the warm shallows, and they eat small invertebrates — so the rule all year is <b>go small and natural</b>. The spawn is the headline, but they bite something nearly every day they're warm.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top baits &amp; presentations</th></tr>
+        <tr><td class="s">Winter</td><td>Deep, schooled near brush &amp; basins; the big bulls feed slowly (good ice fishing)</td><td>Tiny tungsten jig or teardrop with a waxworm/spike, fished slow &amp; vertical</td></tr>
+        <tr><td class="s">Spring (pre-spawn)</td><td>Moving into warming shallows &amp; weed edges as water climbs</td><td>Small jig or a worm/cricket under a tiny float around cover</td></tr>
+        <tr><td class="s">Spawn<br><span style="font-weight:400;color:#90a8af">67–80°F, all summer</span></td><td>Colonial beds in 1–4 ft (the visible "honeycomb"); they spawn repeatedly through the warm months</td><td>Worm or cricket under a bobber, 1/32 oz jig, small popper or wet fly — nonstop action on a bed</td></tr>
+        <tr><td class="s">Summer–Fall</td><td>Big "bulls" slide to deeper weed lines &amp; brush; small fish stay shallow</td><td>Small jig or fly worked a little deeper on the outside weed edges for the bigger fish</td></tr></table>
+        <h3>Weather &amp; light</h3>
+        <p>Bluegill feed best in the <b>warm hours of warm, stable, sunny days</b> — exactly when many gamefish slow down, which makes them the perfect midday and beginner fish. The bedding shallows fire on calm, warm afternoons. The one nuance: the genuine trophy <b>"bull" bluegill are wary</b> — they hold a little deeper, off the obvious beds, and spook in clear water, so catching the biggest ones takes finesse and a quiet approach rather than just dropping a worm on the colony.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🪶 Ultralight — the whole point</h3><p style="margin:4px 0">A 5'–6'6" ultralight spinning rod (or a simple cane/crappie pole) with a 500–1000 reel and <b>2–4 lb</b> line, small hooks (#6–#10) and tiny jigs (1/32–1/64 oz). A worm or cricket under a small float is the timeless rig; a micro tube or grub on a light jighead is deadlier on the bigger fish.</p></div>
+        <div class="gearbox"><h3>🐟 Fly — pure fun</h3><p style="margin:4px 0">Bluegill may be the best fly-rod quarry there is: a 3–4wt with a small <b>foam popper</b>, sponge spider or wet fly draws explosive little takes, and it's how a lot of fly anglers learn. For the deep bulls, a small weighted nymph or micro-jig under an indicator.</p></div>
+        <div class="fightline"><span class="stars">★★☆☆☆</span><b>Fight: 2/5 — but pound-for-pound a brawler.</b></div>
+        <p>On the 1–5 scale a bluegill is a 2 by size alone, but few fish <b>punch above their weight</b> like a big bull: hooked, it turns its deep, flat body sideways to the line and uses it like a sail, fighting in stubborn circles that feel far bigger than the fish. On honest ultralight or a 3wt, a hand-sized 'gill is genuinely sporting — which is exactly why they're so beloved.</p>` },
+      { h:"Variants — the coppernose &amp; hybrids",
+        body:`<p>The wide-ranging northern bluegill has a distinct southern cousin, the <b>coppernose bluegill</b> (a Florida subspecies, <i>Lepomis macrochirus purpurescens</i>), recognizable by the coppery bar across the head of breeding males. Coppernose are popular for stocking warm southern ponds because they grow fast and large in a long season — a big reason Florida and the Deep South produce such heavy 'gills. Bluegill also <b>hybridize readily</b> with other sunfish; the "hybrid bluegill" (usually bluegill × green sunfish) is widely stocked in ponds because it grows quickly, fights hard, and reproduces less — reducing the stunting that plagues pure bluegill in small waters. <span class="src">Don't confuse bluegill with the redear ("shellcracker"), which has a red-edged ear flap and eats snails — see the Species ID guide.</span></p>` }
+    ],
     tagline:"The fish that taught America to fish — a scrappy, beautiful, nearly universal sunfish that fits in a child's hand and a master angler's respect alike.",
     sections:[
       { h:"Identification",
@@ -2175,6 +2358,275 @@ const PROFILE = {
       {t:"Bluegill / sunfish fishing basics — Take Me Fishing", u:"https://www.takemefishing.org/fish/freshwater-fish/bluegill/"},
       {t:"Bluegill — Missouri Department of Conservation Field Guide", u:"https://mdc.mo.gov/discover-nature/field-guide/bluegill"},
       {t:"Managing bluegill in ponds — pond management extension guidance", u:"https://www.takemefishing.org/how-to-fish/fishing-fish-species/bluegill/"}
+    ]
+  },
+yellowperch:{
+    tagline:"A handsome, schooling cool-water panfish of the northern tier — modest on the rod, but a backbone of the Great Lakes fishery and one of the very best fish on the plate.",
+    sections:[
+      { h:"Identification",
+        body:"<i>Perca flavescens</i>, a true perch and close cousin of the walleye and sauger. Golden-yellow flanks crossed by <b>6–8 dark vertical bars</b>, with orange-to-red lower fins that flare bright on spawning males. Two distinct dorsal fins — a spiny front and a soft rear — mark it as a perch, not a sunfish. No canine teeth (unlike its walleye cousin). Most fish run a modest 6–12 inches; a 'jumbo' perch over a pound is a prize." },
+      { h:"Biology &amp; life history",
+        body:"Yellow perch are very early spring spawners, dropping distinctive <b>gelatinous, accordion-folded egg strands</b> over weeds and brush as water warms past about 45–55°F, with no parental care afterward. They school tightly by size and year-class, grow slowly, and — like other panfish — can <b>overpopulate and stunt</b> in waters without enough predators. They're a cool-water fish, most abundant across the northern states and Canada and scarce in the warm South." },
+      { h:"Behavior &amp; seasonal patterns",
+        body:"Perch travel in roaming schools near the bottom over sand, gravel and weed edges, relating to drop-offs, humps and the first break. Unlike the night-feeding walleye, perch are <b>daytime feeders</b> that rest at night — a useful quirk. They follow bait and move constantly, so locating an active school is the whole game; once you catch one, more usually follow. They feed through the cold months and are a marquee <b>ice-fishing</b> target up north." },
+      { h:"Diet &amp; forage",
+        body:"Invertebrates dominate — insect larvae, small crustaceans, snails — alongside small minnows, fish eggs and young crayfish; juveniles start on zooplankton. The takeaway for anglers is to fish <b>small</b>: a minnow, a piece of crawler, a tiny jig or spoon tipped with a grub. Perch key on bite-size, bottom-oriented forage." }
+    ],
+    regions:[
+      { name:"Illinois &amp; the Great Lakes (the heartland)",
+        body:"Among FishDex's covered states, Illinois is perch country: <b>Lake Michigan</b> has a storied (and tightly regulated) yellow-perch fishery, and the northern natural lakes — the <b>Fox Chain O'Lakes</b> — plus the Mississippi River backwaters hold good numbers. The upper Midwest at large (Wisconsin, Minnesota, the Dakotas) is the perch capital, where 'perch jerking' through the ice and the summer fish-fry are institutions." },
+      { name:"The South (uncommon)",
+        body:"Yellow perch are a northern, cool-water fish, so they thin out fast heading south — only a few northern Missouri waters hold them, and they're essentially absent from the warm lowlands of Arkansas and Florida and uncommon in North Carolina. Southern anglers rarely encounter them; this is a fish of the cold-water tier." }
+    ],
+    extra:[
+      { h:"Season &amp; weather playbook — find the school",
+        body:`<p>Perch are schooling bottom feeders that bite in daylight, so cover water until you contact a school, then work it. Keep baits small and near the bottom.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top baits &amp; presentations</th></tr>
+        <tr><td class="s">Winter</td><td>Deep, tightly schooled basins &amp; structure — a top ice-fishing species</td><td>Small tungsten jig or spoon tipped with a minnow head, spike or waxworm; drop-shot through the ice</td></tr>
+        <tr><td class="s">Spring</td><td>Shallowing over weeds &amp; brush to spawn early; then weed edges</td><td>Small jig, minnow under a float, perch rig (two dropper hooks) with minnows</td></tr>
+        <tr><td class="s">Summer</td><td>Weed edges, drop-offs &amp; humps, sliding a bit deeper as it warms</td><td>1/16–1/8 oz jig + plastic or minnow, drop-shot, worm on a bottom rig</td></tr>
+        <tr><td class="s">Fall</td><td>Feeding up in schools — often the year's best jumbo-perch action</td><td>Jig + minnow, small blade bait, spoon — vertical over the school</td></tr></table>
+        <h3>Weather &amp; light</h3>
+        <p>Because perch feed by sight in daylight, they often bite best in <b>bright midday conditions</b> — the opposite of walleye — though low light and stable weather help. Cold fronts push schools deeper and slow them. The cardinal rule is mobility: perch schools roam, so if the bites stop, the school has moved — go find them rather than waiting.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🪶 Ultralight spinning &amp; ice gear</h3><p style="margin:4px 0">A 5'–7' light or ultralight spinning rod with a 1000–2500 reel and <b>2–6 lb</b> line, small hooks and 1/16–1/8 oz jigs. A classic two-hook 'perch rig' (or crappie rig) tipped with minnows covers the bottom efficiently. In winter, a sensitive ice rod with tiny tungsten jigs and spoons.</p><div class="pick"><b>Baits:</b> minnows, pieces of crawler, small soft plastics, spikes/waxworms; spoons (Kastmaster, Swedish Pimple) for ice.</div></div>
+        <div class="fightline"><span class="stars">★★☆☆☆</span><b>Fight: 2/5 — modest, but they come by the bucket.</b></div>
+        <p>A yellow perch gives a light, tapping tug and a short pull — nobody hooks a perch for the battle. The appeal is two-fold: they school thick, so a good spot means fast, steady action that's perfect for kids and ice anglers, and the firm white fillets are widely rated <b>among the finest-eating freshwater fish there is</b>.</p>` },
+      { h:"Relatives — the perch family",
+        body:`<p>The yellow perch anchors the <b>Percidae</b> family alongside its larger predatory cousins the <b>walleye</b> and <b>sauger</b> (and their saugeye hybrid), plus the tiny darters. It's sometimes called the 'American', 'ringed' or 'lake' perch, and shouldn't be confused with the unrelated European perch or with 'white perch' (a temperate bass) or the 'silver/speckled perch' names southerners use for crappie. <span class="src">See the walleye profile for the predatory side of the perch family.</span></p>` }
+    ],
+    conservation:"Prolific schooling panfish that handle and often benefit from harvest of mid-size fish, which thins stunting year-classes. The exception is the big-water stocks — Great Lakes perch have seen sharp ups and downs and are regulated with bag limits and seasons to protect them; respect those. Few fish reward a full creel at the table like perch.",
+    refs:[
+      {t:"Yellow perch — Wikipedia", u:"https://en.wikipedia.org/wiki/Yellow_perch"},
+      {t:"Yellow perch fishing — Take Me Fishing", u:"https://www.takemefishing.org/fish/freshwater-fish/yellow-perch/"},
+      {t:"Yellow perch — Illinois DNR", u:"https://dnr.illinois.gov/"},
+      {t:"Perch tactics — In-Fisherman", u:"https://www.in-fisherman.com/editorial/perch/"}
+    ]
+  },
+  flathead:{
+    tagline:"The big-river apex catfish — a solitary, live-prey hunter that lurks in the timber by day, prowls the flats by night, and grows past 100 pounds.",
+    sections:[
+      { h:"Identification",
+        body:"<i>Pylodictis olivaris</i> — the 'yellow cat', 'mud cat' or 'shovelhead'. Unmistakable: a broad, <b>flattened head</b> with a <b>protruding lower jaw</b>, small eyes, mottled yellow-to-olive-brown flanks, and a <b>squared (not deeply forked) tail</b>. Where channel and blue cats are sleek and fork-tailed, the flathead is blocky and predatory-looking. It's the second-largest North American catfish, reaching well over 100 lb." },
+      { h:"Biology &amp; life history",
+        body:"Flatheads are <b>cavity nesters</b> — in early summer (around 70–75°F) the male finds a hollow log, undercut bank or cavity, and guards the egg mass and fry. They're long-lived (20+ years) and slow-growing, maturing into a true <b>apex predator</b>. Critically, they are <b>solitary</b> — not the roaming schools of channels or blues — each big flathead holding its own piece of prime cover." },
+      { h:"Behavior &amp; seasonal patterns",
+        body:"A classic ambush predator: by day the flathead buries in <b>deep cover</b> — logjams, root wads, undercut banks, the deepest holes — and at night it moves out onto shallower flats, riffles and hole-mouths to hunt. It is strongly <b>nocturnal</b>. In winter flatheads pack into the deepest river holes and go nearly dormant, feeding little. Find the wood and the deep holes and you've found the fish." },
+      { h:"Diet &amp; forage",
+        body:"This is the key to flathead fishing: they eat almost exclusively <b>live fish and crayfish</b> — live bluegill, sunfish, shad, suckers and the like. Unlike the channel and blue cat, a flathead largely <b>ignores cut bait, stinkbait and prepared baits</b>. If you want a big flathead, you fish a lively baitfish on the bottom near its cover. A trophy flathead is a meat-eater, plain and simple." }
+    ],
+    regions:[
+      { name:"Missouri &amp; the Mississippi/Missouri rivers (MO &amp; IL)",
+        body:"Native and abundant in the big rivers — the <b>Missouri and Mississippi</b> and their major tributaries — where flatheads hold in the wing-dam wash, deep outside bends and logjams. The hand-grabbing tradition of <b>'noodling'</b> (where legal) targets nesting flatheads in cavities. Illinois shares the same big-river flathead fishery in the Mississippi, Illinois and Kaskaskia." },
+      { name:"Arkansas (rivers, oxbows &amp; trophy potential)",
+        body:"The <b>Arkansas, White and Mississippi</b> rivers and the Delta's bayous and oxbows grow big flatheads, and they're a celebrated trophy and noodling target. Anglers anchor or set lines with live sunfish near deep cover after dark for the biggest fish." },
+      { name:"North Carolina (an introduced giant)",
+        body:"Flatheads are <b>not native</b> to the Atlantic slope but were introduced to North Carolina rivers — the <b>Cape Fear, Neuse and Yadkin/Pee Dee</b> systems — where they now grow huge and are a popular trophy fishery. As a voracious predator they also impact native fish, so some states encourage harvest of introduced flatheads." }
+    ],
+    extra:[
+      { h:"Season &amp; weather playbook — live bait, after dark",
+        body:`<p>Everything about flathead fishing follows their nocturnal, live-prey nature. Fish lively baitfish on the bottom near deep cover, focus on warm-weather nights, and don't bother with cut or prepared baits.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top approach</th></tr>
+        <tr><td class="s">Winter</td><td>Packed into the deepest river holes; nearly dormant &amp; tough</td><td>A big live bait fished dead-slow right in the hole — patience game; few but possible</td></tr>
+        <tr><td class="s">Spring</td><td>Pre-spawn feeding as water warms; below dams &amp; on hole edges</td><td>Live sunfish/shad on the bottom near cover; rising water helps</td></tr>
+        <tr><td class="s">Summer</td><td><b>Prime</b> — by night they leave the logjams to hunt flats &amp; hole-mouths</td><td>Live bluegill/sunfish (where legal) on a slip-sinker rig at the edges of cover after dark</td></tr>
+        <tr><td class="s">Fall</td><td>Heavy feed-up before winter — among the best trophy windows</td><td>Big live baitfish near deep cover at dusk &amp; into the night</td></tr></table>
+        <h3>Weather &amp; water</h3>
+        <p>Flatheads are <b>night hunters</b> first and foremost — warm summer and fall nights are the prime time, and a big flathead bite often comes after full dark. They're more sight/lateral-line predators than the scent-driven channel cat, so the rising-muddy-water trick matters less than simply presenting a <b>lively bait</b> at the right ambush spot. Stable, warm conditions beat a cold front.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🎣 Heavy — you fish stout on purpose</h3><p style="margin:4px 0">A 7'6"–8' heavy rod with backbone, a strong baitcaster/conventional reel with a bait-clicker, and <b>50–80 lb braid</b>. A simple slip-sinker (Carolina) rig with a stout circle hook and a <b>live bluegill, sunfish or large shiner</b> (check your state's live-bait and game-fish rules). You go heavy because a big flathead will instantly try to bury you in the logjam it lives in.</p><div class="pick"><b>Solid picks:</b> Ugly Stik Catfish / Tiger rods, Abu Garcia 6500/7000-class or Penn conventional reels; 8/0–10/0 circle hooks.</div></div>
+        <div class="fightline"><span class="stars">★★★★★</span><b>Fight: 5/5 — a brutal slugfest.</b></div>
+        <p>A hooked flathead is one of fresh water's strongest fish: it doesn't run far, it <b>dives straight back into the cover</b> it ambushes from and tries to break you off in the wood, throwing its enormous bulk against the rod in heavy, head-shaking surges. There's no finesse — you lean on heavy gear and try to turn the fish before it reaches the snag. Mind the spines and that bucket of a mouth when you land one.</p>` },
+      { h:"Status &amp; relatives",
+        body:`<p>The flathead is the only member of its genus (<i>Pylodictis</i>), so it has no subspecies — just a pile of regional nicknames (yellow cat, shovelhead, mud cat, Appaloosa cat). It rounds out the big-three catfish with the <b>channel</b> and <b>blue</b> cats, but stands apart as the live-prey specialist. Where it's been <b>introduced outside its native range</b> (Atlantic-slope rivers like North Carolina's), it's an effective and sometimes damaging predator on native fish — never move flatheads between waters. <span class="src">See the Species ID guide for the flat head, jaw and squared tail tells.</span></p>` }
+    ],
+    conservation:"Big flatheads are old, slow-growing apex predators and (within their native range) worth releasing to keep the fishery and the river's balance healthy — keep a smaller one for the table instead. Where flatheads are introduced and invasive, agencies may encourage harvest. Follow live-bait and game-fish regulations carefully, and never transport live catfish to a new water.",
+    refs:[
+      {t:"Flathead catfish — Wikipedia", u:"https://en.wikipedia.org/wiki/Flathead_catfish"},
+      {t:"Catfish fishing basics — Take Me Fishing", u:"https://www.takemefishing.org/fish/freshwater-fish/catfish/"},
+      {t:"Flathead catfish — Missouri Department of Conservation Field Guide", u:"https://mdc.mo.gov/discover-nature/field-guide/flathead-catfish"},
+      {t:"Flathead vs blue vs channel ID — In-Fisherman", u:"https://www.in-fisherman.com/editorial/catfish/"}
+    ]
+  },
+  bluecat:{
+    tagline:"The giant of North American catfish — a powerful, current-loving, shad-chasing predator that tops 100 pounds and pulls like a freight train.",
+    sections:[
+      { h:"Identification",
+        body:"<i>Ictalurus furcatus</i>. Like the channel cat it has a <b>deeply forked tail</b>, but the blue is <b>slate-blue to gray with no spots</b>, heavier in the shoulders, and carries a <b>straight-edged anal fin with 30–36 rays</b> (the channel's anal fin is rounded with 24–29 rays). It's the <b>largest catfish in North America</b>, with state records ranging from roughly 100 to over 140 pounds." },
+      { h:"Biology &amp; life history",
+        body:"Blue cats are cavity nesters that spawn in early summer, and they're <b>long-lived</b> (commonly 20–30 years), reaching their giant sizes only over decades — so the true trophies are very old fish, mostly females. They need <b>big water with current or large reservoirs</b> and abundant shad to grow large, which is why they're a big-river and large-impoundment specialist." },
+      { h:"Behavior &amp; seasonal patterns",
+        body:"More than any other catfish, the blue is an <b>open-water, current-oriented predator</b> that roams river channels and reservoir flats <b>following shad schools</b>, suspending and chasing bait rather than just lying on the bottom. They feed in current seams, channel edges, holes and below dams. Unlike the flathead, blues stay active and feed well through <b>winter</b>, which is the prime trophy season in deep holes near wintering shad." },
+      { h:"Diet &amp; forage",
+        body:"Primarily <b>fish — especially shad</b> (live and fresh-dead), plus crayfish, mussels and whatever the river offers. The blue is more piscivorous than the channel cat, but, crucially and unlike the flathead, it <b>readily eats fresh cut bait</b>: a slab of fresh-cut shad or skipjack is the single best blue-cat bait there is. Freshness beats everything." }
+    ],
+    regions:[
+      { name:"Missouri &amp; the Mississippi/Missouri rivers (MO &amp; IL)",
+        body:"The native heartland. The <b>Missouri and Mississippi</b> rivers — and the famous waters around their confluence near St. Louis — produce true trophy blues, holding in the deep holes, wing-dam scour and channel edges near shad. Illinois shares this big-river fishery throughout the Mississippi and Ohio drainages." },
+      { name:"Arkansas (big rivers &amp; lakes)",
+        body:"The <b>Arkansas and Mississippi</b> rivers and several large reservoirs grow heavy blue cats, with drifting and anchoring fresh cut shad the standard approach in current and around shad concentrations." },
+      { name:"North Carolina (introduced giants)",
+        body:"Blue cats were <b>introduced</b> to North Carolina/Virginia waters and have exploded — the <b>Cape Fear, Roanoke and the Kerr/Badin</b> systems now give up 50–100 lb fish and host serious trophy fishing. As with the flathead, that success comes at a cost to native species, so they're considered invasive on the Atlantic slope and harvest is often encouraged." }
+    ],
+    extra:[
+      { h:"Season &amp; weather playbook — follow the shad",
+        body:`<p>Blue-cat fishing is shad-and-current fishing. Locate the bait and the current breaks, present fresh cut shad, and you can catch blues day or night, all year — including the dead of winter.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top approach</th></tr>
+        <tr><td class="s">Winter</td><td><b>Prime trophy time</b> — deep channel holes &amp; flats near wintering shad</td><td>Anchor or controlled-drift fresh-cut shad/skipjack through holes &amp; channel edges</td></tr>
+        <tr><td class="s">Spring</td><td>Pre-spawn feeding in current — below dams, wing dams, channel swings</td><td>Cut shad on a slip-sinker or three-way rig in the current seams</td></tr>
+        <tr><td class="s">Summer</td><td>Spawn, then post-spawn on ledges, holes &amp; flats; active at night too</td><td>Drift big flats &amp; ledges with cut bait; nights for shallower fish</td></tr>
+        <tr><td class="s">Fall</td><td>Heavy shad feed — fish gorge ahead of winter</td><td>Drift or anchor on shad schools with fresh cut chunks</td></tr></table>
+        <h3>Weather &amp; water</h3>
+        <p>Blues are far less night-dependent than flatheads — they <b>feed actively in daylight</b>, especially in current and during the cold months, so winter and current are your allies, not obstacles. Position is dictated by <b>where the shad are</b> and by current breaks; fresh cut bait and a little scent in the flow do the rest. Rising river levels concentrate fish on the new current edges.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🎣 Heavy, with drift capability</h3><p style="margin:4px 0">A 7'6"–8' medium-heavy to heavy rod, a stout baitcaster/conventional reel (line-counters help when drifting), and <b>30–65 lb</b> braid or mono. Use a <b>slip-sinker or three-way rig</b> to anchor in current, or a <b>Santee/float rig</b> to keep bait just off bottom while drifting flats. Big circle hooks (7/0–10/0) and <b>fresh-cut shad or skipjack</b> are the standard.</p><div class="pick"><b>Solid picks:</b> Ugly Stik Catfish, B'n'M / Whisker Seeker rods; Abu Garcia 6500–7000 or Penn conventional reels.</div></div>
+        <div class="fightline"><span class="stars">★★★★★</span><b>Fight: 5/5 — the strongest pull most anglers will feel.</b></div>
+        <p>A big blue catfish is raw, sustained power — it uses its bulk and the current to make <b>long, unstoppable runs</b> and dogged deep battles that can last many minutes. Hooked in heavy current, a trophy blue feels like you've snagged a moving truck. This is exactly why blue-cat anglers run heavy rods, big reels and stout line; anything lighter simply gets spooled or broken.</p>` },
+      { h:"Status &amp; relatives",
+        body:`<p>The blue cat completes the big-three with the channel and flathead. Sometimes called the 'high-fin blue' (a deep-bodied form) or 'Mississippi white cat', it has no meaningful subspecies. Where <b>introduced outside its native range</b> — the Chesapeake tributaries and North Carolina's Atlantic-slope rivers — it has become a dominant, invasive predator, so those states encourage harvest and prohibit moving them. <span class="src">Tell a blue from a channel by the straight-edged anal fin (30–36 rays) and the spotless blue-gray body — see the Species ID guide.</span></p>` }
+    ],
+    conservation:"Trophy blues are decades old and predominantly large females — release the giants (handle them in the water, support the body) and keep a smaller fish if you want one to eat, since blues are excellent table fare at modest sizes. Within the native range that protects the trophy fishery; where blues are invasive, harvest is encouraged. Never transport live catfish between waters.",
+    refs:[
+      {t:"Blue catfish — Wikipedia", u:"https://en.wikipedia.org/wiki/Blue_catfish"},
+      {t:"Catfish fishing basics — Take Me Fishing", u:"https://www.takemefishing.org/fish/freshwater-fish/catfish/"},
+      {t:"Blue catfish — Missouri Department of Conservation Field Guide", u:"https://mdc.mo.gov/discover-nature/field-guide/blue-catfish"},
+      {t:"Channel vs blue catfish ID — In-Fisherman", u:"https://www.in-fisherman.com/editorial/telling-channel-catfish-and-blue-catfish-apart/"}
+    ]
+  },
+  pike:{
+    tagline:"A toothy freshwater ambush predator built for the explosive strike — long, lean and mean, and the apex hunter of cool northern waters.",
+    sections:[
+      { h:"Identification",
+        body:"<i>Esox lucius</i>, the northern pike. A long, torpedo-shaped body with a flat, duck-bill snout full of teeth, and a single dorsal fin set far back near the tail. Greenish flanks marked with <b>rows of light, bean-shaped spots on a darker background</b> (the reverse of a muskie's dark-on-light marks). The <b>cheek is fully scaled and the gill cover is scaled only on its upper half</b> — the surest way to separate pike from muskie." },
+      { h:"Biology &amp; life history",
+        body:"Pike are among the earliest spawners, broadcasting eggs over flooded vegetation and marsh in cold water (about 40–52°F) right after ice-out, with no parental care. They grow fast and can reach 20–40+ inches, the big ones being old females. As a <b>cool-water fish</b> they're intolerant of warm summer water, which pushes the largest pike toward cooler, deeper haunts as the season heats up." },
+      { h:"Behavior &amp; seasonal patterns",
+        body:"The pike is a lie-in-wait <b>ambush predator</b>, hanging motionless along weed (cabbage) edges, points and drop-offs and exploding on anything that passes. After the spring spawn they feed aggressively in shallow weedy bays; through summer the big fish slide deep and cool while small 'hammer-handles' stay shallow; <b>fall</b> brings a heavy feed-up and the best trophy odds; and they stay active under the ice, a premier tip-up target." },
+      { h:"Diet &amp; forage",
+        body:"A voracious, opportunistic piscivore — perch, ciscoes, whitefish, suckers and smaller pike, plus frogs, crayfish and the occasional duckling or rodent. Pike are notably <b>cannibalistic</b> and eat large prey relative to their size. Match that with big, flashy baitfish imitations: large spoons, bucktails, swimbaits, jerk- and glidebaits." }
+    ],
+    regions:[
+      { name:"Illinois &amp; the upper Midwest (our southern edge)",
+        body:"Among FishDex's covered states, Illinois marks the southern fringe of good pike water: the <b>Fox Chain O'Lakes</b>, northern natural lakes, and the Mississippi River backwaters hold them. The species really hits its stride farther north." },
+      { name:"The North (the heartland)",
+        body:"The true pike country is the cold North — <b>Minnesota, Wisconsin, the Dakotas, the Northeast and across Canada</b>, where remote lakes grow giant 'gators' over 40 inches. It's a flagship species for both open-water casting and hard-water tip-up fishing." },
+      { name:"The South (absent)",
+        body:"Northern pike are a cool-water fish whose native range stops well north of the warm lowlands — they're essentially absent from Missouri's bootheel, Arkansas, Florida and lowland North Carolina. In the South their <b>Esox</b> relatives, the muskellunge (mountain reservoirs) and the chain pickerel, fill the toothy-predator niche." }
+    ],
+    extra:[
+      { h:"Season &amp; weather playbook — big baits for a big mood",
+        body:`<p>Pike location tracks water temperature: cool means shallow and aggressive, warm means deep (for the big ones). Throw flashy, sizable baits and always use a bite-proof leader.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top lures &amp; baits</th></tr>
+        <tr><td class="s">Winter (ice)</td><td>Weed edges &amp; drop-offs near the cool-season bait; active under ice</td><td>Tip-ups with big live shiners/suckers; jigging spoons &amp; large jigs</td></tr>
+        <tr><td class="s">Spring</td><td>Shallow, weedy, warming bays after the spawn — aggressive &amp; eager</td><td>Spoons (Daredevle), inline spinners &amp; bucktails, spinnerbaits, jerkbaits, swimbaits</td></tr>
+        <tr><td class="s">Summer</td><td>Big pike go deep &amp; cool (cabbage edges, main-lake structure); small fish stay shallow</td><td>Deeper presentations — large swimbaits, deep-running baits, big spoons; topwater &amp; bucktails in low light</td></tr>
+        <tr><td class="s">Fall</td><td><b>Prime trophy season</b> — heavy feed-up shallow to mid-depth before winter</td><td>Big glidebaits, large soft swimbaits, live suckers, oversized spoons &amp; bucktails</td></tr></table>
+        <h3>Weather &amp; light</h3>
+        <p>Cool water makes pike shallow and active; <b>overcast, wind and low light</b> embolden them and trigger reaction strikes, while bright, hot, calm conditions push the big fish deep and slow. A falling barometer ahead of a front can spark a vicious feed. Whatever the weather, a pike commits to the ambush — a confident, flashy retrieve past good cover draws the strike.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🎣 Medium-heavy + a bite leader (non-negotiable)</h3><p style="margin:4px 0">A 7'–7'6" medium-heavy rod with 30–50 lb braid, and <b>always a wire or heavy fluorocarbon (40–60 lb) leader</b> — a pike's teeth will shear straight mono or braid instantly. Throw large spoons (Daredevle), inline bucktails (Mepps Musky Killer), spinnerbaits, jerk/glidebaits and big soft swimbaits; topwater in summer.</p><div class="pick"><b>Handle with care:</b> long-nose pliers, jaw spreader and a cradle/net; support the fish horizontally and keep fingers clear of the teeth.</div></div>
+        <div class="gearbox"><h3>🐟 Fly</h3><p style="margin:4px 0">An 8–9wt with big flashy baitfish flies and a wire/heavy bite tippet — pike are a blast on the fly in shallow weedy water.</p></div>
+        <div class="fightline"><span class="stars">★★★★☆</span><b>Fight: 4/5 — a violent handful.</b></div>
+        <p>The pike's strike is the show — a sudden, savage T-bone — followed by strong, head-shaking runs and thrashing, especially boatside where a green pike can be genuinely dangerous to handle. They have power and a temper but tire fairly quickly. Keep steady pressure, get a good landing tool ready, and respect the teeth.</p>` },
+      { h:"Relatives &amp; hybrids — the Esox family",
+        body:`<p>The pike belongs to the pike family, <b>Esocidae</b>, alongside the larger <b>muskellunge</b> (light body with dark or no marks; only the upper half of cheek and gill cover scaled) and the smaller, southern <b>chain pickerel</b> and grass/redfin pickerels. Pike and muskie cross to produce the <b>'tiger muskie'</b> — a strikingly barred, fast-growing, usually sterile hybrid that many states stock for trophy potential. <span class="src">The pike-vs-muskie scaling and marking tells are in the Species ID guide.</span></p>` }
+    ],
+    conservation:"Big pike are old females and the engine of the population — release the trophies, supporting them horizontally and keeping them wet, and never hang a big one vertically. A wire leader isn't just about landing fish; it prevents deep-cut, lost-leader mortality. In summer's warm water, land and release pike quickly so they don't exhaust. Keep a few small 'eaters' if you like — they're excellent — but let the big girls swim.",
+    refs:[
+      {t:"Northern pike — Wikipedia", u:"https://en.wikipedia.org/wiki/Northern_pike"},
+      {t:"Northern pike fishing — Take Me Fishing", u:"https://www.takemefishing.org/fish/freshwater-fish/northern-pike/"},
+      {t:"Pike vs muskie ID — In-Fisherman", u:"https://www.in-fisherman.com/editorial/pike-musky/"},
+      {t:"Northern pike — Illinois DNR", u:"https://dnr.illinois.gov/"}
+    ]
+  },
+  redfish:{
+    tagline:"The bulldog of the flats — a copper-bronze inshore brawler with a signature tail spot, equally at home tailing in inches of marsh grass or bruising the surf as a giant bull.",
+    sections:[
+      { h:"Identification",
+        body:"<i>Sciaenops ocellatus</i>, the red drum. Coppery-bronze to reddish above, white-bellied, with a blunt nose and a down-turned, <b>inferior mouth</b> built for rooting the bottom. The hallmark is one (sometimes several) <b>black eyespot(s) at the base of the tail</b>. Young inshore fish are the 'slot' or 'rat' reds; mature fish become the huge nearshore <b>'bull reds'</b>. Known regionally as red drum, channel bass or spottail bass." },
+      { h:"Biology &amp; life history",
+        body:"Reds spawn in late summer and fall near passes and inlets — males produce the species' namesake <b>drumming</b> sound with their swim bladder. The young settle into estuaries and marshes and live <b>inshore for several years</b> as slot-size fish, then mature and move to nearshore waters as bulls. They are remarkably <b>long-lived</b>, reaching 30–40+ years, so the biggest bulls are very old, highly fecund spawners." },
+      { h:"Behavior &amp; seasonal patterns",
+        body:"Inshore reds root the bottom for crabs and shrimp over grass flats, oyster bars and marsh edges, and on a low tide they famously <b>'tail'</b> — head down, tail waving above the surface as they feed. They're strongly <b>tide-driven</b>, feeding hardest on moving water. In fall, big bulls stack up in the passes, beaches and surf to spawn; in winter, schools of slot reds pile into clear, shallow water and sun themselves on warm afternoons." },
+      { h:"Diet &amp; forage",
+        body:"Bottom-oriented opportunists — <b>shrimp, crabs, mullet and other baitfish</b>. That diet drives the classic lures: gold weedless spoons (mimicking a fleeing baitfish), soft-plastic shrimp and paddle-tails worked low, and natural baits like live shrimp and cut mullet fished on the bottom. Reds will also crush topwater in low light." }
+    ],
+    regions:[
+      { name:"Florida (year-round sight-fishing)",
+        body:"Among FishDex's covered states, Florida is the redfish jewel, on both coasts. The <b>Mosquito Lagoon and Indian River</b> on the Atlantic side are world-famous for sight-fishing big reds in clear, shallow water, while the Gulf grass flats and mangrove shorelines of <b>Tampa Bay, Charlotte Harbor</b> and the Everglades hold endless slot fish. A premier light-tackle and fly sight-fishery, fishable all year." },
+      { name:"North Carolina (red drum is the state fish)",
+        body:"North Carolina takes its 'old drum' seriously — it's the state saltwater fish. Trophy <b>bull reds</b> gather in <b>Pamlico Sound and around the Outer Banks</b> in fall (catch-and-release giants), while slot reds work the marshes, creeks and surf from spring through fall. The Atlantic's northern stronghold for the species." },
+      { name:"The Gulf Coast at large",
+        body:"Beyond Florida, the <b>Louisiana marsh</b> is the redfish mecca — vast, fertile estuaries loaded with slot and bull reds — with Texas, Mississippi and Alabama all strong. Across the Gulf, the redfish is <i>the</i> inshore gamefish." }
+    ],
+    extra:[
+      { h:"Season &amp; weather playbook — read the tide",
+        body:`<p>Redfish are a tide-and-structure game. Fish moving water around grass, oysters and marsh edges; in fall, switch gears for the big bulls in the passes and surf.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top baits &amp; presentations</th></tr>
+        <tr><td class="s">Spring</td><td>Warming flats, oyster bars &amp; marsh edges; spreading out to feed</td><td>Gold weedless spoon, paddle-tail on a jighead, popping cork + shrimp, live shrimp</td></tr>
+        <tr><td class="s">Summer</td><td>Flats early &amp; late; <b>tailing</b> on shallow low tides; mangrove edges</td><td>Sight-fishing soft plastics &amp; flies; topwater at dawn; live/cut bait on the bottom</td></tr>
+        <tr><td class="s">Fall</td><td><b>Bull-red run</b> — giants stack in passes, inlets, beaches &amp; surf to spawn</td><td>Cut mullet/crab &amp; big soft plastics on heavier gear; circle hooks; release the bulls</td></tr>
+        <tr><td class="s">Winter</td><td>Schools in clear, shallow backwater &amp; deeper holes; sunning on warm afternoons</td><td>Slow soft plastics &amp; live/dead shrimp; sight-fish the gin-clear schools on calm days</td></tr></table>
+        <h3>Tide, weather &amp; light</h3>
+        <p><b>Moving tides</b> are everything — a falling tide that pulls bait off the flats and concentrates fish (and exposes tailers) is prime, and reds set up to ambush on current edges, oyster bars and creek mouths. Wind and water clarity govern sight-fishing; a calm, clear morning is ideal for spotting tails and wakes. In winter, fish the warmest part of the day, when schools move onto shallow dark bottom to soak up heat.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🪶 Inshore spinning</h3><p style="margin:4px 0">A 7'–7'6" medium spinning rod with a 2500–4000 reel, <b>10–20 lb braid and a 20–30 lb fluorocarbon leader</b>. Throw gold weedless spoons, paddle-tail soft plastics on jigheads, a popping cork with shrimp or a soft plastic, topwater walkers, and live/cut bait on a knocker or fish-finder rig.</p><div class="pick"><b>Solid picks:</b> Penn Battle / Shimano Stradic reels on a St. Croix Mojo Inshore or similar rod.</div></div>
+        <div class="gearbox"><h3>🎣 Bull reds &amp; 🐟 fly</h3><p style="margin:4px 0">For bulls in passes/surf, step up to 5000–6000 reels or surf gear, 30–50 lb braid, heavy leader and circle hooks with cut mullet or crab. On the fly, an <b>8–9wt</b> with crab, shrimp and baitfish patterns (Clouser, Merkin, spoon fly) is the tailing-redfish dream.</p></div>
+        <div class="fightline"><span class="stars">★★★★★</span><b>Fight: 5/5 — updated. Pure bulldog.</b></div>
+        <p>We bumped the redfish to 5/5: even a slot fish fights like something twice its size, boring down with broad shoulders and a relentless, drag-peeling pull, and a big bull red is a long, grinding battle that tests your gear and your arms. There aren't dramatic jumps — just dogged, powerful runs that keep coming. Few inshore fish are more satisfying to land.</p>` },
+      { h:"Relatives &amp; variants — the drum family",
+        body:`<p>The red drum belongs to the croaker and drum family <b>Sciaenidae</b>, alongside the black drum, the spotted seatrout (specked trout) and the croakers — many of which 'drum' with their swim bladders. The signature <b>tail eyespot</b> is thought to fool predators into striking the tail instead of the head, and the number of spots varies — some reds sport several ocelli down the flank. Its many regional names — red drum, redfish, channel bass, spottail bass — all describe the same fish. <span class="src">Don't confuse the inshore reds with the freshwater drum found in rivers and lakes — different fish, same family.</span></p>` }
+    ],
+    conservation:"Redfish are managed with tight <b>slot limits</b> (keep a mid-size fish, release everything above the slot) precisely to protect the big bull spawners — the population famously rebounded from 1980s overharvest after slot rules and gamefish status. Release bulls in the water when you can, support them horizontally, and revive them fully; they're old, irreplaceable breeders. Always check the current state slot and bag limits before keeping one.",
+    refs:[
+      {t:"Red drum — Wikipedia", u:"https://en.wikipedia.org/wiki/Red_drum"},
+      {t:"Redfish (red drum) fishing — Take Me Fishing", u:"https://www.takemefishing.org/fish/saltwater-fish/red-drum/"},
+      {t:"Red drum — Florida FWC", u:"https://myfwc.com/fishing/saltwater/recreational/red-drum/"},
+      {t:"Red drum — NC Wildlife / Marine Fisheries", u:"https://www.deq.nc.gov/about/divisions/marine-fisheries"}
+    ]
+  },
+  snook:{
+    tagline:"Florida's explosive inshore gamefish — a structure-loving, line-burning ambush predator with a jutting jaw, a razor gill plate, and a famous sensitivity to cold.",
+    sections:[
+      { h:"Identification",
+        body:"<i>Centropomus undecimalis</i>, the common snook. A sleek, silvery body with a distinctly <b>sloping forehead</b>, a protruding lower jaw, and the unmistakable mark: a bold <b>black lateral line</b> running the full length of the body. The rear gill-plate edge is <b>razor-sharp</b> — it will cut leader and fingers. Florida has several snook species, but the common snook is the large, primary gamefish, reaching 40+ pounds." },
+      { h:"Biology &amp; life history",
+        body:"Snook spawn in summer in aggregations near passes, inlets and beaches. Most striking is their biology: they are <b>protandric hermaphrodites</b> — most begin life as males, and some transform into females as they grow large, so the biggest snook are typically females (a key reason to protect them). They are <b>cold-intolerant</b>: hard freezes cause large snook kills, which is what confines them to subtropical Florida and the warm Gulf." },
+      { h:"Behavior &amp; seasonal patterns",
+        body:"Snook are ambush predators that relate <b>tightly to structure and current</b> — mangrove roots, dock pilings, bridge fenders, jetties, passes and beaches — using current edges and shadow lines to wait for bait. They make a clear seasonal migration: out to the <b>passes and beaches to spawn in summer</b>, then back into the sheltered <b>backcountry rivers, creeks and canals for warmth in winter</b>. The night bite around dock and bridge lights is legendary." },
+      { h:"Diet &amp; forage",
+        body:"A current-feeding predator that inhales <b>baitfish</b> (pilchards, mullet, pinfish, sardines), shrimp and crabs with a big bucket of a mouth, usually ambushing prey swept past its structure by the tide. Match the local bait: free-lined live pilchards or mullet, shrimp, and lures that imitate fleeing baitfish — jigs, paddle-tails, twitchbaits and topwater." }
+    ],
+    regions:[
+      { name:"Florida (essentially the entire range)",
+        body:"Within FishDex's covered states, snook are a <b>Florida fish</b>, flourishing on both coasts: the <b>Indian River Lagoon</b>, the <b>Ten Thousand Islands and Everglades</b> backcountry, <b>Tampa Bay</b>, the <b>Sanibel/Boca Grande passes</b>, and the beaches in summer. In winter they pile into rivers, canals, basins and warmwater refuges (power-plant outflows, springs). A flagship inshore gamefish with strict slot limits and closed seasons." },
+      { name:"The subtropical edge (cold-limited)",
+        body:"Snook range is policed by temperature — they're expanding slowly northward with warming trends but get knocked back by hard freezes, and they're <b>absent from the cooler states</b> (Missouri, Arkansas, Illinois, and the cooler waters of North Carolina). This is a tropical-to-subtropical fish, and cold is its boundary." }
+    ],
+    extra:[
+      { h:"Season &amp; weather playbook — current, structure &amp; lights",
+        body:`<p>Snook fishing means fishing structure on a moving tide, and following the fish from winter rivers to summer passes and beaches. Fish ambush points and be ready to turn a fish out of the pilings instantly.</p>
+        <table class="pb"><tr><th>Season</th><th>Where they hold</th><th>Top baits &amp; presentations</th></tr>
+        <tr><td class="s">Spring</td><td>Staging &amp; feeding up, moving from winter haunts toward the passes</td><td>Live bait (pilchards, shrimp), jigs &amp; paddle-tails, twitchbaits around structure</td></tr>
+        <tr><td class="s">Summer</td><td><b>Prime</b> — spawning at passes, inlets &amp; beaches; night bite at dock/bridge lights</td><td>Beach sight-fishing with flies &amp; jigs; free-lined live pilchards/mullet; topwater &amp; flies in the lights</td></tr>
+        <tr><td class="s">Fall</td><td>Transition back to the backcountry, gorging on the <b>mullet run</b></td><td>Big topwater walkers, swimbaits &amp; live mullet along beaches &amp; inlets</td></tr>
+        <tr><td class="s">Winter</td><td>Sluggish in warm refuges — rivers, canals, deep basins, springs &amp; outflows</td><td>Slow soft plastics &amp; live shrimp on warm afternoons; <b>don't fish them hard in a cold snap</b></td></tr></table>
+        <h3>Tide, light &amp; weather</h3>
+        <p>Snook ambush on <b>moving tides</b>, sitting in the current shadow of structure and picking off bait swept past — a falling tide that funnels bait through a pass or out of the mangroves is prime. The <b>night bite around dock and bridge lights</b> is a signature snook game, as fish stack in the shadow line and pick off illuminated bait. In winter, fish the warmest part of warm days and back off entirely during cold fronts — stressed snook in cold water die.</p>` },
+      { h:"Tackle &amp; gear — what to actually use",
+        body:`<div class="gearbox"><h3>🪶 Inshore spinning + a heavy leader</h3><p style="margin:4px 0">A 7'–7'6" medium-heavy spinning rod, 3000–5000 reel, 15–30 lb braid, and a <b>heavy 30–50 lb fluorocarbon leader</b> — non-negotiable, because snook wrap structure and their gill plate slices light leader. Free-line live pilchards, mullet or shrimp; throw jigs/paddle-tails, twitchbaits (MirrOlure) and topwater walkers around structure and lights.</p><div class="pick"><b>Solid picks:</b> Shimano Stradic / Penn Battle reels on a St. Croix Mojo Inshore-class rod.</div></div>
+        <div class="gearbox"><h3>🐟 Fly</h3><p style="margin:4px 0">An 8–9wt with baitfish and shrimp patterns shines around lights and on the beaches; keep that heavy bite leader.</p></div>
+        <div class="fightline"><span class="stars">★★★★★</span><b>Fight: 5/5 — explosive and unforgiving.</b></div>
+        <p>A snook eats with a violent thump and instantly bolts <b>back into the structure</b> it lives in — a piling, a dock, a mangrove root — with bulldogging head-shakes and slashing jumps. The fight is won or lost in the first two seconds: you must turn the fish and pull it away from the cover before it cuts you off on a barnacled piling or its own razor gill plate. Pound for pound, one of the most thrilling inshore fish to hook.</p>` },
+      { h:"Relatives &amp; biology notes",
+        body:`<p>Florida hosts several members of the snook genus <b>Centropomus</b> — the common snook (by far the largest and the primary target), plus the smaller fat snook, swordspine snook and tarpon snook. Their <b>protandric</b> sex change (male first, female later with size) means the trophy fish are usually females, which is exactly why slot limits and closed seasons that protect big fish matter so much for the population. <span class="src">Handle snook for release with wet hands, support them horizontally, and never touch the gills.</span></p>` }
+    ],
+    conservation:"Snook are tightly managed in Florida — <b>slot limits, closed seasons</b> (covering the summer spawn and the cold winter months), gamefish status (no commercial sale), and cold-kill harvest closures after major freezes. Release fish carefully: don't touch the gills or strip the slime, support the body horizontally, and revive fully. Protect the big females, and never stress or fish for snook during a hard cold snap, when they're already fighting to survive. Always check current FWC regulations before keeping one.",
+    refs:[
+      {t:"Common snook — Wikipedia", u:"https://en.wikipedia.org/wiki/Common_snook"},
+      {t:"Snook fishing — Take Me Fishing", u:"https://www.takemefishing.org/fish/saltwater-fish/snook/"},
+      {t:"Snook — Florida FWC", u:"https://myfwc.com/fishing/saltwater/recreational/snook/"},
+      {t:"Snook biology &amp; tactics — Florida Sportsman", u:"https://www.floridasportsman.com/"}
     ]
   }
 };
@@ -2228,13 +2680,16 @@ const PROFILE = {
     </div>
     <section><h2>Overview</h2><p>${f.habitat} ${f.tip}</p></section>`;
 
-  if(P&&P.sections) P.sections.forEach(s=>{ html+=`<section><h2>${s.h}</h2><p>${s.body}</p></section>`; });
+  if(P&&P.sections) P.sections.forEach(s=>{ html+=`<section><h2>${s.h}</h2><div class="sbody">${s.body}</div></section>`; });
 
   if(P&&P.regions&&P.regions.length){
     html+=`<section><h2>Regional profiles — same fish, different worlds</h2>`;
     P.regions.forEach(r=>{ html+=`<div class="region"><h3>${r.name}</h3><p style="margin:0">${r.body}</p></div>`; });
     html+=`</section>`;
   }
+
+  // Deep angling detail (seasonal/weather playbook, gear, flies, subspecies, fight)
+  if(P&&P.extra) P.extra.forEach(s=>{ html+=`<section><h2>${s.h}</h2><div class="sbody">${s.body}</div></section>`; });
 
   // Angling (from tactics)
   if(tac){
