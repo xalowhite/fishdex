@@ -84,6 +84,17 @@
   .cap{font-size:12px;color:var(--muted);margin-top:6px;text-align:center}
   footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:12px;margin-top:20px}
   .seg{display:inline-block;font-size:11px;background:#10333a;border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--accent2);margin-left:6px}
+  /* skill-level system */
+  .lvlbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+  .lvlbtn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:18px;padding:6px 14px;font-size:13px;cursor:pointer}
+  .lvlbtn.on{background:#23464f;border-color:var(--accent);color:var(--accent2);font-weight:700}
+  .card .lvl{position:absolute;top:10px;right:12px;font-size:11px}
+  .card{position:relative}
+  .lvl-b{color:#7bd88f}.lvl-i{color:#e9c96b}.lvl-a{color:#e98989}
+  .lvltag{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 8px;margin-left:8px;vertical-align:middle}
+  .lvltag.b{background:#10331c;color:#7bd88f;border:1px solid #1d5c33}
+  .lvltag.i{background:#332b10;color:#e9c96b;border:1px solid #5c4f1d}
+  .lvltag.a{background:#331010;color:#e98989;border:1px solid #5c1d1d}
 </style>
 </head>
 <body>
@@ -108,6 +119,13 @@
       <a class="btn" href="#fly">🪶 Fly Fishing 101</a>
       <a class="btn ghost" href="#spin">🎣 Spin &amp; Baitcast 101</a>
     </div>
+    <div class="lvlbar" id="lvlbar">
+      <span style="color:var(--muted);font-size:13px;margin-right:4px">Show topics for:</span>
+      <button class="lvlbtn on" data-lv="all">Everything</button>
+      <button class="lvlbtn" data-lv="b">🟢 New angler</button>
+      <button class="lvlbtn" data-lv="i">🟡 Improving</button>
+      <button class="lvlbtn" data-lv="a">🔴 Advanced</button>
+    </div>
     <div class="cards">
       <a class="card" href="#fly"><div class="ic">🪶</div><h3>Fly Fishing 101</h3><p>How the system works, the casts, your first outfit, and the styles of fly fishing.</p><div class="meta">Start here</div></a>
       <a class="card" href="#weights"><div class="ic">📏</div><h3>Rod-Weight Progression</h3><p>1–2wt creeks to 15wt marlin — what each rod is for, with a visual scale.</p><div class="meta">Gear</div></a>
@@ -123,6 +141,11 @@
       <a class="card" href="#ethics"><div class="ic">♻️</div><h3>Conservation &amp; Ethics</h3><p>Catch-and-release that works, fish handling, and stopping the spread of invasives.</p><div class="meta">Ethics</div></a>
       <a class="card" href="#glossary"><div class="ic">📖</div><h3>Glossary</h3><p>Fly &amp; spin terminology decoded in plain English.</p><div class="meta">Reference</div></a>
       <a class="card" href="#resources"><div class="ic">▶️</div><h3>Videos &amp; Resources</h3><p>The best free instruction — Orvis, BassResource, Animated Knots &amp; more.</p><div class="meta">Go deeper</div></a>
+      <a class="card" href="#reels"><div class="ic">⚙️</div><h3>Reels Deep-Dive</h3><p>Spinning sizes 1000–8000, baitcaster gear ratios, fly reels &amp; drag — what to buy and why.</p><div class="meta">Gear</div></a>
+      <a class="card" href="#hardbaits"><div class="ic">🐟</div><h3>Hard Baits: Full Selection</h3><p>Every crankbait depth class, jerkbaits, topwater types, swimbaits &amp; blades — and exactly where each belongs.</p><div class="meta">Tactics</div></a>
+      <a class="card" href="#flycasting"><div class="ic">🌀</div><h3>Fly Casting Clinic</h3><p>Every cast from roll to double-haul, wind from all four directions, and scenario playbooks.</p><div class="meta">Skills</div></a>
+      <a class="card" href="#rigmatch"><div class="ic">🧵</div><h3>Lines, Leaders &amp; Tippet Matchups</h3><p>From a #26 midge on 7X to a Sex Dungeon on a 300-grain sink tip — the complete matching system.</p><div class="meta">Reference</div></a>
+      <a class="card" href="#oddballs"><div class="ic">🐊</div><h3>Rough Fish &amp; Oddballs</h3><p>Bowfin, gar, carp, drum &amp; buffalo — seasonal placement, time of day, and why they make you better.</p><div class="meta">Tactics</div></a>
     </div>
   </div>
 
